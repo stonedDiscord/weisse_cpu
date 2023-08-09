@@ -66,4 +66,3 @@ jobs:
         path: |
          ./front-difference.jpg
          ./back-difference.jpg
-         ./back-sand-difference.jpg
