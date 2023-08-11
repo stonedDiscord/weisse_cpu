@@ -16,7 +16,7 @@ outputs:
     options:
       output: front-drawn.jpg
       auto_crop: true
-      zoom: 4
+      zoom: 6
       height: 3073
       width: 3664
       silk: "#d0d595"
