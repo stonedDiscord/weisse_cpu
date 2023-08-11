@@ -16,6 +16,9 @@ outputs:
     options:
       format: jpg
       output: front-drawn.jpg
+      auto_crop: true
+      height: 3073
+      width: 3664
       style:
         clad: "#5a645c"
         board: "#1e464e"
