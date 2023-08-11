@@ -29,6 +29,7 @@ outputs:
     dir: drawings
     options:
       bottom: true
+      mirror: true
       format: jpg
       output: back-drawn.jpg
       show_components: all
