@@ -11,7 +11,7 @@ outputs:
 
   - name: 'drawt'
     comment: "Drawings to compare the original top side against"
-    type: pcbdraw
+    type: render_3d
     dir: drawings
     options:
       format: jpg
