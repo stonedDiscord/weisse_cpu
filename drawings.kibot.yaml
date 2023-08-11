@@ -16,9 +16,7 @@ outputs:
     options:
       output: front-drawn.jpg
       auto_crop: true
-      zoom: 8
-      height: 3073
-      width: 3664
+      zoom: 7.5
       silk: "#d0d595"
 
   - name: 'drawb'
