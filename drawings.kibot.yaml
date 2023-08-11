@@ -14,17 +14,12 @@ outputs:
     type: render_3d
     dir: drawings
     options:
-      format: jpg
       output: front-drawn.jpg
       auto_crop: true
+      zoom: 2
       height: 3073
       width: 3664
-      style:
-        clad: "#5a645c"
-        board: "#1e464e"
-        copper: "#0e8986"
-        pads: "#a3b5c1"
-        silk: "#d0d595"
+      silk: "#d0d595"
 
   - name: 'drawb'
     comment: "Drawings to compare the original back side against"
