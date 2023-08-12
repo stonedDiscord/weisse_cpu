@@ -9064,7 +9064,7 @@
     (property "Value" "BD679" (at 69.85 77.4699 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
-    (property "Footprint" "Package_TO_SOT_THT:TO-220-3_Vertical" (at 69.85 73.66 0)
+    (property "Footprint" "Package_TO_SOT_THT:TO-126-3_Vertical" (at 69.85 73.66 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Datasheet" "~" (at 64.77 76.2 0)
