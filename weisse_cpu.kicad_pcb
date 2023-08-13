@@ -4426,7 +4426,7 @@
 
   (footprint "Package_DIP:DIP-16_W7.62mm" (layer "F.Cu")
     (tstamp b73c0525-1afb-4b96-9103-074b59d21904)
-    (at 160.125 290.3 90)
+    (at 161.26 290.3 90)
     (descr "16-lead though-hole mounted DIP package, row spacing 7.62 mm (300 mils)")
     (tags "THT DIP DIL PDIP 2.54mm 7.62mm 300mil")
     (property "Sheetfile" "weisse_cpu.kicad_sch")
@@ -4728,7 +4728,7 @@
 
   (footprint "Library:Batterie" (layer "F.Cu")
     (tstamp c6834225-7d5a-43a7-9f4d-a495617df91e)
-    (at 269.5 312)
+    (at 270.5 312)
     (property "Sheetfile" "weisse_cpu.kicad_sch")
     (property "Sheetname" "")
     (property "ki_description" "Single-cell battery")
