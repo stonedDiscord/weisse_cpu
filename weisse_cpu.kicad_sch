@@ -26877,6 +26877,32 @@
     )
   )
 
+  (symbol (lib_id "Device:C") (at 988.06 49.53 0) (unit 1)
+    (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
+    (uuid e8a22284-8804-41a1-ac7e-d6a019460b3f)
+    (property "Reference" "C110" (at 991.87 48.26 0)
+      (effects (font (size 1.27 1.27)) (justify left))
+    )
+    (property "Value" "C" (at 991.87 50.8 0)
+      (effects (font (size 1.27 1.27)) (justify left))
+    )
+    (property "Footprint" "Capacitor_THT:C_Rect_L9.0mm_W2.5mm_P7.50mm_MKT" (at 989.0252 53.34 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (property "Datasheet" "~" (at 988.06 49.53 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (pin "1" (uuid 07dd905e-6e82-40d6-bed5-e4bf9ee6c59c))
+    (pin "2" (uuid d08595e6-41a1-40ab-b32d-6dc0b49dcb45))
+    (instances
+      (project "weisse_cpu"
+        (path "/e63e39d7-6ac0-4ffd-8aa3-1841a4541b55"
+          (reference "C110") (unit 1)
+        )
+      )
+    )
+  )
+
   (symbol (lib_id "Device:D") (at 129.54 125.73 0) (mirror y) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid e8ae5714-b604-4a81-9c69-7d738d3a0188)
