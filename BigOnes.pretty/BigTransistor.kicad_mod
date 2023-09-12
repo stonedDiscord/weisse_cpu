@@ -34,4 +34,9 @@
   (pad "1" thru_hole circle (at -2 3.5 180) (size 1 1) (drill 0.4) (layers "*.Cu" "*.Mask") (tstamp 287c18e4-0230-42fe-8d13-5d6effb0088d))
   (pad "2" thru_hole circle (at 0 1 180) (size 1 1) (drill 0.4) (layers "*.Cu" "*.Mask") (tstamp f3f0ed51-faea-43a1-8bd7-043bf41660a6))
   (pad "3" thru_hole circle (at 2 3.5 180) (size 1 1) (drill 0.4) (layers "*.Cu" "*.Mask") (tstamp 15d38bfc-4e6d-493d-8ebe-26e83ba12127))
+  (model "${KICAD7_3DMODEL_DIR}/Package_TO_SOT_THT.3dshapes/TO-92_Wide.wrl"
+    (offset (xyz -2.5 -3.5 0.5))
+    (scale (xyz 1 1 1))
+    (rotate (xyz 30 0 0))
+  )
 )

@@ -11,11 +11,12 @@ outputs:
     dir: drawings
     options:
       output: front-drawn.jpg
-      width: 3600
-      height: 3000
+      width: 3700
+      height: 3111
       auto_crop: true
       zoom: 7
       silk: "#d0d595"
+      solder_mask: "#153e44d4"
 
   - name: 'drawb'
     comment: "Drawings to compare the original back side against"

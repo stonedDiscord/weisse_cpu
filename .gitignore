@@ -29,4 +29,5 @@ fp-info-cache
 *.csv
 
 drawings/
+difference/
 *.pdf

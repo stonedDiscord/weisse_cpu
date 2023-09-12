@@ -6,7 +6,7 @@ viewf: difference/front.jpg
 viewb: difference/back.jpg
 	gwenview $<
 
-difference/%.jpg: drawings/%.jpg
+difference/%.jpg: drawings/%-drawn.jpg
 	composite $< ./photo/$*.jpg -compose difference  ./difference/$*.jpg || true
 
 drawings/front.jpg drawings/back.jpg: drawings.kibot.yaml
