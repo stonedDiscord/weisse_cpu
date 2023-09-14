@@ -4,4 +4,5 @@
   (lib (name "8085")(type "KiCad")(uri "${KIPRJMOD}/8085.kicad_sym")(options "")(descr ""))
   (lib (name "Synthesizer")(type "KiCad")(uri "${KIPRJMOD}/Synthesizer.kicad_sym")(options "")(descr ""))
   (lib (name "DiodeArray")(type "KiCad")(uri "${KIPRJMOD}/DiodeArray.kicad_sym")(options "")(descr ""))
+  (lib (name "RTC")(type "KiCad")(uri "${KIPRJMOD}/RTC.kicad_sym")(options "")(descr ""))
 )
