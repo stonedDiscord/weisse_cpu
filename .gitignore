@@ -28,6 +28,5 @@ fp-info-cache
 *.xml
 *.csv
 
-drawings/
-difference/
+photo/
 *.pdf
