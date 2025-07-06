@@ -47145,7 +47145,7 @@
 		)
 	)
 	(global_label "M2A"
-		(shape input)
+		(shape output)
 		(at -71.12 205.74 0)
 		(fields_autoplaced yes)
 		(effects
@@ -47189,7 +47189,7 @@
 		)
 	)
 	(global_label "LIW3"
-		(shape input)
+		(shape output)
 		(at -252.73 300.99 0)
 		(fields_autoplaced yes)
 		(effects
@@ -49477,7 +49477,7 @@
 		)
 	)
 	(global_label "M5Ain"
-		(shape input)
+		(shape output)
 		(at 320.04 328.93 0)
 		(fields_autoplaced yes)
 		(effects
@@ -51897,7 +51897,7 @@
 		)
 	)
 	(global_label "LIW4out"
-		(shape output)
+		(shape input)
 		(at 308.61 326.39 0)
 		(fields_autoplaced yes)
 		(effects
@@ -52535,7 +52535,7 @@
 		)
 	)
 	(global_label "LIW1out"
-		(shape output)
+		(shape input)
 		(at 308.61 318.77 0)
 		(fields_autoplaced yes)
 		(effects
@@ -52865,7 +52865,7 @@
 		)
 	)
 	(global_label "LIW2out"
-		(shape output)
+		(shape input)
 		(at 308.61 321.31 0)
 		(fields_autoplaced yes)
 		(effects
@@ -52997,7 +52997,7 @@
 		)
 	)
 	(global_label "M2Ain"
-		(shape input)
+		(shape output)
 		(at 327.66 346.71 0)
 		(fields_autoplaced yes)
 		(effects
@@ -53349,7 +53349,7 @@
 		)
 	)
 	(global_label "LIW1"
-		(shape input)
+		(shape output)
 		(at -252.73 295.91 0)
 		(fields_autoplaced yes)
 		(effects
@@ -53591,7 +53591,7 @@
 		)
 	)
 	(global_label "M5Bin"
-		(shape input)
+		(shape output)
 		(at 322.58 331.47 0)
 		(fields_autoplaced yes)
 		(effects
@@ -53657,7 +53657,7 @@
 		)
 	)
 	(global_label "M2B"
-		(shape input)
+		(shape output)
 		(at -71.12 215.9 0)
 		(fields_autoplaced yes)
 		(effects
@@ -54933,7 +54933,7 @@
 		)
 	)
 	(global_label "LIW3out"
-		(shape output)
+		(shape input)
 		(at 308.61 323.85 0)
 		(fields_autoplaced yes)
 		(effects
@@ -56451,7 +56451,7 @@
 		)
 	)
 	(global_label "M1B"
-		(shape input)
+		(shape output)
 		(at -71.12 195.58 0)
 		(fields_autoplaced yes)
 		(effects
@@ -56495,7 +56495,7 @@
 		)
 	)
 	(global_label "M1A"
-		(shape input)
+		(shape output)
 		(at -71.12 185.42 0)
 		(fields_autoplaced yes)
 		(effects
@@ -57177,7 +57177,7 @@
 		)
 	)
 	(global_label "LIW2"
-		(shape input)
+		(shape output)
 		(at -252.73 298.45 0)
 		(fields_autoplaced yes)
 		(effects
@@ -59047,7 +59047,7 @@
 		)
 	)
 	(global_label "M2Bin"
-		(shape input)
+		(shape output)
 		(at 325.12 349.25 0)
 		(fields_autoplaced yes)
 		(effects
@@ -59993,7 +59993,7 @@
 		)
 	)
 	(global_label "M1Ain"
-		(shape input)
+		(shape output)
 		(at 314.96 341.63 0)
 		(fields_autoplaced yes)
 		(effects
