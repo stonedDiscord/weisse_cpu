@@ -30661,12 +30661,6 @@
 		(uuid "b1f04c3c-e8e5-4580-b062-bcec4f6af962")
 	)
 	(junction
-		(at 325.12 461.01)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "b279f884-54c7-4d49-8519-c62e40f32eca")
-	)
-	(junction
 		(at 210.82 814.07)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -34127,16 +34121,6 @@
 			(type default)
 		)
 		(uuid "386fca78-5e70-42d5-b86a-b14a15867506")
-	)
-	(wire
-		(pts
-			(xy 325.12 461.01) (xy 336.55 461.01)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "38af90cf-7811-4b5d-8bd2-c4922cc09337")
 	)
 	(wire
 		(pts
@@ -37997,16 +37981,6 @@
 			(type default)
 		)
 		(uuid "8998cb6f-0a15-4ef1-8f4e-3ee7e94b2ab3")
-	)
-	(wire
-		(pts
-			(xy 312.42 461.01) (xy 325.12 461.01)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "8a3e31fb-3211-4e8b-84ed-58052694a46b")
 	)
 	(wire
 		(pts
@@ -51998,6 +51972,28 @@
 			)
 		)
 	)
+	(global_label "RST75int"
+		(shape input)
+		(at 665.48 687.07 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "92b5eb19-f3a6-4a74-bdb2-0cca46dd61cd")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 676.8108 687.07 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+				(hide yes)
+			)
+		)
+	)
 	(global_label "LS5"
 		(shape input)
 		(at -252.73 283.21 0)
@@ -53276,22 +53272,22 @@
 	)
 	(global_label "RAMVCC"
 		(shape input)
-		(at 92.71 624.84 90)
+		(at 80.01 622.3 180)
 		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
-			(justify left)
+			(justify right)
 		)
 		(uuid "a6fc9d88-38e4-42a2-8de2-a0836c2df81f")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 92.71 614.4162 90)
+			(at 69.5862 622.3 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(justify left)
+				(justify right)
 				(hide yes)
 			)
 		)
@@ -56301,6 +56297,28 @@
 		(uuid "de02e336-c9d2-4ccd-9676-bd265f495220")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
 			(at 1108.1438 345.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+				(hide yes)
+			)
+		)
+	)
+	(global_label "RST75int"
+		(shape input)
+		(at 245.11 351.79 270)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "de725d80-edc3-4f2e-b41c-191faf02bb60")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 245.11 363.1208 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -71974,6 +71992,73 @@
 		)
 	)
 	(symbol
+		(lib_id "power:+5V")
+		(at 92.71 635 270)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "2792b307-1f3f-423b-9736-94513c9eb8bd")
+		(property "Reference" "#PWR0449"
+			(at 88.9 635 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "+5V"
+			(at 96.52 634.9999 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" ""
+			(at 92.71 635 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 92.71 635 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+5V\""
+			(at 92.71 635 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "f22edbcf-e67f-468a-bd17-205d3f3bb26c")
+		)
+		(instances
+			(project "weisse_cpu"
+				(path "/e63e39d7-6ac0-4ffd-8aa3-1841a4541b55"
+					(reference "#PWR0449")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "Connector:Conn_01x04_Pin")
 		(at 361.95 124.46 0)
 		(unit 1)
@@ -80521,7 +80606,7 @@
 	)
 	(symbol
 		(lib_id "power:GND")
-		(at 325.12 461.01 0)
+		(at 312.42 461.01 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -80530,7 +80615,7 @@
 		(fields_autoplaced yes)
 		(uuid "432f8c34-4573-4918-a9d2-e6a90fe456a9")
 		(property "Reference" "#PWR060"
-			(at 325.12 467.36 0)
+			(at 312.42 467.36 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -80539,7 +80624,7 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 325.12 466.09 0)
+			(at 312.42 466.09 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -80547,7 +80632,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 325.12 461.01 0)
+			(at 312.42 461.01 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -80556,7 +80641,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 325.12 461.01 0)
+			(at 312.42 461.01 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -80565,7 +80650,7 @@
 			)
 		)
 		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
-			(at 325.12 461.01 0)
+			(at 312.42 461.01 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -82458,72 +82543,6 @@
 		)
 	)
 	(symbol
-		(lib_id "power:+12V")
-		(at 347.98 619.76 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "4a697697-511a-4ee0-8e30-dbacba818f8f")
-		(property "Reference" "#PWR0410"
-			(at 347.98 623.57 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "+12V"
-			(at 347.98 614.68 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 347.98 619.76 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 347.98 619.76 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"+12V\""
-			(at 347.98 619.76 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "e3a68e3e-054a-429a-bfd4-02da3879d9f9")
-		)
-		(instances
-			(project ""
-				(path "/e63e39d7-6ac0-4ffd-8aa3-1841a4541b55"
-					(reference "#PWR0410")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "power:GND")
 		(at 770.89 462.28 0)
 		(unit 1)
@@ -84029,6 +84048,72 @@
 			(project "weisse_cpu"
 				(path "/e63e39d7-6ac0-4ffd-8aa3-1841a4541b55"
 					(reference "#PWR031")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 336.55 461.01 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "4e433db0-c317-4918-bd34-37b38d4c6f59")
+		(property "Reference" "#PWR0453"
+			(at 336.55 467.36 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 336.55 466.09 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 336.55 461.01 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 336.55 461.01 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
+			(at 336.55 461.01 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "f1aeee9c-6c13-4a5e-b74a-0a712a981394")
+		)
+		(instances
+			(project "weisse_cpu"
+				(path "/e63e39d7-6ac0-4ffd-8aa3-1841a4541b55"
+					(reference "#PWR0453")
 					(unit 1)
 				)
 			)
@@ -93493,6 +93578,73 @@
 		)
 	)
 	(symbol
+		(lib_id "power:+5V")
+		(at 90.17 622.3 270)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "6c71d91a-0714-4e61-ad32-98d4ae501112")
+		(property "Reference" "#PWR0450"
+			(at 86.36 622.3 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "+5V"
+			(at 93.98 622.2999 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" ""
+			(at 90.17 622.3 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 90.17 622.3 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+5V\""
+			(at 90.17 622.3 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "66fd4d47-a449-4cb0-b00f-8bf5b6fbfc96")
+		)
+		(instances
+			(project "weisse_cpu"
+				(path "/e63e39d7-6ac0-4ffd-8aa3-1841a4541b55"
+					(reference "#PWR0450")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "Triac_Thyristor:TIC126")
 		(at 798.83 797.56 180)
 		(unit 1)
@@ -101305,6 +101457,72 @@
 			(project "weisse_cpu"
 				(path "/e63e39d7-6ac0-4ffd-8aa3-1841a4541b55"
 					(reference "#PWR0337")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:+15V")
+		(at 347.98 619.76 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "831b23ce-4e51-4124-98ff-63b12722d8f2")
+		(property "Reference" "#PWR0410"
+			(at 347.98 623.57 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "+13V"
+			(at 345.186 614.934 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" ""
+			(at 347.98 619.76 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 347.98 619.76 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+15V\""
+			(at 347.98 619.76 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "642f4dca-60fc-4c74-9a40-faffd6cd0942")
+		)
+		(instances
+			(project "weisse_cpu"
+				(path "/e63e39d7-6ac0-4ffd-8aa3-1841a4541b55"
+					(reference "#PWR0410")
 					(unit 1)
 				)
 			)
@@ -111017,6 +111235,72 @@
 			(project "weisse_cpu"
 				(path "/e63e39d7-6ac0-4ffd-8aa3-1841a4541b55"
 					(reference "ICA8")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:+15V")
+		(at 312.42 453.39 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "9e43d0c2-2705-471f-8a3b-9a6e8a53ce3b")
+		(property "Reference" "#PWR0451"
+			(at 312.42 457.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "+13V"
+			(at 309.626 448.564 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" ""
+			(at 312.42 453.39 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 312.42 453.39 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+15V\""
+			(at 312.42 453.39 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "3bf4c8f1-33e1-4a51-bb0e-e4700f76496d")
+		)
+		(instances
+			(project "weisse_cpu"
+				(path "/e63e39d7-6ac0-4ffd-8aa3-1841a4541b55"
+					(reference "#PWR0451")
 					(unit 1)
 				)
 			)
@@ -125056,7 +125340,7 @@
 	)
 	(symbol
 		(lib_id "Transistor_BJT:BC557")
-		(at 90.17 629.92 0)
+		(at 85.09 624.84 90)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -125065,7 +125349,7 @@
 		(fields_autoplaced yes)
 		(uuid "cb659a8a-abe6-4220-89a9-1f29b7bd6bb2")
 		(property "Reference" "TR99"
-			(at 95.25 628.65 0)
+			(at 83.82 619.76 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -125074,7 +125358,7 @@
 			)
 		)
 		(property "Value" "BC557"
-			(at 95.25 631.19 0)
+			(at 86.36 619.76 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -125083,7 +125367,7 @@
 			)
 		)
 		(property "Footprint" "BigOnes:BigTransistor"
-			(at 95.25 631.825 0)
+			(at 86.995 619.76 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -125094,7 +125378,7 @@
 			)
 		)
 		(property "Datasheet" "https://www.onsemi.com/pub/Collateral/BC556BTA-D.pdf"
-			(at 90.17 629.92 0)
+			(at 85.09 624.84 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -125104,7 +125388,7 @@
 			)
 		)
 		(property "Description" "0.1A Ic, 45V Vce, PNP Small Signal Transistor, TO-92"
-			(at 90.17 629.92 0)
+			(at 85.09 624.84 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -142311,6 +142595,72 @@
 			(project "weisse_cpu"
 				(path "/e63e39d7-6ac0-4ffd-8aa3-1841a4541b55"
 					(reference "DM2")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 325.12 461.01 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "ff3597ed-5bc9-4b4f-960f-b5ca5a2c5e48")
+		(property "Reference" "#PWR0452"
+			(at 325.12 467.36 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 325.12 466.09 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 325.12 461.01 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 325.12 461.01 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
+			(at 325.12 461.01 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "72279340-bf9e-43cd-8988-c41d4243391c")
+		)
+		(instances
+			(project "weisse_cpu"
+				(path "/e63e39d7-6ac0-4ffd-8aa3-1841a4541b55"
+					(reference "#PWR0452")
 					(unit 1)
 				)
 			)
