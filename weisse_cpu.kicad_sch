@@ -29606,8 +29606,8 @@
 	)
 	(text_box "ROM & RAM"
 		(exclude_from_sim no)
-		(at 1033.78 17.78 0)
-		(size 134.62 137.16)
+		(at 1026.16 17.78 0)
+		(size 142.24 137.16)
 		(margins 0.9525 0.9525 0.9525 0.9525)
 		(stroke
 			(width 0)
@@ -33567,6 +33567,16 @@
 			(type default)
 		)
 		(uuid "323cebf7-6f55-44bd-a7ad-f30b4b3f96d6")
+	)
+	(wire
+		(pts
+			(xy 1043.94 134.62) (xy 1056.64 134.62)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "328871e6-97d7-4282-8d64-761216983910")
 	)
 	(wire
 		(pts
@@ -47226,6 +47236,28 @@
 			)
 		)
 	)
+	(global_label "WriteEXROM"
+		(shape input)
+		(at 1040.13 140.97 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "4a99424a-8223-46d3-a8dc-2d0ab3a7e358")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 1026.0777 140.97 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+				(hide yes)
+			)
+		)
+	)
 	(global_label "RAMVCC"
 		(shape input)
 		(at 317.5 668.02 180)
@@ -50218,6 +50250,28 @@
 			)
 		)
 	)
+	(global_label "WriteEXROM"
+		(shape input)
+		(at 144.78 619.76 270)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "761d4674-4018-446e-a641-6c32afa08a43")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 144.78 633.8123 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+				(hide yes)
+			)
+		)
+	)
 	(global_label "D5"
 		(shape input)
 		(at 275.59 331.47 180)
@@ -51573,28 +51627,6 @@
 		(uuid "87705379-6521-4a1b-8201-91a3d0f98876")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
 			(at 1432.56 44.4718 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
-				(hide yes)
-			)
-		)
-	)
-	(global_label "BUS_A11"
-		(shape input)
-		(at 1056.64 134.62 180)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid "884cdbb3-3316-4455-9b35-fc257c1eb58a")
-		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 1045.3696 134.62 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -55076,6 +55108,28 @@
 					(size 1.27 1.27)
 				)
 				(justify left)
+				(hide yes)
+			)
+		)
+	)
+	(global_label "BUS_A11"
+		(shape input)
+		(at 1040.13 128.27 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "b08b5cec-97bc-45d7-9e9a-7866f27b8fd3")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 1028.8596 128.27 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
 				(hide yes)
 			)
 		)
@@ -88406,6 +88460,79 @@
 			(project "weisse_cpu"
 				(path "/e63e39d7-6ac0-4ffd-8aa3-1841a4541b55"
 					(reference "#PWR029")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Jumper:Jumper_3_Bridged12")
+		(at 1040.13 134.62 90)
+		(mirror x)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board yes)
+		(dnp no)
+		(uuid "5295fd3c-98f2-403f-86cf-2757057343a7")
+		(property "Reference" "JP2"
+			(at 1037.59 133.3499 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "Jumper_3_Bridged12"
+			(at 1037.59 135.8899 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "BigOnes:PinHeader_1x03_P2.54mm_Vertical"
+			(at 1040.13 134.62 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 1040.13 134.62 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Jumper, 3-pole, pins 1+2 closed/bridged"
+			(at 1040.13 134.62 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "2"
+			(uuid "b1e500c0-5225-4a28-91d5-3a698934f25b")
+		)
+		(pin "3"
+			(uuid "24198240-5001-4268-af1d-8a2f584e2459")
+		)
+		(pin "1"
+			(uuid "c7cc0fba-377b-47e8-a8ff-81a27592ee49")
+		)
+		(instances
+			(project "weisse_cpu"
+				(path "/e63e39d7-6ac0-4ffd-8aa3-1841a4541b55"
+					(reference "JP2")
 					(unit 1)
 				)
 			)
