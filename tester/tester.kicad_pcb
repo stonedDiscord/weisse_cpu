@@ -16113,7 +16113,7 @@
 		(descr "Lumberg MSF series connector, B16B-MSF-A (https://downloads.lumberg.com/datenblaetter/de/2_5msf_o.pdf), generated with kicad-footprint-generator")
 		(tags "connector Lumberg MSF vertical")
 		(property "Reference" "LAMPENSPALTEN1"
-			(at 18.75 2.49 -90)
+			(at 18.75 2.49 270)
 			(layer "F.SilkS")
 			(uuid "94bd0000-cdff-4dd3-85ed-d831a8aba086")
 			(effects
@@ -16586,7 +16586,7 @@
 		(descr "Lumberg MSF series connector, B16B-MSF-A (https://downloads.lumberg.com/datenblaetter/de/2_5msf_o.pdf), generated with kicad-footprint-generator")
 		(tags "connector Lumberg MSF vertical")
 		(property "Reference" "LAMPENZEILEN1"
-			(at 18.75 2.49 -90)
+			(at 18.75 2.49 270)
 			(layer "F.SilkS")
 			(uuid "9abbd7a3-845b-4d5b-99f3-76cdabfb945d")
 			(effects
