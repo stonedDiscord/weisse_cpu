@@ -4,43 +4,27 @@
 0x72        Sound
 */
 
-#include <stdint.h>
+#include <stdlib.h>
 
 #define KDC_DATA 0x50
 #define KDC_CMD 0x51
 
 #define WRITE_DISPLAY 0x80
 
-void io_out(uint8_t port, uint8_t data) {
-    /*
-    __asm
-    out (port), data
-    __endasm;
-    */
-}
-
-uint8_t io_in(uint8_t port) {
-    /*
-    __asm
-    in (port)
-    __endasm;
-    */
-}
-
 void kdc_cmd_out(uint8_t data) {
-    io_out(KDC_CMD, data);
+    io_outp(KDC_CMD, data);
 }
 
 void kdc_data_out(uint8_t data) {
-    io_out(KDC_DATA, data);
+    io_outp(KDC_DATA, data);
 }
 
 uint8_t kdc_cmd_in() {
-    return io_in(KDC_CMD);
+    return io_inp(KDC_CMD);
 }
 
 uint8_t kdc_data_in() {
-    return io_in(KDC_DATA);
+    return io_inp(KDC_DATA);
 }
 
 void writeLamps(uint8_t line, uint8_t data) {
