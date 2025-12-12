@@ -10,19 +10,19 @@
 #define WRITE_DISPLAY 0x80
 
 void kdc_cmd_out(int data) {
-    out(KDC_CMD, data);
+    outp(KDC_CMD, data);
 }
 
 void kdc_data_out(int data) {
-    out(KDC_DATA, data);
+    outp(KDC_DATA, data);
 }
 
 int kdc_cmd_in() {
-    return in(KDC_CMD);
+    return inp(KDC_CMD);
 }
 
 int kdc_data_in() {
-    return in(KDC_DATA);
+    return inp(KDC_DATA);
 }
 
 void writeLamps(int line, int data) {

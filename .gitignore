@@ -32,6 +32,7 @@ photo/
 *.pdf
 
 testrom/*.asm
+testrom/*.bin
 testrom/*.ihx
 testrom/*.lk
 testrom/*.lst
@@ -39,5 +40,6 @@ testrom/*.map
 testrom/*.mem
 testrom/*.noi
 testrom/*.rel
+testrom/*.rom
 testrom/*.rst
 testrom/*.sym
