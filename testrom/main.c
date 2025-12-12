@@ -4,35 +4,33 @@
 0x72        Sound
 */
 
-#include <stdlib.h>
-
 #define KDC_DATA 0x50
 #define KDC_CMD 0x51
 
 #define WRITE_DISPLAY 0x80
 
-void kdc_cmd_out(uint8_t data) {
-    io_outp(KDC_CMD, data);
+void kdc_cmd_out(int data) {
+    out(KDC_CMD, data);
 }
 
-void kdc_data_out(uint8_t data) {
-    io_outp(KDC_DATA, data);
+void kdc_data_out(int data) {
+    out(KDC_DATA, data);
 }
 
-uint8_t kdc_cmd_in() {
-    return io_inp(KDC_CMD);
+int kdc_cmd_in() {
+    return in(KDC_CMD);
 }
 
-uint8_t kdc_data_in() {
-    return io_inp(KDC_DATA);
+int kdc_data_in() {
+    return in(KDC_DATA);
 }
 
-void writeLamps(uint8_t line, uint8_t data) {
+void writeLamps(int line, int data) {
     kdc_cmd_out(WRITE_DISPLAY | line);
     kdc_data_out(data);
 }
 
-void writeDigits(uint8_t digit, uint8_t mon, uint8_t srv) {
+void writeDigits(int digit, int mon, int srv) {
     kdc_cmd_out(WRITE_DISPLAY | digit + 8);
     kdc_data_out((mon << 4) | srv);
 }
@@ -45,7 +43,7 @@ void init_kdc() {
 }
 
 void main(void) {
-    uint8_t i;
+    int i;
 
     init_kdc();
 
@@ -59,11 +57,11 @@ void main(void) {
         writeDigits(i,0x03,0x04);
     }
 
-    uint8_t last_key = 0;
+    int last_key = 0;
 
     // Infinite loop to keep lamps on and scan keyboard
     while (1) {
-        uint8_t status = kdc_cmd_in();
+        int status = kdc_cmd_in();
         if ((status & 0x04) == 0) { // FIFO not empty
             last_key = kdc_data_in();
         }
