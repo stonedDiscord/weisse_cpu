@@ -6,36 +6,48 @@
 ; 0x60 - 0x6f 8256
 ; 0x72        Sound
 
+;RST0
+DI
+JMP     start
+JMP     start
+NOP
+;RST1
 JMP     start
 NOP
 JMP     start
 NOP
+;RST2
 JMP     start
 NOP
 JMP     start
 NOP
+;RST3
 JMP     start
 NOP
 JMP     start
 NOP
+;RST4
 JMP     start
 NOP
+;TRAP
 JMP     start
 NOP
+;RST5
 JMP     start
 NOP
+;RST5.5
 JMP     start
 NOP
+;RST6
 JMP     start
 NOP
+;RST6.5
 JMP     start
 NOP
+;RST7
 JMP     start
 NOP
-JMP     start
-NOP
-JMP     start
-NOP
+;RST7.5
 JMP     start
 NOP
 
