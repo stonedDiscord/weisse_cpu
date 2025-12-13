@@ -10,13 +10,7 @@ KDC_DATA        .EQU 0x50
 KDC_CMD         .EQU 0x51
 WRITE_DISPLAY   .EQU 0x80
 
-; =========================
-; Absolute code area
-; =========================
-.area CODE ABS
-.org 0x200
-
-        JMP START
+        JMP     START
 
 ; =========================
 ; Initialize 8279
