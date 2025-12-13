@@ -31,7 +31,6 @@ fp-info-cache
 photo/
 *.pdf
 
-testrom/*.asm
 testrom/*.bin
 testrom/*.ihx
 testrom/*.lk
