@@ -7,6 +7,37 @@
 ; 0x72        Sound
 
 JMP     start
+NOP
+JMP     start
+NOP
+JMP     start
+NOP
+JMP     start
+NOP
+JMP     start
+NOP
+JMP     start
+NOP
+JMP     start
+NOP
+JMP     start
+NOP
+JMP     start
+NOP
+JMP     start
+NOP
+JMP     start
+NOP
+JMP     start
+NOP
+JMP     start
+NOP
+JMP     start
+NOP
+JMP     start
+NOP
+JMP     start
+NOP
 
 ;data
 KDC_DATA:      EQU 50H

@@ -38,6 +38,7 @@ testrom/*.lst
 testrom/*.map
 testrom/*.mem
 testrom/*.noi
+testrom/*.o
 testrom/*.rel
 testrom/*.rom
 testrom/*.rst
