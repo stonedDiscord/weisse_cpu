@@ -11,28 +11,20 @@
 #define KDC_CMD 0x51
 #define WRITE_DISPLAY 0x80
 
-void kdc_cmd_out(int) {
-	__asm
-		out (KDC_CMD), data
-	__endasm;
+void kdc_cmd_out(int data) {
+	outp(KDC_CMD, data);
 }
 
-void kdc_data_out(int) {
-	__asm
-		out (KDC_DATA), data
-	__endasm;
+void kdc_data_out(int data) {
+	outp(KDC_DATA, data);
 }
 
 int kdc_cmd_in() {
-	__asm
-
-	__endasm;
+	return inp(KDC_CMD);
 }
 
 int kdc_data_in() {
-	__asm
-
-	__endasm;
+	return inp(KDC_DATA);
 }
 
 void writeLamps(int line, int data) {
