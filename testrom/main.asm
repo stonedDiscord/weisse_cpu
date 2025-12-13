@@ -6,7 +6,7 @@
 ; 0x60 - 0x6f 8256
 ; 0x72        Sound
 
-jmp     start
+JMP     start
 
 ;data
 KDC_DATA:      EQU 50H
@@ -70,13 +70,13 @@ DIGILP: CALL    WR_DIG
         ; Infinite loop to scan keyboard
 MAINLP: IN      KDC_CMD
         ANI     04H
-        JNZ     NO_KEY
+        JNZ     NOKEY
         ; Key pressed - read it
         IN      KDC_DATA
-        MOV     B, A
+        MOV	B, A
         JMP     DISPKY
-NO_KEY: MOV     B, 0
-DISPKY: MOV     A, B
+NOKEY:  MVI	B, 0
+DISPKY: MOV	A, B
         RRC
         RRC
         RRC
@@ -86,14 +86,11 @@ DISPKY: MOV     A, B
         MVI     C, 0
         MVI     B, 0
         CALL    WR_DIG
-
         MOV     A, B
         ANI     0FH
         MOV     D, A
         MVI     C, 1
         MVI     B, 0
         CALL    WR_DIG
-
         JMP     MAINLP
-
         HLT
