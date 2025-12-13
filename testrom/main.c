@@ -2,27 +2,30 @@
 0x50 - 0x51 8279
 0x60 - 0x6f 8256
 0x72        Sound
+
 */
 
-#define KDC_DATA 0x50
-#define KDC_CMD 0x51
+#include <stdlib.h>
+
+__sfr __at 0x50 KDC_DATA;
+__sfr __at 0x51 KDC_CMD;
 
 #define WRITE_DISPLAY 0x80
 
-void kdc_cmd_out(int data) {
-    outp(KDC_CMD, data);
+void kdc_cmd_out(signed char data) {
+    KDC_CMD = data;
 }
 
-void kdc_data_out(int data) {
-    outp(KDC_DATA, data);
+void kdc_data_out(signed char data) {
+    KDC_DATA =  data;
 }
 
 int kdc_cmd_in() {
-    return inp(KDC_CMD);
+    return KDC_CMD;
 }
 
 int kdc_data_in() {
-    return inp(KDC_DATA);
+    return KDC_DATA;
 }
 
 void writeLamps(int line, int data) {
