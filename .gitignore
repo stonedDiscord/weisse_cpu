@@ -43,3 +43,4 @@ testrom/*.rel
 testrom/*.rom
 testrom/*.rst
 testrom/*.sym
+testrom/*.zip

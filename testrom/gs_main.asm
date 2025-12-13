@@ -8,9 +8,9 @@
 
 ;RST0
 DI
-JMP     start
-JMP     start
+LXI     SP, 0C7FCH
 NOP
+JMP     reset
 ;RST1
 JMP     start
 NOP
@@ -92,9 +92,9 @@ WR_DIG: MOV     A, C
         RET
 
 ; Main program
-start:  CALL    KDCINI
+reset:  CALL    KDCINI
         ; Turn on all lamps
-        MVI     B, 0FFH
+start:  MVI     B, 0FFH
         MVI     C, 0
 LAMPLP: CALL    WRLAMP
         INR     C

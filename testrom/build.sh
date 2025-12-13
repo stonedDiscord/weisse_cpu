@@ -1,3 +1,5 @@
 #!/bin/bash
 
 docker run  -v .:/src/ z88dk/z88dk z88dk-z80asm -m8085 -b gs_main.asm
+rm testrom.zip
+7z a testrom.zip gs_main.bin
