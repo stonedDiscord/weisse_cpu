@@ -11,28 +11,38 @@
 #define KDC_CMD 0x51
 #define WRITE_DISPLAY 0x80
 
-void kdc_cmd_out(int data) {
-	outp(KDC_CMD, data);
+void kdc_cmd_out(char data) {
+    char test = data;
+	__asm
+        OUT KDC_CMD
+    __endasm;
 }
 
-void kdc_data_out(int data) {
-	outp(KDC_DATA, data);
+void kdc_data_out(char data) {
+    char test = data;
+	__asm
+        OUT KDC_DATA
+    __endasm;
 }
 
-int kdc_cmd_in() {
-	return inp(KDC_CMD);
+char kdc_cmd_in() {
+	__asm
+        IN KDC_CMD
+    __endasm;
 }
 
-int kdc_data_in() {
-	return inp(KDC_DATA);
+char kdc_data_in() {
+	__asm
+        IN KDC_DATA
+    __endasm;
 }
 
-void writeLamps(int line, int data) {
+void writeLamps(char line, char data) {
     kdc_cmd_out(WRITE_DISPLAY | line);
     kdc_data_out(data);
 }
 
-void writeDigits(int digit, int mon, int srv) {
+void writeDigits(char digit, char mon, char srv) {
     kdc_cmd_out(WRITE_DISPLAY | digit + 8);
     kdc_data_out((mon << 4) | srv);
 }
@@ -45,7 +55,7 @@ void init_kdc() {
 }
 
 void main(void) {
-    int i;
+    char i;
 
     init_kdc();
 
@@ -59,11 +69,11 @@ void main(void) {
         writeDigits(i,0x03,0x04);
     }
 
-    int last_key = 0;
+    char last_key = 0;
 
     // Infinite loop to keep lamps on and scan keyboard
     while (1) {
-        int status = kdc_cmd_in();
+        char status = kdc_cmd_in();
         if ((status & 0x04) == 0) { // FIFO not empty
             last_key = kdc_data_in();
         }
