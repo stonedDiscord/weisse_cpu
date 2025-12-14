@@ -52,19 +52,34 @@ JMP     start
 NOP
 
 ;data
-KDC_DATA:      EQU 50H
-KDC_CMD:       EQU 51H
-WRITE_DISPLAY: EQU 80H
+KDC_DATA:       EQU 50H
+KDC_CMD:        EQU 51H
+
+WRITE_DISPLAY:  EQU 80H
+CLEAR_DISPLAY:  EQU 0C1H
+END_INT:        EQU 0E0H
+READ_FIFO:      EQU 40H
 
 ; Initialize KDC
-KDCINI: MVI     A, 0CH
+KDCINI: MVI     A, 0CH  ; DD MODE 1 KKK MODE 4
         OUT     KDC_CMD
-        MVI     A, 3EH
+        MVI     A, 3EH  ; CLOCK 102 KHZ
         OUT     KDC_CMD
-        MVI     A, 0C1H
+        MVI     A, CLEAR_DISPLAY
         OUT     KDC_CMD
-        MVI     A, 0E0H
+        MVI     A, END_INT
         OUT     KDC_CMD
+        IN      KDC_CMD
+        RET
+
+; Read Sensor RAM
+; Input: E = line number
+RDKEY:  MOV     A,E
+        ANI     07H ; clamp to 7
+        MOV     E,A
+        ORI     READ_FIFO ; build command
+        OUT     KDC_CMD
+        IN      KDC_DATA
         RET
 
 ; Write to lamps
@@ -77,7 +92,7 @@ WRLAMP: MOV     A, C
         RET
 
 ; Write to digits
-; Input: C = digit number, B = mon, D = srv
+; Input: C = digit number, D = mon, B = srv
 WR_DIG: MOV     A, C
         ADI     8
         ORI     WRITE_DISPLAY
@@ -110,30 +125,27 @@ DIGILP: CALL    WR_DIG
         MOV     A, C
         CPI     8
         JNZ     DIGILP
+
         ; Infinite loop to scan keyboard
-MAINLP: IN      KDC_CMD
-        ANI     04H
-        JNZ     NOKEY
-        ; Key pressed - read it
-        IN      KDC_DATA
-        MOV	B, A
-        JMP     DISPKY
-NOKEY:  MVI	B, 0
-DISPKY: MOV	A, B
-        RRC
-        RRC
-        RRC
-        RRC
-        ANI     0FH
-        MOV     D, A
-        MVI     C, 0
-        MVI     B, 0
+MAINLP: MVI     A,END_INT
+        OUT     KDC_CMD
+
+        INR     E
+        MOV     A, E
+        ANI     07H     ; Mask to keep E in 0-7 range
+        MOV     E, A
+
+        CALL    RDKEY
+        MOV     B, A
+
+        MOV	A, E
+        MOV	D, E
+
+        MOV     C, E
         CALL    WR_DIG
-        MOV     A, B
-        ANI     0FH
-        MOV     D, A
-        MVI     C, 1
-        MVI     B, 0
-        CALL    WR_DIG
+        
+        CALL    WRLAMP
+        
+
         JMP     MAINLP
         HLT
