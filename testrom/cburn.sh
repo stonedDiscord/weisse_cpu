@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# Check if file exists and get its size
+if [ ! -f a.rom ]; then
+    echo "Error: a.rom not found"
+    exit 1
+fi
+
+current_size=$(stat -c%s a.rom)
+if [ $current_size -lt 1024 ]; then
+    echo "Padding a.rom from $current_size to 1024 bytes"
+    dd if=/dev/zero bs=1 count=$((1024 - current_size)) >> a.rom
+fi
+
+cat a.rom a.rom a.rom a.rom > c_8.bin
+cat c_8.bin c_8.bin c_8.bin c_8.bin > c_64.bin
+rm c_8.bin
+cat c_64.bin c_64.bin c_64.bin c_64.bin > c_1024.bin
+rm c_64.bin
+
+minipro -p "W27C512@DIP28" -w c_1024.bin

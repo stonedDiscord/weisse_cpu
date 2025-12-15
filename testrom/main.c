@@ -21,10 +21,13 @@
  */
 
 #include <stdint.h>
+#include "8256.h"
 #include "8279.h"
 
 #define KDC_DATA 0x50
 #define KDC_CMD 0x51
+
+
 
 /**
  * @brief Send command data to the 8279 keyboard/display controller
@@ -117,6 +120,23 @@ void writeDigits(uint8_t digit, uint8_t mon, uint8_t srv) {
 }
 
 /**
+ * @brief Set the 8279 keyboard/display controller clock divider
+ *
+ * @param divider Clock divider value (2-31)
+ *
+ * Sets the clock frequency for the 8279 controller. 
+ *
+ * @note Values outside the valid range will be clamped
+ */
+void set_kdc_clock(uint8_t divider) {
+    // Ensure divider is within valid range (2-31)
+    if (divider < 2) divider = 2;
+    if (divider > 31) divider = 31;
+    
+    kdc_cmd_out(I8279_CLOCK_DIVIDER_SET | divider);
+}
+
+/**
  * @brief Initialize the 8279 keyboard/display controller
  *
  * Sets up the controller in 16-bit display mode, left entry,
@@ -150,23 +170,6 @@ void delay(uint16_t ms) {
 }
 
 /**
- * @brief Set the 8279 keyboard/display controller clock divider
- *
- * @param divider Clock divider value (2-31)
- *
- * Sets the clock frequency for the 8279 controller. 
- *
- * @note Values outside the valid range will be clamped
- */
-void set_kdc_clock(uint8_t divider) {
-    // Ensure divider is within valid range (2-31)
-    if (divider < 2) divider = 2;
-    if (divider > 31) divider = 31;
-    
-    kdc_cmd_out(I8279_CLOCK_DIVIDER_SET | divider);
-}
-
-/**
  * @brief Main program entry point
  *
  * Initializes the 8279 controller, lights all indicator lamps,
@@ -179,33 +182,35 @@ void main(void) {
 
     init_kdc();
 
-    // Lamps
-    for (i = 0; i < 8; i++) {
-        writeLamps(i,0xFF);
-    }
-
-    // 7-Segment displays
-    for (i = 0; i < 8; i++) {
-        writeDigits(i,0x03,0x04);
-    }
-
-    uint8_t last_key = 0;
+    uint8_t keys[16];
 
     // Infinite loop to scan the keyboard
     while (1) {
-        delay(150);
-        last_key = readSram(i);
-        delay(150);
-        writeDigits(i, last_key >> 4, last_key & 0x0F);
-        delay(150);
-        writeLamps(i, last_key);
-        delay(150);
-     
+
+        delay(1000);
+        keys[i] = readSram(i);
+
+        writeDigits(0, keys[0] & 0x0F,  keys[1] & 0x0F);
+        writeDigits(1, keys[0] >> 4,    keys[1] >> 4);
+
+        writeDigits(2, keys[2] & 0x0F,  keys[3] & 0x0F);
+        writeDigits(3, keys[2] >> 4,    keys[3] >> 4);
+
+        writeDigits(4, keys[4] & 0x0F,  keys[5] & 0x0F);
+        writeDigits(5, keys[4] >> 4,    keys[5] >> 4);
+
+        writeDigits(6, keys[6] & 0x0F,  keys[7] & 0x0F);
+        writeDigits(7, keys[6] >> 4,    keys[7] >> 4);
+
+        if (i<4)
+            writeLamps(i, keys[i]);
+        
         kdc_cmd_out(I8279_END_INTERRUPT);
 
         i++;
-        if (i >= 8) {
+        if (i >= 16) {
             i = 0;
+            kdc_cmd_out(I8279_CLEAR | I8279_CLEAR_FIFO);
         }
     }
 }
