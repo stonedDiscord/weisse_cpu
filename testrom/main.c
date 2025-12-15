@@ -27,7 +27,7 @@
 #define KDC_DATA 0x50
 #define KDC_CMD 0x51
 
-
+#define MUART   0x60
 
 /**
  * @brief Send command data to the 8279 keyboard/display controller
@@ -79,6 +79,37 @@ uint8_t kdc_data_in() {
 	__asm
         POP HL
         IN KDC_DATA
+        MOV L,A
+        PUSH HL
+    __endasm;
+    return out;
+}
+
+/**
+ * @brief Read data from the 8256 MUART's Port 1
+ *
+ * @return uint8_t Data read from port
+ */
+uint8_t readPort1() {
+    uint8_t out;
+	__asm
+        POP HL
+        IN (MUART + I8256_PORT1)
+        MOV L,A
+        PUSH HL
+    __endasm;
+    return out;
+}
+
+/**
+ * @brief Read data from the 8256 MUART's Port 2
+ * @return uint8_t Data read from port
+ */
+uint8_t readPort2() {
+    uint8_t out;
+    __asm
+        POP HL
+        IN (MUART + I8256_PORT2)
         MOV L,A
         PUSH HL
     __endasm;
@@ -157,6 +188,30 @@ void init_kdc() {
 }
 
 /**
+ * @brief Initialize the 8256 MUART
+ */
+void init_muart() {
+	__asm
+        MVI A, I8256_CMD1_FRQ_1K | I8256_CMD1_8085 | I8256_CMD1_STOP_1 | I8256_CMD1_CHARLEN_8
+        OUT (MUART + I8256_CMD1)
+        MVI A, (I8256_CMD2_SCLK_DIV3 | 5) //4800baud
+        OUT (MUART + I8256_CMD2)
+        MVI A, (I8256_CMD3_RESET | I8256_CMD3_IAE | I8256_CMD3_RXE | I8256_CMD3_SET)
+        OUT (MUART + I8256_CMD3)
+        MVI A, (I8256_MODE_PORT2C_OO)
+        OUT (MUART + I8256_MODE)
+        MVI A, 0x70
+        OUT (MUART + I8256_PORT1C)
+        MVI A, 0xff
+        OUT (MUART + I8256_PORT2)
+        MVI A, 0x30
+        OUT (MUART + I8256_PORT1)
+        MVI A, 0xBA
+        OUT (MUART + I8256_INTAD)
+    __endasm;
+}
+
+/**
  * @brief Software delay function
  *
  * @param ms Number of milliseconds to delay
@@ -181,8 +236,11 @@ void main(void) {
     uint8_t i;
 
     init_kdc();
+    init_muart();
 
     uint8_t keys[16];
+    uint8_t port1;
+    uint8_t port2;
 
     // Infinite loop to scan the keyboard
     while (1) {
@@ -196,11 +254,14 @@ void main(void) {
         writeDigits(2, keys[2] & 0x0F,  keys[3] & 0x0F);
         writeDigits(3, keys[2] >> 4,    keys[3] >> 4);
 
-        writeDigits(4, keys[4] & 0x0F,  keys[5] & 0x0F);
-        writeDigits(5, keys[4] >> 4,    keys[5] >> 4);
+        port1 = readPort1();
+        port2 = readPort2();
 
-        writeDigits(6, keys[6] & 0x0F,  keys[7] & 0x0F);
-        writeDigits(7, keys[6] >> 4,    keys[7] >> 4);
+        writeDigits(4, port1 & 0x0F,  port1 & 0x0F);
+        writeDigits(5, port1 >> 4,    port1 >> 4);
+
+        writeDigits(6, port2 & 0x0F,  port2 & 0x0F);
+        writeDigits(7, port2 >> 4,    port2 >> 4);
 
         if (i<4)
             writeLamps(i, keys[i]);
