@@ -1,3 +1,11 @@
+/**
+ * @file 8279.h
+ * @brief Header file for Intel 8279 keyboard/display controller interface
+ *
+ * @author stonedDiscord
+ * @date 12.15.2025
+ */
+
 #include <stdbool.h>
 
 #define I8279_MODE_SET 0x00
@@ -31,18 +39,30 @@
 #define I8279_END_INTERRUPT 0xE0
 #define I8279_ERROR_MODE 0x10
 
+/**
+ * @brief FIFO status register structure for 8279 controller
+ *
+ * Contains the status information of the 8279's FIFO buffer including
+ * character count, error conditions, and buffer full status.
+ */
 struct FIFO_STATUS {
-    unsigned char count : 3;
-    bool full  : 1;
-    bool underrun : 1;
-    bool overrun  : 1;
-    bool senserr : 1;
-    bool displayerr : 1;
+    unsigned char count : 3;      ///< Number of characters in FIFO (0-8)
+    bool full  : 1;               ///< FIFO full flag
+    bool underrun : 1;            ///< FIFO underrun error flag
+    bool overrun  : 1;            ///< FIFO overrun error flag
+    bool senserr : 1;             ///< Sensor RAM error flag
+    bool displayerr : 1;          ///< Display RAM error flag
 };
 
+/**
+ * @brief Keyboard data structure for 8279 controller
+ *
+ * Contains the keyboard scan data including keycode, scan line,
+ * and modifier key status (shift and control).
+ */
 struct KB_DATA {
-    unsigned char keycode : 3;
-    unsigned char scan: 3;
-    bool shift: 1;
-    bool cntl: 1;
+    unsigned char keycode : 3;    ///< Key code (0-7)
+    unsigned char scan: 3;        ///< Scan line number (0-7)
+    bool shift: 1;                ///< Shift key pressed flag
+    bool cntl: 1;                 ///< Control key pressed flag
 };
