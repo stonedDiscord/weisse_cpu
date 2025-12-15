@@ -6,11 +6,10 @@
 */
 
 #include <stdint.h>
+#include "8279.h"
 
 #define KDC_DATA 0x50
 #define KDC_CMD 0x51
-#define WRITE_DISPLAY 0x80
-#define READ_SRAM 0x40
 
 void kdc_cmd_out(uint8_t data) {
     uint8_t test = data;
@@ -39,25 +38,29 @@ uint8_t kdc_data_in() {
 }
 
 uint8_t readSram(uint8_t addr) {
-    kdc_cmd_out(READ_SRAM | addr);
+    kdc_cmd_out(I8279_READ_SENSOR_RAM | addr);
     return kdc_data_in();
 }
 
 void writeLamps(uint8_t line, uint8_t data) {
-    kdc_cmd_out(WRITE_DISPLAY | line);
+    kdc_cmd_out(I8279_WRITE_DISPLAY_RAM | line);
     kdc_data_out(data);
 }
 
 void writeDigits(uint8_t digit, uint8_t mon, uint8_t srv) {
-    kdc_cmd_out(WRITE_DISPLAY | digit + 8);
+    kdc_cmd_out(I8279_WRITE_DISPLAY_RAM | digit + 8);
     kdc_data_out((mon << 4) | srv);
 }
 
 void init_kdc() {
-    kdc_cmd_out(0x0C);
-    kdc_cmd_out(0x3E);
-    kdc_cmd_out(0xC1);
-    kdc_cmd_out(0xE0);
+    kdc_cmd_out(I8279_MODE_SET |
+                I8279_MODE_DISPLAY_16BIT |
+                I8279_MODE_DISPLAY_LE |
+                I8279_MODE_KEYBOARD_ENCODED |
+                I8279_MODE_KEYBOARD_SENSOR_MATRIX);
+    kdc_cmd_out(I8279_CLOCK_DIVIDER_SET | 30);
+    kdc_cmd_out(I8279_CLEAR | I8279_CLEAR_ALL);
+    kdc_cmd_out(I8279_END_INTERRUPT);
 }
 
 void main(void) {
