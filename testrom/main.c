@@ -26,29 +26,39 @@ void kdc_data_out(uint8_t data) {
 }
 
 uint8_t kdc_cmd_in() {
+    uint8_t out;
 	__asm
+        POP HL
         IN KDC_CMD
+        MOV L,A
+        PUSH HL
     __endasm;
+    return out;
 }
 
 uint8_t kdc_data_in() {
+    uint8_t out;
 	__asm
+        POP HL
         IN KDC_DATA
+        MOV L,A
+        PUSH HL
     __endasm;
+    return out;
 }
 
 uint8_t readSram(uint8_t addr) {
-    kdc_cmd_out(I8279_READ_SENSOR_RAM | addr);
+    kdc_cmd_out(I8279_READ_SENSOR_RAM | (addr & 7));
     return kdc_data_in();
 }
 
 void writeLamps(uint8_t line, uint8_t data) {
-    kdc_cmd_out(I8279_WRITE_DISPLAY_RAM | line);
+    kdc_cmd_out(I8279_WRITE_DISPLAY_RAM | (line & 7));
     kdc_data_out(data);
 }
 
 void writeDigits(uint8_t digit, uint8_t mon, uint8_t srv) {
-    kdc_cmd_out(I8279_WRITE_DISPLAY_RAM | digit + 8);
+    kdc_cmd_out(I8279_WRITE_DISPLAY_RAM | ((digit & 7) + 8));
     kdc_data_out((mon << 4) | srv);
 }
 
@@ -61,6 +71,13 @@ void init_kdc() {
     kdc_cmd_out(I8279_CLOCK_DIVIDER_SET | 30);
     kdc_cmd_out(I8279_CLEAR | I8279_CLEAR_ALL);
     kdc_cmd_out(I8279_END_INTERRUPT);
+}
+
+void delay(uint16_t ms) {
+    uint16_t i;
+    for (i = 0; i < ms; i++) {
+        ;
+    }
 }
 
 void main(void) {
@@ -82,12 +99,20 @@ void main(void) {
 
     // Infinite loop to keep lamps on and scan keyboard
     while (1) {
+        delay(150);
         last_key = readSram(i);
-
+        delay(150);
         writeDigits(i, last_key >> 4, last_key & 0x0F);
+        delay(150);
         writeLamps(i, last_key);
+        delay(150);
+     
+        kdc_cmd_out(I8279_END_INTERRUPT);
 
         i++;
-        i = i & 7;
+        if (i >= 8) {
+            i = 0;
+        }
+
     }
 }
