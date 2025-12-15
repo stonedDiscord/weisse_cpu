@@ -5,44 +5,50 @@
 
 */
 
-#include <stdlib.h>
+#include <stdint.h>
 
 #define KDC_DATA 0x50
 #define KDC_CMD 0x51
 #define WRITE_DISPLAY 0x80
+#define READ_SRAM 0x40
 
-void kdc_cmd_out(char data) {
-    char test = data;
+void kdc_cmd_out(uint8_t data) {
+    uint8_t test = data;
 	__asm
         OUT KDC_CMD
     __endasm;
 }
 
-void kdc_data_out(char data) {
-    char test = data;
+void kdc_data_out(uint8_t data) {
+    uint8_t test = data;
 	__asm
         OUT KDC_DATA
     __endasm;
 }
 
-char kdc_cmd_in() {
+uint8_t kdc_cmd_in() {
 	__asm
         IN KDC_CMD
     __endasm;
 }
 
-char kdc_data_in() {
+uint8_t kdc_data_in() {
 	__asm
         IN KDC_DATA
     __endasm;
 }
 
-void writeLamps(char line, char data) {
+uint8_t readSram(uint8_t addr) {
+    kdc_cmd_out(READ_SRAM | addr);
+    return kdc_data_in();
+}
+
+void writeLamps(uint8_t line, uint8_t data) {
     kdc_cmd_out(WRITE_DISPLAY | line);
     kdc_data_out(data);
 }
 
-void writeDigits(char digit, char mon, char srv) {
+void writeDigits(uint8_t digit, uint8_t mon, uint8_t srv) {
     kdc_cmd_out(WRITE_DISPLAY | digit + 8);
     kdc_data_out((mon << 4) | srv);
 }
@@ -55,7 +61,7 @@ void init_kdc() {
 }
 
 void main(void) {
-    char i;
+    uint8_t i;
 
     init_kdc();
 
@@ -69,15 +75,16 @@ void main(void) {
         writeDigits(i,0x03,0x04);
     }
 
-    char last_key = 0;
+    uint8_t last_key = 0;
 
     // Infinite loop to keep lamps on and scan keyboard
     while (1) {
-        char status = kdc_cmd_in();
-        if ((status & 0x04) == 0) { // FIFO not empty
-            last_key = kdc_data_in();
-        }
-        writeDigits(0, last_key >> 4, 0);
-        writeDigits(1, 0, last_key & 0x0F);
+        uint8_t last_key = readSram(i);
+
+        writeDigits(i, last_key >> 4, last_key & 0x0F);
+        writeLamps(i, last_key);
+
+        i++;
+        i = i & 7;
     }
 }
