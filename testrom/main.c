@@ -82,7 +82,7 @@ void main(void) {
 
     // Infinite loop to keep lamps on and scan keyboard
     while (1) {
-        uint8_t last_key = readSram(i);
+        last_key = readSram(i);
 
         writeDigits(i, last_key >> 4, last_key & 0x0F);
         writeLamps(i, last_key);

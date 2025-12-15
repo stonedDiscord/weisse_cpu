@@ -1,6 +1,10 @@
 name: Build
 
-on: [push, pull_request]
+on:
+  push:
+    paths: ['testrom/main.c']
+  pull_request:
+    paths: ['testrom/main.c']
 
 jobs:
   build:
