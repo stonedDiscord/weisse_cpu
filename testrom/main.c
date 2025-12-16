@@ -91,7 +91,7 @@ uint8_t kdc_data_in() {
  * @return uint8_t Data read from port
  */
 uint8_t readPort1() {
-    uint8_t out;
+    uint8_t out=0xaa;
 	__asm
         POP HL
         IN (MUART + I8256_PORT1)
@@ -106,7 +106,7 @@ uint8_t readPort1() {
  * @return uint8_t Data read from port
  */
 uint8_t readPort2() {
-    uint8_t out;
+    uint8_t out=0xaa;
     __asm
         POP HL
         IN (MUART + I8256_PORT2)
