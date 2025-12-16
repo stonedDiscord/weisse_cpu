@@ -245,7 +245,7 @@ void main(void) {
     // Infinite loop to scan the keyboard
     while (1) {
 
-        delay(1000);
+        delay(45);
         keys[i] = readSram(i);
 
         writeDigits(0, keys[0] & 0x0F,  keys[1] & 0x0F);
@@ -257,13 +257,15 @@ void main(void) {
         port1 = readPort1();
         port2 = readPort2();
 
+        writeLamps(6, port1);
         writeDigits(4, port1 & 0x0F,  port1 & 0x0F);
         writeDigits(5, port1 >> 4,    port1 >> 4);
 
+        writeLamps(7, port2);
         writeDigits(6, port2 & 0x0F,  port2 & 0x0F);
         writeDigits(7, port2 >> 4,    port2 >> 4);
 
-        if (i<4)
+        if (i<6)
             writeLamps(i, keys[i]);
         
         kdc_cmd_out(I8279_END_INTERRUPT);
