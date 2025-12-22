@@ -294,6 +294,14 @@ void main(void) {
     uint8_t port1;
     uint8_t port2;
 
+
+    struct noteData track[4] = {{NOTE_C,A5,DURATION_WHOLE},{NOTE_D,A5,DURATION_QUARTER},{NOTE_E,A5,DURATION_QUARTER},{NOTE_F,A5,DURATION_QUARTER}};
+
+    for (i=0; i<4; i++) {
+        playSound(track[i]);
+        delay(500);
+    }
+
     // Infinite loop to scan the keyboard
     while (1) {
 
