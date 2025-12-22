@@ -113480,21 +113480,21 @@
 		(fields_autoplaced yes)
 		(uuid "8ee3d19c-c0cb-4729-ac8c-b9bd209b1c4a")
 		(property "Reference" "C134"
-			(at 1215.39 314.96 0)
+			(at 1223.01 312.4199 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(justify left)
+				(justify right)
 			)
 		)
-		(property "Value" "C"
-			(at 1215.39 312.42 0)
+		(property "Value" "10nF"
+			(at 1223.01 314.9599 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(justify left)
+				(justify right)
 			)
 		)
 		(property "Footprint" "Capacitor_THT:CP_Radial_Tantal_D4.5mm_P5.00mm"
@@ -145627,7 +145627,7 @@
 				)
 			)
 		)
-		(property "Value" "C"
+		(property "Value" "1uF"
 			(at 1211.961 290.83 90)
 			(effects
 				(font
