@@ -282,7 +282,7 @@ void init_muart() {
  */
 void delay(uint16_t ms) {
     uint16_t i;
-    for (i = 0; i < ms*250; i++) {
+    for (i = 0; i < ms*25; i++) {
         __asm
             NOP
         __endasm
