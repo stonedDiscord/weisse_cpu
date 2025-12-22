@@ -29,6 +29,8 @@
 
 #define MUART   0x60
 
+#define SOUND   0x72
+
 /**
  * @brief Send command data to the 8279 keyboard/display controller
  *
@@ -93,7 +95,7 @@ uint8_t kdc_data_in() {
 void playSound(uint8_t note) {
     uint8_t test = note;
 	__asm
-        OUT 0x72
+        OUT SOUND
     __endasm;
 }
 
