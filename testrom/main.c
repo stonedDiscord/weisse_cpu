@@ -57,9 +57,10 @@ typedef enum {
 struct noteData
 {
     /* data */
-    note_t note: 4;
-    uint8_t octave: 2;
     duration_t duration: 2;
+    uint8_t octave: 2;
+    note_t note: 4;   
+    
 };
 
 #include "track.c"
