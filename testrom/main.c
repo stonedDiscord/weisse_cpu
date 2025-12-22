@@ -169,6 +169,17 @@ uint8_t readPort2() {
 }
 
 /**
+ * @brief Read data from the 8279's display RAM
+ *
+ * @param addr Address in display RAM (0-15)
+ * @return uint8_t Data read from display RAM
+ */
+uint8_t readDram(uint8_t addr) {
+    kdc_cmd_out(I8279_READ_DISPLAY_RAM | (addr & 0x0F));
+    return kdc_data_in();
+}
+
+/**
  * @brief Read data from the 8279's sensor RAM
  *
  * @param addr Address in sensor RAM (0-7)
@@ -299,7 +310,7 @@ void main(void) {
 
     for (i=0; i<4; i++) {
         playSound(track[i]);
-        delay(500);
+        delay(1000);
     }
 
     // Infinite loop to scan the keyboard
