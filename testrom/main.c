@@ -282,8 +282,10 @@ void init_muart() {
  */
 void delay(uint16_t ms) {
     uint16_t i;
-    for (i = 0; i < ms; i++) {
-        ;
+    for (i = 0; i < ms*250; i++) {
+        __asm
+            NOP
+        __endasm
     }
 }
 
@@ -310,7 +312,7 @@ void main(void) {
 
     for (i=0; i<4; i++) {
         playSound(track[i]);
-        delay(1000);
+        delay(430);
     }
 
     // Infinite loop to scan the keyboard
