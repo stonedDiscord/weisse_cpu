@@ -282,7 +282,7 @@ void init_muart() {
  */
 void delay(uint16_t ms) {
     uint16_t i;
-    for (i = 0; i < ms*25; i++) {
+    for (i = 0; i < ms*5; i++) {
         __asm
             NOP
         __endasm
@@ -308,7 +308,7 @@ void main(void) {
     uint8_t port2;
 
 
-    struct noteData track[4] = {{NOTE_C,A5,DURATION_WHOLE},{NOTE_D,A5,DURATION_QUARTER},{NOTE_E,A5,DURATION_QUARTER},{NOTE_F,A5,DURATION_QUARTER}};
+    struct noteData track[4] = {{NOTE_C,A8,DURATION_WHOLE},{NOTE_D,A5,DURATION_QUARTER},{NOTE_E,A5,DURATION_QUARTER},{NOTE_F,A5,DURATION_QUARTER}};
 
     for (i=0; i<4; i++) {
         playSound(track[i]);
