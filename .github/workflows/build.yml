@@ -2,9 +2,9 @@ name: Build
 
 on:
   push:
-    paths: ['testrom/main.c']
+    paths: ['testrom/*.c']
   pull_request:
-    paths: ['testrom/main.c']
+    paths: ['testrom/*.c']
 
 jobs:
   build:
