@@ -327,7 +327,7 @@ void main(void) {
         writeDigits(2, track[i][2],track[i][2]);
         writeDigits(3, track[i][3],track[i][3]);
         writeDigits(4, i,i);
-        delay(track[i][3]);
+        delay(track[i][3]*5);
     }
 
     powerOuts(0xFF);
