@@ -320,7 +320,7 @@ void main(void) {
     for (i=0; i<sizeof(track)/sizeof(track[0]); i++) {
         playSound(*(uint8_t*)&track[i]);
         writeDigits(0, i,i);
-        delay(860);
+        delay(680);
     }
 
     powerOuts(0xFF);
