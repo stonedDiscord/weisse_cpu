@@ -317,7 +317,10 @@ void main(void) {
     uint8_t port2;
 
     for (i=0; i<sizeof(track)/sizeof(track[0]); i++) {
-        struct noteData thisNote = {track[i][0],track[i][1],track[i][2]}
+        struct noteData thisNote;
+        thisNote.note = track[i][0];
+        thisNote.octave = track[i][1];
+        thisNote.duration = track[i][2];
         playSound(thisNote);
         writeDigits(0, track[i][0],track[i][0]);
         writeDigits(1, track[i][1],track[i][1]);
