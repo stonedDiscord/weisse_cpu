@@ -12,10 +12,15 @@ octave_map_midi = {5:3, 6:2, 7:1, 8:0}
 notes = []
 active_notes = {}
 current_time = 0
+tempo = 500000  # default 120 BPM
 
 mid = mido.MidiFile('apple.mid')
+ticks_per_beat = mid.ticks_per_beat
+
 for msg in mid:
     current_time += msg.time
+    if msg.type == 'set_tempo':
+        tempo = msg.tempo
     if msg.type == 'note_on' and msg.velocity > 0:
         active_notes[msg.note] = current_time
     elif msg.type == 'note_off' or (msg.type == 'note_on' and msg.velocity == 0):
@@ -39,9 +44,23 @@ for msg in mid:
             note_str = note_name_list[note]
             oct_str = octave_name_list[octave]
             dur_str = duration_name_list[dur]
-            notes.append((note_str, oct_str, dur_str))
+            notes.append((start_time, current_time, note_str, oct_str, dur_str))
 
-print("struct noteData track[] = {")
-for note, oct, dur in notes:
-    print(f"    {{{note}, {oct}, {dur}}},")
+print(f"tempo: {tempo}, ticks_per_beat: {ticks_per_beat}")
+
+# Sort notes by start_time
+notes.sort(key=lambda x: x[0])
+
+# Calculate delays in ms (duration of previous note)
+delays = [0]  # first note has no delay
+for i in range(1, len(notes)):
+    prev_start, prev_end = notes[i-1][0], notes[i-1][1]
+    prev_duration_beats = prev_end - prev_start
+    delay_ms = int(prev_duration_beats * (tempo / 1000000) * 1000)
+    delays.append(delay_ms)
+
+print("uint8_t track[][4] = {")
+for i, (start, end, note, oct, dur) in enumerate(notes):
+    delay = delays[i]
+    print(f"    {{{note}, {oct}, {dur}, {delay}}},")
 print("};")

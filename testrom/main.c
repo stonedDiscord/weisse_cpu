@@ -51,7 +51,7 @@ typedef enum {
     DURATION_EIGHTH = 0,
     DURATION_QUARTER = 1,
     DURATION_HALF = 2,
-    DURATION_WHOLE = 3,    
+    DURATION_WHOLE = 3,
 } duration_t;
 
 struct noteData
@@ -317,9 +317,14 @@ void main(void) {
     uint8_t port2;
 
     for (i=0; i<sizeof(track)/sizeof(track[0]); i++) {
-        playSound(*(uint8_t*)&track[i]);
-        writeDigits(0, i,i);
-        delay(680);
+        struct noteData thisNote = {track[i][0],track[i][1],track[i][2]}
+        playSound(thisNote);
+        writeDigits(0, track[i][0],track[i][0]);
+        writeDigits(1, track[i][1],track[i][1]);
+        writeDigits(2, track[i][2],track[i][2]);
+        writeDigits(3, track[i][3],track[i][3]);
+        writeDigits(4, i,i);
+        delay(track[i][3]);
     }
 
     powerOuts(0xFF);
