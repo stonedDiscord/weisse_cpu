@@ -54,14 +54,6 @@ typedef enum {
     DURATION_WHOLE = 3,
 } duration_t;
 
-struct noteData
-{
-    /* data */
-    note_t note: 4;
-    uint8_t octave: 2;
-    duration_t duration: 2;    
-};
-
 #include "track.c"
 
 #define KDC_DATA 0x50
@@ -144,6 +136,14 @@ void playSound(uint8_t note) {
 	__asm
         OUT SOUND
     __endasm;
+}
+
+void playNote(note_t note,octave_t octave,duration_t duration)
+{
+    uint8_t notedata = (note & 0x0F);
+    notedata |= ((octave & 0x03) << 4);
+    notedata |= ((duration & 0x03) << 6);
+    playSound(notedata);
 }
 
 /**
@@ -317,17 +317,13 @@ void main(void) {
     uint8_t port2;
 
     for (i=0; i<sizeof(track)/sizeof(track[0]); i++) {
-        struct noteData thisNote;
-        thisNote.note = track[i][0];
-        thisNote.octave = track[i][1];
-        thisNote.duration = track[i][2];
-        playSound(thisNote);
+        playNote(track[i][0],track[i][1],track[i][2]);
         writeDigits(0, track[i][0],track[i][0]);
         writeDigits(1, track[i][1],track[i][1]);
         writeDigits(2, track[i][2],track[i][2]);
         writeDigits(3, track[i][3],track[i][3]);
         writeDigits(4, i,i);
-        delay(track[i][3]*5);
+        delay(track[i][3]*10);
     }
 
     powerOuts(0xFF);
