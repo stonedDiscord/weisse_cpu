@@ -287,14 +287,18 @@ void init_muart() {
  * @brief Software delay function
  *
  * @param ms Number of milliseconds to delay
- * @note This is a simple busy-wait loop and not precise
+ * @note This is a simple busy-wait loop and not very precise
  */
 void delay(uint16_t ms) {
     uint16_t i;
-    for (i = 0; i < ms*5; i++) {
+    for (i = 0; i < ms; i++) {
+        for (uint8_t j = 0; j < 28; j++) {
         __asm
             NOP
+            NOP
+            NOP
         __endasm
+        }
     }
 }
 
@@ -315,6 +319,7 @@ void main(void) {
     uint8_t keys[16];
     uint8_t port1;
     uint8_t port2;
+
 
     for (i=0; i<sizeof(track)/sizeof(track[0]); i++) {
         playNote(track[i][0],track[i][1],track[i][2]);
