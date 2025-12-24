@@ -25,7 +25,7 @@
 #include "8279.h"
 
 typedef enum {
-    NOTE_CL = 0,
+    NOTE_INVALID = 0,
     NOTE_C = 1,
     NOTE_B = 2,
     NOTE_AS = 3,

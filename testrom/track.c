@@ -1,5 +1,4 @@
 uint8_t track[][4] = {
-    {NOTE_DS, A5, DURATION_EIGHTH, 0},
     {NOTE_CS, A5, DURATION_EIGHTH, 42},
     {NOTE_DS, A5, DURATION_EIGHTH, 128},
     {NOTE_DS, A5, DURATION_EIGHTH, 42},
