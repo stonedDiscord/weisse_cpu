@@ -189,7 +189,7 @@ def parse_midi_file(filename):
     for i in range(1, len(note_events)):
         delay = note_events[i]['absolute_delay'] - note_events[i-1]['absolute_delay']
         # Ensure no negative delays - use absolute value for overlapping notes
-        note_events[i]['delay'] = abs(delay)
+        note_events[i]['delay'] = abs(delay) // 8
     
     # First note has delay of 0 (starts immediately)
     if note_events:

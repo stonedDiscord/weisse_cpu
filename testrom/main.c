@@ -70,7 +70,7 @@ struct noteData
     note_t note: 4;
     octave_t octave: 2;
     duration_t duration: 2;
-    uint16_t length;
+    uint8_t length; //divided by 8
 };
 
 #include "track.c"
@@ -346,7 +346,7 @@ void main(void) {
     uint8_t port2;
 
     for (uint16_t i=0; i<sizeof(track)/sizeof(track[0]); i++) {
-        delay(track[i].length);
+        delay(track[i].length * 8);
         playNote(track[i].note, track[i].octave, track[i].duration);
         startSound();
         writeDigits(0, track[i].note, track[i].note);
