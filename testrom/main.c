@@ -24,6 +24,17 @@
 #include "8256.h"
 #include "8279.h"
 
+enum IO71 {
+    IO71_START_SOUND = 0x01,
+    IO71_GONG = 0x02,
+    IO71_MUTE = 0x04,
+    IO71_UG = 0x08,
+    IO71_DS = 0x10,
+    IO71_US = 0x20,
+    IO71_DM = 0x40,
+    IO71_UM = 0x80,
+};
+
 typedef enum {
     NOTE_INVALID = 0,
     NOTE_C = 1,
@@ -302,6 +313,12 @@ void delay(uint16_t ms) {
     }
 }
 
+void startSound() {
+    powerOuts(IO71_START_SOUND);
+    delay(1);
+    playSound(0);
+}
+
 /**
  * @brief Main program entry point
  *
@@ -320,18 +337,16 @@ void main(void) {
     uint8_t port1;
     uint8_t port2;
 
-
-    for (i=0; i<sizeof(track)/sizeof(track[0]); i++) {
+    for (uint16_t i=0; i<sizeof(track)/sizeof(track[0]); i++) {
+        delay(track[i][3]);
         playNote(track[i][0],track[i][1],track[i][2]);
+        startSound();
         writeDigits(0, track[i][0],track[i][0]);
         writeDigits(1, track[i][1],track[i][1]);
         writeDigits(2, track[i][2],track[i][2]);
         writeDigits(3, track[i][3],track[i][3]);
         writeDigits(4, i,i);
-        delay(track[i][3]*10);
     }
-
-    powerOuts(0xFF);
 
     // Infinite loop to scan the keyboard
     while (1) {
