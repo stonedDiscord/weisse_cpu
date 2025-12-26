@@ -205,17 +205,17 @@ def parse_midi_file(filename):
 def generate_track_c(note_events):
     """Generate C code for track array"""
     if not note_events:
-        return "uint8_t track[][4] = {};\n"
+        return "struct noteData track[] = {};\n"
     
-    lines = ["uint8_t track[][4] = {"]
+    lines = ["struct noteData track[] = {"]
     
     for i, event in enumerate(note_events):
         # Map note enum values to string names
         note_names = ['INVALID', 'C', 'B', 'AS', 'A', 'GS', 'G', 'FS', 'F', 'E', 'DS', 'D', 'CS']
-        line = f"    {{NOTE_{note_names[event['note']]}, " \
-               f"{['A8', 'A7', 'A6', 'A5'][event['octave']]}, " \
-               f"DURATION_{['EIGHTH', 'QUARTER', 'HALF', 'WHOLE'][event['duration']]}, " \
-               f"{event['delay']}}}"
+        line = f"    {{ .note = NOTE_{note_names[event['note']]}, " \
+               f".octave = {['A8', 'A7', 'A6', 'A5'][event['octave']]}, " \
+               f".duration = DURATION_{['EIGHTH', 'QUARTER', 'HALF', 'WHOLE'][event['duration']]}, " \
+               f".length = {event['delay']} }}"
         
         if i < len(note_events) - 1:
             line += ","
