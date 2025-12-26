@@ -159,10 +159,11 @@ void playSound(uint8_t note) {
 
 void playNote(uint8_t note, uint8_t octave, uint8_t duration)
 {
-    uint8_t notedata = (note & 0x0F);
-    notedata |= ((octave & 0x03) << 4);
-    notedata |= ((duration & 0x03) << 6);
-    playSound(notedata);
+    uint8_t l_notedata = 0;
+    l_notedata |= (note & 0x0F);
+    l_notedata |= ((duration & 0x03) << 4);
+    l_notedata |= ((octave & 0x03) << 6);    
+    playSound(l_notedata);
 }
 
 /**
@@ -324,7 +325,7 @@ void delay(uint16_t ms) {
 void startSound() {
     powerOuts(IO71_START_SOUND);
     delay(1);
-    playSound(0);
+    powerOuts(0);
 }
 
 /**
