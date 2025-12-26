@@ -35,7 +35,7 @@ enum IO71 {
     IO71_UM = 0x80,
 };
 
-typedef enum {
+typedef enum note {
     NOTE_INVALID = 0,
     NOTE_C = 1,
     NOTE_B = 2,
@@ -51,19 +51,27 @@ typedef enum {
     NOTE_CS = 12,
 } note_t;
 
-typedef enum {
+typedef enum octave {
     A8 = 0,
     A7 = 1,
     A6 = 2,
     A5 = 3,
 } octave_t;
 
-typedef enum {
+typedef enum duration {
     DURATION_EIGHTH = 0,
     DURATION_QUARTER = 1,
     DURATION_HALF = 2,
     DURATION_WHOLE = 3,
 } duration_t;
+
+struct noteData
+{
+    note_t note: 4;
+    octave_t octave: 2;
+    duration_t duration: 2;
+    uint16_t length;
+};
 
 #include "track.c"
 
@@ -149,7 +157,7 @@ void playSound(uint8_t note) {
     __endasm;
 }
 
-void playNote(note_t note,octave_t octave,duration_t duration)
+void playNote(uint8_t note, uint8_t octave, uint8_t duration)
 {
     uint8_t notedata = (note & 0x0F);
     notedata |= ((octave & 0x03) << 4);
@@ -338,14 +346,14 @@ void main(void) {
     uint8_t port2;
 
     for (uint16_t i=0; i<sizeof(track)/sizeof(track[0]); i++) {
-        delay(track[i][3]);
-        playNote(track[i][0],track[i][1],track[i][2]);
+        delay(track[i].length);
+        playNote(track[i].note, track[i].octave, track[i].duration);
         startSound();
-        writeDigits(0, track[i][0],track[i][0]);
-        writeDigits(1, track[i][1],track[i][1]);
-        writeDigits(2, track[i][2],track[i][2]);
-        writeDigits(3, track[i][3],track[i][3]);
-        writeDigits(4, i,i);
+        writeDigits(0, track[i].note, track[i].note);
+        writeDigits(1, track[i].octave, track[i].octave);
+        writeDigits(2, track[i].duration, track[i].duration);
+        writeDigits(3, track[i].length, track[i].length);
+        writeDigits(4, i, i);
     }
 
     // Infinite loop to scan the keyboard
