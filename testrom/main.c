@@ -138,6 +138,11 @@ uint8_t kdc_data_in() {
     return out;
 }
 
+/**
+ * @brief Set the power outputs via port 0x71
+ * Used for the sound timer and mute control
+ * @param data Data to write to the power outputs
+ */
 void powerOuts(uint8_t data) {
     uint8_t test = data;
 	__asm
@@ -146,24 +151,15 @@ void powerOuts(uint8_t data) {
 }
 
 /**
- * @brief Play a sound note
+ * @brief Set the sound note
  *
  * @param note Note value to play
  */
-void playSound(uint8_t note) {
+void setSound(uint8_t note) {
     uint8_t test = note;
 	__asm
         OUT SOUND
     __endasm;
-}
-
-void playNote(uint8_t note, uint8_t octave, uint8_t duration)
-{
-    uint8_t l_notedata = 0;
-    l_notedata |= (note & 0x0F);
-    l_notedata |= ((duration & 0x03) << 4);
-    l_notedata |= ((octave & 0x03) << 6);    
-    playSound(l_notedata);
 }
 
 /**
@@ -322,7 +318,13 @@ void delay(uint16_t ms) {
     }
 }
 
-void startSound() {
+void playNote(uint8_t note, uint8_t octave, uint8_t duration)
+{
+    uint8_t l_notedata = 0;
+    l_notedata |= (note & 0x0F);
+    l_notedata |= ((duration & 0x03) << 4);
+    l_notedata |= ((octave & 0x03) << 6);    
+    setSound(l_notedata);
     powerOuts(IO71_START_SOUND);
     delay(1);
     powerOuts(0);
@@ -349,7 +351,6 @@ void main(void) {
     for (uint16_t i=0; i<sizeof(track)/sizeof(track[0]); i++) {
         delay(track[i].length * 8);
         playNote(track[i].note, track[i].octave, track[i].duration);
-        startSound();
         writeDigits(0, track[i].note, track[i].note);
         writeDigits(1, track[i].octave, track[i].octave);
         writeDigits(2, track[i].duration, track[i].duration);
