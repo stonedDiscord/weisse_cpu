@@ -177,11 +177,22 @@ uint8_t readStatus() {
  *
  * @param txdata Data to transmit
  */
-void printSerial(uint8_t txdata) {
+void printSerialChar(uint8_t txdata) {
     uint8_t test = txdata;
 	__asm
         OUT MUART + I8256_BUFFER
     __endasm;
+}
+
+uint8_t readSerialChar() {
+    uint8_t out=0xaa;
+    __asm
+        POP HL
+        IN (MUART + I8256_BUFFER)
+        MOV L,A
+        PUSH HL
+    __endasm;
+    return out;
 }
 
 /**
@@ -311,7 +322,15 @@ void delay(uint16_t ms) {
 
 void waitTxReady() {
     while ((readStatus() & I8256_STATUS_TBE) == 0) {
-        delay(1);
+        delay(10);
+    }
+}
+
+printString(const char* str) {
+    while (*str) {
+        waitTxReady();
+        printSerialChar(*str);
+        str++;
     }
 }
 
@@ -358,14 +377,8 @@ void main(void) {
         // Print lyric to serial port
         if (track[i].lyric != 0) {
             const char* lyric = track[i].lyric;
-            while (*lyric) {
-                waitTxReady();
-                printSerial(*lyric);
-                writeLamps(0, *lyric);
-                lyric++;
-            }
-            waitTxReady();
-            printSerial(' '); // Add space between lyrics
+            printString(lyric);
+            printString(" ");
         }
         
         delay(track[i].length * 8);
@@ -403,6 +416,13 @@ void main(void) {
         if (i >= 16) {
             i = 0;
             kdc_cmd_out(I8279_CLEAR | I8279_CLEAR_FIFO);
+        }
+
+        if(readStatus() & I8256_STATUS_RBF) {
+            uint8_t rcv = readSerialChar();
+            // Echo received character
+            waitTxReady();
+            printSerialChar(rcv);
         }
     }
 }
