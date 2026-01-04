@@ -74,3 +74,12 @@
 #define I8256_MODE_T5C      0x20
 #define I8256_MODE_T24      0x40
 #define I8256_MODE_T35      0x80
+
+#define I8256_STATUS_FE    0x01
+#define I8256_STATUS_OE    0x02
+#define I8256_STATUS_PE    0x04
+#define I8256_STATUS_BD    0x08
+#define I8256_STATUS_TRE   0x10
+#define I8256_STATUS_TBE   0x20
+#define I8256_STATUS_RBF   0x40
+#define I8256_STATUS_INT   0x80

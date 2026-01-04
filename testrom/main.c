@@ -21,6 +21,7 @@
  */
 
 #include <stdint.h>
+#include <stddef.h>
 #include "8256.h"
 #include "8279.h"
 
@@ -149,6 +150,22 @@ uint8_t readPort2() {
     __asm
         POP HL
         IN (MUART + I8256_PORT2)
+        MOV L,A
+        PUSH HL
+    __endasm;
+    return out;
+}
+
+/**
+ * @brief Read status from the 8256 MUART
+ *
+ * @return uint8_t Status byte
+ */
+uint8_t readStatus() {
+    uint8_t out=0xaa;
+    __asm
+        POP HL
+        IN (MUART + I8256_STATUS)
         MOV L,A
         PUSH HL
     __endasm;
@@ -292,6 +309,12 @@ void delay(uint16_t ms) {
     }
 }
 
+void waitTxReady() {
+    while ((readStatus() & I8256_STATUS_TBE) == 0) {
+        delay(1);
+    }
+}
+
 void playNote(uint8_t note, uint8_t octave, uint8_t duration)
 {
     uint8_t l_notedata = 0;
@@ -331,6 +354,20 @@ void main(void) {
         writeDigits(2, track[i].duration, track[i].duration);
         writeDigits(3, track[i].length, track[i].length);
         writeDigits(4, i, i);
+        
+        // Print lyric to serial port
+        if (track[i].lyric != 0) {
+            const char* lyric = track[i].lyric;
+            while (*lyric) {
+                waitTxReady();
+                printSerial(*lyric);
+                writeLamps(0, *lyric);
+                lyric++;
+            }
+            waitTxReady();
+            printSerial(' '); // Add space between lyrics
+        }
+        
         delay(track[i].length * 8);
     }
 

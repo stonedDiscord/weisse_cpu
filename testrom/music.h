@@ -36,4 +36,5 @@ struct noteData
     octave_t octave: 2;
     duration_t duration: 2;
     uint8_t length; //divided by 8
+    const char* lyric; //lyric text for this note
 };
