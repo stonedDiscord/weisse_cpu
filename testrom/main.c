@@ -27,36 +27,64 @@
 
 enum IO71 {
     IO71_START_SOUND = 0x01,
-    IO71_GONG = 0x02,
-    IO71_MUTE = 0x04,
-    IO71_UG = 0x08,
-    IO71_DS = 0x10,
-    IO71_US = 0x20,
-    IO71_DM = 0x40,
-    IO71_UM = 0x80,
+    IO71_GONG        = 0x02,
+    IO71_MUTE        = 0x04,
+    IO71_UG          = 0x08,
+    IO71_DS          = 0x10,
+    IO71_US          = 0x20,
+    IO71_DM          = 0x40,
+    IO71_UM          = 0x80,
 };
 
 #include "track.c"
 
-#define KDC_DATA 0x50
-#define KDC_CMD 0x51
+#define KDC_DATA    0x50
+#define KDC_CMD     0x51
 
-#define MUART   0x60
+#define MUART       0x60
 
-#define SOUND   0x72
+#define COINS       0x70
+#define COUNTERS    0x71
+#define SOUND       0x72
 
+bool timer3_flag = false;
+bool timer5_flag = false;
 
+// timer2
 void _8085_int1() {
     uint8_t out=0xaa;
 }
+// timer3
 void _8085_int3() {
-    uint8_t out=0xaa;
+    timer3_flag = false;
 }
+// tx int
 void _8085_int5() {
     uint8_t out=0xaa;
 }
+//timer5
 void _8085_int7() {
-    uint8_t out=0xaa;
+    timer5_flag = false;
+}
+
+/**
+ * @brief Set Timer 3
+ *
+ * @param data Timer value
+ */
+void set_timer3(uint8_t data) {
+    uint8_t test = data;
+    __asm
+        OUT I8256_TIMER3
+    __endasm;
+}
+
+void wait_timer3(uint8_t data) {
+    timer3_flag = true;
+    set_timer3(data); // Set timer value as needed
+    while (timer3_flag) {
+        // Wait for timer3_flag to be cleared in interrupt
+    }
 }
 
 /**
@@ -66,7 +94,7 @@ void _8085_int7() {
  */
 void kdc_cmd_out(uint8_t data) {
     uint8_t test = data;
-	__asm
+    __asm
         OUT KDC_CMD
     __endasm;
 }
@@ -78,7 +106,7 @@ void kdc_cmd_out(uint8_t data) {
  */
 void kdc_data_out(uint8_t data) {
     uint8_t test = data;
-	__asm
+    __asm
         OUT KDC_DATA
     __endasm;
 }
@@ -90,7 +118,7 @@ void kdc_data_out(uint8_t data) {
  */
 uint8_t kdc_cmd_in() {
     uint8_t out;
-	__asm
+    __asm
         POP HL
         IN KDC_CMD
         MOV L,A
@@ -106,7 +134,7 @@ uint8_t kdc_cmd_in() {
  */
 uint8_t kdc_data_in() {
     uint8_t out;
-	__asm
+    __asm
         POP HL
         IN KDC_DATA
         MOV L,A
@@ -140,8 +168,8 @@ void _8085_int75() {
  */
 void powerOuts(uint8_t data) {
     uint8_t test = data;
-	__asm
-        OUT 0x71
+    __asm
+        OUT COUNTERS
     __endasm;
 }
 
@@ -152,7 +180,7 @@ void powerOuts(uint8_t data) {
  */
 void setSound(uint8_t note) {
     uint8_t test = note;
-	__asm
+    __asm
         OUT SOUND
     __endasm;
 }
@@ -173,7 +201,7 @@ void _8085_int55() {
  */
 uint8_t readPort1() {
     uint8_t out=0xaa;
-	__asm
+    __asm
         POP HL
         IN (MUART + I8256_PORT1)
         MOV L,A
@@ -220,7 +248,7 @@ uint8_t readStatus() {
  */
 void printSerialChar(uint8_t txdata) {
     uint8_t test = txdata;
-	__asm
+    __asm
         OUT MUART + I8256_BUFFER
     __endasm;
 }
@@ -322,7 +350,7 @@ void init_kdc() {
  * @brief Initialize the 8256 MUART
  */
 void init_muart() {
-	__asm
+    __asm
         MVI A, I8256_CMD1_FRQ_1K | I8256_CMD1_8085 | I8256_CMD1_STOP_1 | I8256_CMD1_CHARLEN_8
         OUT (MUART + I8256_CMD1)
         MVI A, (I8256_CMD2_SCLK_DIV3 | 5) //4800baud
@@ -349,6 +377,27 @@ void init_muart() {
  * @note This is a simple busy-wait loop and not very precise
  */
 void delay(uint16_t ms) {
+    uint8_t full_chunks = ms / 255;
+    uint8_t remainder = ms % 255;
+    
+    // Wait for full 255ms chunks
+    for (uint8_t i = 0; i < full_chunks; i++) {
+        wait_timer3(255);
+    }
+    
+    // Wait for the remaining milliseconds
+    if (remainder > 0) {
+        wait_timer3(remainder);
+    }
+}
+
+/**
+ * @brief Software delay function
+ *
+ * @param ms Number of milliseconds to delay
+ * @note This is a simple busy-wait loop and not very precise
+ */
+void dumb_delay(uint16_t ms) {
     uint16_t i;
     for (i = 0; i < ms; i++) {
         for (uint8_t j = 0; j < 28; j++) {
