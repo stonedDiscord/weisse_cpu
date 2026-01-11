@@ -68,6 +68,19 @@ void _8085_int7() {
 }
 
 /**
+ * @brief Enable Interrupts
+ *
+ * @param data Interrupt array
+ */
+void en_ints(uint8_t data) {
+    uint8_t test = data;
+    __asm
+        OUT (MUART + I8256_INTEN)
+        EI
+    __endasm;
+}
+
+/**
  * @brief Set Timer 3
  *
  * @param data Timer value
@@ -75,12 +88,13 @@ void _8085_int7() {
 void set_timer3(uint8_t data) {
     uint8_t test = data;
     __asm
-        OUT I8256_TIMER3
+        OUT (MUART + I8256_TIMER3)
     __endasm;
 }
 
 void wait_timer3(uint8_t data) {
     timer3_flag = true;
+    en_ints(I8256_INT_L3);
     set_timer3(data); // Set timer value as needed
     while (timer3_flag) {
         // Wait for timer3_flag to be cleared in interrupt
@@ -365,6 +379,8 @@ void init_muart() {
         OUT (MUART + I8256_PORT2)
         MVI A, 0x30
         OUT (MUART + I8256_PORT1)
+        MVI A, 0x08
+        OUT (MUART + I8256_INTEN)
         MVI A, 0xBA
         OUT (MUART + I8256_INTAD)
     __endasm;
@@ -374,7 +390,8 @@ void init_muart() {
  * @brief Software delay function
  *
  * @param ms Number of milliseconds to delay
- * @note This is a simple busy-wait loop and not very precise
+ * @note Timer 3 works at either 1kHz or 16kHz depending on configuration.
+ *       This function assumes a 1kHz timer for millisecond delays.
  */
 void delay(uint16_t ms) {
     uint8_t full_chunks = ms / 255;
@@ -412,7 +429,7 @@ void dumb_delay(uint16_t ms) {
 
 void waitTxReady() {
     while ((readStatus() & I8256_STATUS_TBE) == 0) {
-        delay(10);
+        delay(1);
     }
 }
 
@@ -471,7 +488,7 @@ void main(void) {
             printString(" ");
         }
         
-        delay(track[i].length * 8);
+        delay(track[i].length * 3);
     }
 
     // Infinite loop to scan the keyboard
