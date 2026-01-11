@@ -1,5 +1,4 @@
-docker run  -v .:/src/ z88dk/z88dk \
-zcc +z80 -clib=8085 -pragma-define:CRT_ORG_BSS=0xc000 -pragma-define:REGISTER_SP=0xc7f0 -pragma-define:CRT_ENABLE_INT55=2 -pragma-define:CRT_ENABLE_INT65=2 -pragma-define:CRT_ENABLE_INT75=2 main.c -create-app
+docker run  -v .:/src/ z88dk/z88dk zcc +z80 -clib=8085 -crt0=crt0.asm main.c -create-app
 
 rm testromc.zip
 7z a testromc.zip a.rom

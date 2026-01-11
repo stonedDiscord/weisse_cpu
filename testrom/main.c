@@ -45,6 +45,20 @@ enum IO71 {
 
 #define SOUND   0x72
 
+
+void _8085_int1() {
+    uint8_t out=0xaa;
+}
+void _8085_int3() {
+    uint8_t out=0xaa;
+}
+void _8085_int5() {
+    uint8_t out=0xaa;
+}
+void _8085_int7() {
+    uint8_t out=0xaa;
+}
+
 /**
  * @brief Send command data to the 8279 keyboard/display controller
  *
