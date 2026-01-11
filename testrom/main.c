@@ -106,8 +106,8 @@ uint8_t kdc_data_in() {
  *
  * Currently a placeholder function.
  */
-void kdc_interrupt() {
-    ;
+void _8085_int65() {
+    uint8_t out=0xaa;
 }
 
 /**
@@ -115,8 +115,8 @@ void kdc_interrupt() {
  *
  * Currently a placeholder function.
  */
-void scan_interrupt() {
-    ;
+void _8085_int75() {
+    uint8_t out=0xaa;
 }
 
 /**
@@ -148,8 +148,8 @@ void setSound(uint8_t note) {
  *
  * Currently a placeholder function.
  */
-void sound_interrupt() {
-    ;
+void _8085_int55() {
+    uint8_t out=0xaa;
 }
 
 /**
