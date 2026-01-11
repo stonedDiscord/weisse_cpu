@@ -33,6 +33,7 @@ photo/
 
 testrom/main.asm
 testrom/*.bin
+testrom/*.ic*6
 testrom/*.ihx
 testrom/*.lis
 testrom/*.lk

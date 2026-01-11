@@ -12,9 +12,6 @@ if [ $current_size -lt 4096 ]; then
     dd if=/dev/zero bs=1 count=$((4096 - current_size)) >> a.rom
 fi
 
-rm c_8.bin
-rm c_64.bin
-
 cat a.rom a.rom > c_8.bin
 cat c_8.bin c_8.bin c_8.bin c_8.bin > c_64.bin
 rm c_8.bin

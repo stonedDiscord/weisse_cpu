@@ -102,6 +102,24 @@ uint8_t kdc_data_in() {
 }
 
 /**
+ * @brief Keyboard/display controller interrupt handler RST65
+ *
+ * Currently a placeholder function.
+ */
+void kdc_interrupt() {
+    ;
+}
+
+/**
+ * @brief Scan interrupt handler RST75
+ *
+ * Currently a placeholder function.
+ */
+void scan_interrupt() {
+    ;
+}
+
+/**
  * @brief Set the power outputs via port 0x71
  * Used for the sound timer and mute control
  * @param data Data to write to the power outputs
@@ -123,6 +141,15 @@ void setSound(uint8_t note) {
 	__asm
         OUT SOUND
     __endasm;
+}
+
+/**
+ * @brief Sound interrupt handler RST55
+ *
+ * Currently a placeholder function.
+ */
+void sound_interrupt() {
+    ;
 }
 
 /**
