@@ -19,8 +19,12 @@
 
 #include <stdint.h>
 #include <stddef.h>
-#include "8256.h"
+
+#define I8279_IO    0x50
 #include "8279.h"
+
+#define I8256_IO    0x60
+#include "8256.h"
 
 enum COUNTER_VALS {
     COUNTERS_START_SOUND = 0x01,
@@ -34,11 +38,6 @@ enum COUNTER_VALS {
 };
 
 #include "track.c"
-
-#define KDC_DATA    0x50
-#define KDC_CMD     0x51
-
-#define MUART       0x60
 
 #define COINS       0x70
 #define COUNTERS    0x71
@@ -72,7 +71,7 @@ void _8085_int7() {
 void en_ints(uint8_t data) {
     uint8_t test = data;
     __asm
-        OUT (MUART + I8256_INTEN)
+        OUT (I8256_INTEN)
         EI
     __endasm;
 }
@@ -85,7 +84,7 @@ void en_ints(uint8_t data) {
 void set_timer3(uint8_t data) {
     uint8_t test = data;
     __asm
-        OUT (MUART + I8256_TIMER3)
+        OUT (I8256_TIMER3)
     __endasm;
 }
 
@@ -106,7 +105,7 @@ void wait_timer3(uint8_t data) {
 void kdc_cmd_out(uint8_t data) {
     uint8_t test = data;
     __asm
-        OUT KDC_CMD
+        OUT I8279_CMD
     __endasm;
 }
 
@@ -118,7 +117,7 @@ void kdc_cmd_out(uint8_t data) {
 void kdc_data_out(uint8_t data) {
     uint8_t test = data;
     __asm
-        OUT KDC_DATA
+        OUT I8279_DATA
     __endasm;
 }
 
@@ -131,7 +130,7 @@ uint8_t kdc_cmd_in() {
     uint8_t out;
     __asm
         POP HL
-        IN KDC_CMD
+        IN I8279_CMD
         MOV L,A
         PUSH HL
     __endasm;
@@ -147,7 +146,7 @@ uint8_t kdc_data_in() {
     uint8_t out;
     __asm
         POP HL
-        IN KDC_DATA
+        IN I8279_DATA
         MOV L,A
         PUSH HL
     __endasm;
@@ -214,7 +213,7 @@ uint8_t readPort1() {
     uint8_t out=0xaa;
     __asm
         POP HL
-        IN (MUART + I8256_PORT1)
+        IN (I8256_PORT1)
         MOV L,A
         PUSH HL
     __endasm;
@@ -229,7 +228,7 @@ uint8_t readPort2() {
     uint8_t out=0xaa;
     __asm
         POP HL
-        IN (MUART + I8256_PORT2)
+        IN (I8256_PORT2)
         MOV L,A
         PUSH HL
     __endasm;
@@ -245,7 +244,7 @@ uint8_t readStatus() {
     uint8_t out=0xaa;
     __asm
         POP HL
-        IN (MUART + I8256_STATUS)
+        IN (I8256_STATUS)
         MOV L,A
         PUSH HL
     __endasm;
@@ -260,7 +259,7 @@ uint8_t readStatus() {
 void printSerialChar(uint8_t txdata) {
     uint8_t test = txdata;
     __asm
-        OUT MUART + I8256_BUFFER
+        OUT I8256_BUFFER
     __endasm;
 }
 
@@ -268,7 +267,7 @@ uint8_t readSerialChar() {
     uint8_t out=0xaa;
     __asm
         POP HL
-        IN (MUART + I8256_BUFFER)
+        IN (I8256_BUFFER)
         MOV L,A
         PUSH HL
     __endasm;
@@ -367,23 +366,23 @@ void init_kdc() {
 void init_muart() {
     __asm
         MVI A, I8256_CMD1_FRQ_1K | I8256_CMD1_8085 | I8256_CMD1_STOP_1 | I8256_CMD1_CHARLEN_8
-        OUT (MUART + I8256_CMD1)
+        OUT (I8256_CMD1)
         MVI A, (I8256_CMD2_SCLK_DIV3 | 5) //4800baud
-        OUT (MUART + I8256_CMD2)
+        OUT (I8256_CMD2)
         MVI A, (I8256_CMD3_RESET | I8256_CMD3_IAE | I8256_CMD3_RXE | I8256_CMD3_SET)
-        OUT (MUART + I8256_CMD3)
+        OUT (I8256_CMD3)
         MVI A, (I8256_MODE_PORT2C_OO)
-        OUT (MUART + I8256_MODE)
+        OUT (I8256_MODE)
         MVI A, 0x70
-        OUT (MUART + I8256_PORT1C)
+        OUT (I8256_PORT1C)
         MVI A, 0xff
-        OUT (MUART + I8256_PORT2)
+        OUT (I8256_PORT2)
         MVI A, 0x30
-        OUT (MUART + I8256_PORT1)
+        OUT (I8256_PORT1)
         MVI A, 0x08
-        OUT (MUART + I8256_INTEN)
+        OUT (I8256_INTEN)
         MVI A, 0xBA
-        OUT (MUART + I8256_INTAD)
+        OUT (I8256_INTAD)
     __endasm;
 }
 

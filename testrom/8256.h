@@ -5,25 +5,31 @@
  * @author stonedDiscord
  * @date 15.12.2025
  */
+#ifndef HEADER_8256
+#define HEADER_8256
 
 #include <stdbool.h>
 
-#define I8256_CMD1          0x00
-#define I8256_CMD2          0x01
-#define I8256_CMD3          0x02
-#define I8256_MODE          0x03
-#define I8256_PORT1C        0x04
-#define I8256_INTEN         0x05
-#define I8256_INTAD         0x06
-#define I8256_BUFFER        0x07
-#define I8256_PORT1         0x08
-#define I8256_PORT2         0x09
-#define I8256_TIMER1        0x0a
-#define I8256_TIMER2        0x0b
-#define I8256_TIMER3        0x0c
-#define I8256_TIMER4    0x0d
-#define I8256_TIMER5        0x0e
-#define I8256_STATUS        0x0f
+#ifndef I8256_IO
+#error "Please set the I8256_IO base address before including this file."
+#endif
+
+#define I8256_CMD1          (I8256_IO + 0x00)
+#define I8256_CMD2          (I8256_IO + 0x01)
+#define I8256_CMD3          (I8256_IO + 0x02)
+#define I8256_MODE          (I8256_IO + 0x03)
+#define I8256_PORT1C        (I8256_IO + 0x04)
+#define I8256_INTEN         (I8256_IO + 0x05)
+#define I8256_INTAD         (I8256_IO + 0x06)
+#define I8256_BUFFER        (I8256_IO + 0x07)
+#define I8256_PORT1         (I8256_IO + 0x08)
+#define I8256_PORT2         (I8256_IO + 0x09)
+#define I8256_TIMER1        (I8256_IO + 0x0a)
+#define I8256_TIMER2        (I8256_IO + 0x0b)
+#define I8256_TIMER3        (I8256_IO + 0x0c)
+#define I8256_TIMER4        (I8256_IO + 0x0d)
+#define I8256_TIMER5        (I8256_IO + 0x0e)
+#define I8256_STATUS        (I8256_IO + 0x0f)
 
 
 #define I8256_CMD1_FRQ_16    0x00
@@ -92,3 +98,5 @@
 #define I8256_STATUS_TBE    0x20
 #define I8256_STATUS_RBF    0x40
 #define I8256_STATUS_INT    0x80
+
+#endif

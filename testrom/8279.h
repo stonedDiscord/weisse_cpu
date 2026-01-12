@@ -5,8 +5,18 @@
  * @author stonedDiscord
  * @date 15.12.2025
  */
+#ifndef HEADER_8279
+#define HEADER_8279
 
 #include <stdbool.h>
+
+#ifndef I8279_IO
+#error "Please set the I8279_IO address before including this file."
+#endif
+
+
+#define I8279_DATA    I8279_IO
+#define I8279_CMD     (I8279_DATA + 1)
 
 #define I8279_MODE_SET 0x00
 #define I8279_MODE_DISPLAY_8BIT 0x00
@@ -66,3 +76,5 @@ struct KB_DATA {
     bool shift: 1;                ///< Shift key pressed flag
     bool cntl: 1;                 ///< Control key pressed flag
 };
+
+#endif
