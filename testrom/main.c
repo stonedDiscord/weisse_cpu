@@ -359,6 +359,10 @@ void init_kdc() {
 
 /**
  * @brief Initialize the 8256 MUART
+ * 
+ * Configures the MUART for 4800 baud, 8 data bits, 1 stop bit,
+ * enables receiver and transmitter, sets port modes, and enables interrupts.
+ * 
  */
 void init_muart() {
     __asm
@@ -453,10 +457,9 @@ void playNote(uint8_t note, uint8_t octave, uint8_t duration)
 /**
  * @brief Main program entry point
  *
- * Initializes the 8279 controller, lights all indicator lamps,
- * displays test pattern on 7-segment displays, and enters
- * an infinite loop that continuously scans keyboard input
- * and updates displays accordingly.
+ * Initializes the controllers, plays the track
+ * and then displays the state of the inputs on the lamp matrix
+ * and echoes back any serial input
  */
 void main(void) {
     uint8_t i;
