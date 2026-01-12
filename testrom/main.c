@@ -1,16 +1,13 @@
 /**
  * @file main.c
- * @brief Main program for 8279 keyboard/display controller interface
+ * @brief Main program for adp Steuereinheit
  *
- * This program provides an interface to the Intel 8279 keyboard/display controller,
- * which manages a keyboard matrix and 7-segment displays. The controller is
- * connected via I/O ports and provides functions for reading keyboard input,
- * controlling indicator lamps, and driving 7-segment displays.
+ * This program interacts with a type of German slot machine in use from the late 1980s-early 1990s
  *
  * Hardware Configuration:
  * - 0x50-0x51: 8279 keyboard/display controller
- * - 0x60-0x6f: 8256 (if present)
- * - 0x72: Sound output
+ * - 0x60-0x6f: 8256 UART
+ * - 0x70-0x73: 8255
  *
  * The program initializes the controller in 16-bit display mode with encoded
  * keyboard scanning, then continuously scans for keyboard input and updates
@@ -25,15 +22,15 @@
 #include "8256.h"
 #include "8279.h"
 
-enum IO71 {
-    IO71_START_SOUND = 0x01,
-    IO71_GONG        = 0x02,
-    IO71_MUTE        = 0x04,
-    IO71_UG          = 0x08,
-    IO71_DS          = 0x10,
-    IO71_US          = 0x20,
-    IO71_DM          = 0x40,
-    IO71_UM          = 0x80,
+enum COUNTER_VALS {
+    COUNTERS_START_SOUND = 0x01,
+    COUNTERS_GONG        = 0x02,
+    COUNTERS_MUTE        = 0x04,
+    COUNTERS_UG          = 0x08,
+    COUNTERS_DS          = 0x10,
+    COUNTERS_US          = 0x20,
+    COUNTERS_DM          = 0x40,
+    COUNTERS_UM          = 0x80,
 };
 
 #include "track.c"
@@ -180,7 +177,7 @@ void _8085_int75() {
  * Used for the sound timer and mute control
  * @param data Data to write to the power outputs
  */
-void powerOuts(uint8_t data) {
+void counterOut(uint8_t data) {
     uint8_t test = data;
     __asm
         OUT COUNTERS
@@ -448,9 +445,9 @@ void playNote(uint8_t note, uint8_t octave, uint8_t duration)
     l_notedata |= ((duration & 0x03) << 4);
     l_notedata |= ((octave & 0x03) << 6);    
     setSound(l_notedata);
-    powerOuts(IO71_START_SOUND);
+    counterOut(COUNTERS_START_SOUND);
     delay(1);
-    powerOuts(0);
+    counterOut(0);
 }
 
 /**
