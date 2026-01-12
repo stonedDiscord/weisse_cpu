@@ -454,6 +454,29 @@ void playNote(uint8_t note, uint8_t octave, uint8_t duration)
     counterOut(0);
 }
 
+void playTrack()
+{
+    for (uint16_t i = 0; i < sizeof(track) / sizeof(track[0]); i++)
+    {
+        playNote(track[i].note, track[i].octave, track[i].duration);
+        writeDigits(0, track[i].note, track[i].note);
+        writeDigits(1, track[i].octave, track[i].octave);
+        writeDigits(2, track[i].duration, track[i].duration);
+        writeDigits(3, track[i].length, track[i].length);
+        writeDigits(4, i, i);
+
+        // Print lyric to serial port
+        if (track[i].lyric != 0)
+        {
+            const char *lyric = track[i].lyric;
+            printString(lyric);
+            printString(" ");
+        }
+
+        delay(track[i].length * 3);
+    }
+}
+
 /**
  * @brief Main program entry point
  *
@@ -473,28 +496,9 @@ void main(void) {
 
     delay(800);
 
-    for (uint16_t i=0; i<sizeof(track)/sizeof(track[0]); i++) {
-        playNote(track[i].note, track[i].octave, track[i].duration);
-        writeDigits(0, track[i].note, track[i].note);
-        writeDigits(1, track[i].octave, track[i].octave);
-        writeDigits(2, track[i].duration, track[i].duration);
-        writeDigits(3, track[i].length, track[i].length);
-        writeDigits(4, i, i);
-        
-        // Print lyric to serial port
-        if (track[i].lyric != 0) {
-            const char* lyric = track[i].lyric;
-            printString(lyric);
-            printString(" ");
-        }
-        
-        delay(track[i].length * 3);
-    }
-
     // Infinite loop to scan the keyboard
     while (1) {
 
-        delay(45);
         keys[i] = readSram(i);
 
         writeDigits(0, keys[0] & 0x0F,  keys[1] & 0x0F);
