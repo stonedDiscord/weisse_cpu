@@ -478,6 +478,39 @@ void playTrack()
 }
 
 /**
+ * @brief Macro to define a button with row, column, and inversion
+ *
+ * @param row Row number (0-7)
+ * @param col Column number (0-7)
+ * @param inverted Inversion flag (0 or 1)
+ */
+#define BUTTON(row, col, inverted) (uint8_t)(((row & 0x07) << 4) | (col & 0x0F) | ((inverted & 0x01) << 7))
+
+// Button definitions
+#define RISK_LEFT  BUTTON(3, 1, 1)
+#define RISK_RIGHT BUTTON(3, 0, 1)
+/**
+ * @brief Check the state of a button
+ *
+ * @param button Button identifier (row, column, and inversion flag)
+ * @return bool State of the button (0 or 1)
+ */
+bool check_button(uint8_t button) {
+    uint8_t row = (button >> 4) & 0x07;
+    uint8_t col = button & 0x0F;
+    uint8_t inverted = (button >> 7) & 0x01;
+    
+    uint8_t sram_data = readSram(row);
+    bool button_state = (sram_data >> col) & 0x01;
+    
+    if (inverted) {
+        return !button_state;
+    } else {
+        return button_state;
+    }
+}
+
+/**
  * @brief Main program entry point
  *
  * Initializes the controllers, plays the track
