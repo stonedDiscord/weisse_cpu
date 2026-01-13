@@ -21,10 +21,10 @@
 #include <stddef.h>
 
 #define I8279_IO    0x50
-#include "8279.h"
+#include "8279.c"
 
 #define I8256_IO    0x60
-#include "8256.h"
+#include "8256.c"
 
 enum COUNTER_VALS {
     COUNTERS_START_SOUND = 0x01,
@@ -95,62 +95,6 @@ void wait_timer3(uint8_t data) {
     while (timer3_flag) {
         // Wait for timer3_flag to be cleared in interrupt
     }
-}
-
-/**
- * @brief Send command data to the 8279 keyboard/display controller
- *
- * @param data Command byte to send to the controller
- */
-void kdc_cmd_out(uint8_t data) {
-    uint8_t test = data;
-    __asm
-        OUT I8279_CMD
-    __endasm;
-}
-
-/**
- * @brief Send data to the 8279 keyboard/display controller
- *
- * @param data Data byte to send to the controller
- */
-void kdc_data_out(uint8_t data) {
-    uint8_t test = data;
-    __asm
-        OUT I8279_DATA
-    __endasm;
-}
-
-/**
- * @brief Read status data from the 8279 keyboard/display controller
- *
- * @return uint8_t Status byte received from the controller
- */
-uint8_t kdc_cmd_in() {
-    uint8_t out;
-    __asm
-        POP HL
-        IN I8279_CMD
-        MOV L,A
-        PUSH HL
-    __endasm;
-    return out;
-}
-
-/**
- * @brief Read data from the 8279 keyboard/display controller
- *
- * @return uint8_t Data byte received from the controller
- */
-uint8_t kdc_data_in() {
-    uint8_t out;
-    __asm
-        POP HL
-        IN I8279_DATA
-        MOV L,A
-        PUSH HL
-    __endasm;
-    return out;
 }
 
 /**
