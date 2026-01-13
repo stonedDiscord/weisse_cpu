@@ -64,40 +64,6 @@ void _8085_int7() {
 }
 
 /**
- * @brief Enable Interrupts
- *
- * @param data Interrupt array
- */
-void en_ints(uint8_t data) {
-    uint8_t test = data;
-    __asm
-        OUT I8256_INTEN
-        EI
-    __endasm;
-}
-
-/**
- * @brief Set Timer 3
- *
- * @param data Timer value
- */
-void set_timer3(uint8_t data) {
-    uint8_t test = data;
-    __asm
-        OUT I8256_TIMER3
-    __endasm;
-}
-
-void wait_timer3(uint8_t data) {
-    timer3_flag = true;
-    en_ints(I8256_INT_L3);
-    set_timer3(data); // Set timer value as needed
-    while (timer3_flag) {
-        // Wait for timer3_flag to be cleared in interrupt
-    }
-}
-
-/**
  * @brief Keyboard/display controller interrupt handler RST65
  *
  * Currently a placeholder function.
@@ -116,11 +82,20 @@ void _8085_int75() {
 }
 
 /**
- * @brief Set the power outputs via port 0x71
- * Used for the sound timer and mute control
- * @param data Data to write to the power outputs
+ * @brief Sound interrupt handler RST55
+ *
+ * Currently a placeholder function.
  */
-void counterOut(uint8_t data) {
+void _8085_int55() {
+    uint8_t out=0xaa;
+}
+
+/**
+ * @brief Set the counter outputs via port 0x71
+ * Used for the sound timer and mute control
+ * @param data Data to write to the counter outputs
+ */
+void counter_out(uint8_t data) {
     uint8_t test = data;
     __asm
         OUT COUNTERS
@@ -132,67 +107,20 @@ void counterOut(uint8_t data) {
  *
  * @param note Note value to play
  */
-void setSound(uint8_t note) {
+void set_sound(uint8_t note) {
     uint8_t test = note;
     __asm
         OUT SOUND
     __endasm;
 }
 
-/**
- * @brief Sound interrupt handler RST55
- *
- * Currently a placeholder function.
- */
-void _8085_int55() {
-    uint8_t out=0xaa;
-}
-
-/**
- * @brief Read data from the 8256 MUART's Port 1
- *
- * @return uint8_t Data read from port
- */
-uint8_t readPort1() {
-    uint8_t out=0xaa;
-    __asm
-        POP HL
-        IN I8256_PORT1
-        MOV L,A
-        PUSH HL
-    __endasm;
-    return out;
-}
-
-/**
- * @brief Read data from the 8256 MUART's Port 2
- * @return uint8_t Data read from port
- */
-uint8_t readPort2() {
-    uint8_t out=0xaa;
-    __asm
-        POP HL
-        IN I8256_PORT2
-        MOV L,A
-        PUSH HL
-    __endasm;
-    return out;
-}
-
-/**
- * @brief Read status from the 8256 MUART
- *
- * @return uint8_t Status byte
- */
-uint8_t readStatus() {
-    uint8_t out=0xaa;
-    __asm
-        POP HL
-        IN I8256_STATUS
-        MOV L,A
-        PUSH HL
-    __endasm;
-    return out;
+void wait_timer3(uint8_t data) {
+    timer3_flag = true;
+    enable_interrupts(I8256_INT_L3);
+    set_timer3(data); // Set timer value as needed
+    while (timer3_flag) {
+        // Wait for timer3_flag to be cleared in interrupt
+    }
 }
 
 /**
@@ -200,14 +128,14 @@ uint8_t readStatus() {
  *
  * @param txdata Data to transmit
  */
-void printSerialChar(uint8_t txdata) {
+void print_serial_char(uint8_t txdata) {
     uint8_t test = txdata;
     __asm
         OUT I8256_BUFFER
     __endasm;
 }
 
-uint8_t readSerialChar() {
+uint8_t read_serial_char() {
     uint8_t out=0xaa;
     __asm
         POP HL
@@ -224,7 +152,7 @@ uint8_t readSerialChar() {
  * @param addr Address in display RAM (0-15)
  * @return uint8_t Data read from display RAM
  */
-uint8_t readDram(uint8_t addr) {
+uint8_t read_dram(uint8_t addr) {
     kdc_cmd_out(I8279_READ_DISPLAY_RAM | (addr & 0x0F));
     return kdc_data_in();
 }
@@ -235,7 +163,7 @@ uint8_t readDram(uint8_t addr) {
  * @param addr Address in sensor RAM (0-7)
  * @return uint8_t Data read from sensor RAM
  */
-uint8_t readSram(uint8_t addr) {
+uint8_t read_sram(uint8_t addr) {
     kdc_cmd_out(I8279_READ_SENSOR_RAM | (addr & 7));
     return kdc_data_in();
 }
@@ -246,7 +174,7 @@ uint8_t readSram(uint8_t addr) {
  * @param line Lamp line number (0-7)
  * @param data Data to write to the lamp line
  */
-void writeLamps(uint8_t line, uint8_t data) {
+void write_lamps(uint8_t line, uint8_t data) {
     kdc_cmd_out(I8279_WRITE_DISPLAY_RAM | (line & 7));
     kdc_data_out(data);
 }
@@ -258,7 +186,7 @@ void writeLamps(uint8_t line, uint8_t data) {
  * @param mon Digit on the money display
  * @param srv Digit on the service display
  */
-void writeDigits(uint8_t digit, uint8_t mon, uint8_t srv) {
+void write_digits(uint8_t digit, uint8_t mon, uint8_t srv) {
     kdc_cmd_out(I8279_WRITE_DISPLAY_RAM | ((digit & 7) + 8));
     kdc_data_out((mon << 4) | srv);
 }
@@ -371,49 +299,49 @@ void dumb_delay(uint16_t ms) {
     }
 }
 
-void waitTxReady() {
-    while ((readStatus() & I8256_STATUS_TBE) == 0) {
+void wait_tx_ready() {
+    while ((read_status() & I8256_STATUS_TBE) == 0) {
         delay(1);
     }
 }
 
-printString(const char* str) {
+print_string(const char* str) {
     while (*str) {
-        waitTxReady();
-        printSerialChar(*str);
+        wait_tx_ready();
+        print_serial_char(*str);
         str++;
     }
 }
 
-void playNote(uint8_t note, uint8_t octave, uint8_t duration)
+void play_note(uint8_t note, uint8_t octave, uint8_t duration)
 {
     uint8_t l_notedata = 0;
     l_notedata |= (note & 0x0F);
     l_notedata |= ((duration & 0x03) << 4);
     l_notedata |= ((octave & 0x03) << 6);    
-    setSound(l_notedata);
-    counterOut(COUNTERS_START_SOUND);
+    set_sound(l_notedata);
+    counter_out(COUNTERS_START_SOUND);
     delay(1);
-    counterOut(0);
+    counter_out(0);
 }
 
-void playTrack()
+void play_track()
 {
     for (uint16_t i = 0; i < sizeof(track) / sizeof(track[0]); i++)
     {
-        playNote(track[i].note, track[i].octave, track[i].duration);
-        writeDigits(0, track[i].note, track[i].note);
-        writeDigits(1, track[i].octave, track[i].octave);
-        writeDigits(2, track[i].duration, track[i].duration);
-        writeDigits(3, track[i].length, track[i].length);
-        writeDigits(4, i, i);
+        play_note(track[i].note, track[i].octave, track[i].duration);
+        write_digits(0, track[i].note, track[i].note);
+        write_digits(1, track[i].octave, track[i].octave);
+        write_digits(2, track[i].duration, track[i].duration);
+        write_digits(3, track[i].length, track[i].length);
+        write_digits(4, i, i);
 
         // Print lyric to serial port
         if (track[i].lyric != 0)
         {
             const char *lyric = track[i].lyric;
-            printString(lyric);
-            printString(" ");
+            print_string(lyric);
+            print_string(" ");
         }
 
         delay(track[i].length * 3);
@@ -443,7 +371,7 @@ bool check_button(uint8_t button) {
     uint8_t col = button & 0x0F;
     uint8_t inverted = (button >> 7) & 0x01;
     
-    uint8_t sram_data = readSram(row);
+    uint8_t sram_data = read_sram(row);
     bool button_state = (sram_data >> col) & 0x01;
     
     if (inverted) {
@@ -475,27 +403,27 @@ void main(void) {
     // Infinite loop to scan the keyboard
     while (1) {
 
-        keys[i] = readSram(i);
+        keys[i] = read_sram(i);
 
-        writeDigits(0, keys[0] & 0x0F,  keys[1] & 0x0F);
-        writeDigits(1, keys[0] >> 4,    keys[1] >> 4);
+        write_digits(0, keys[0] & 0x0F,  keys[1] & 0x0F);
+        write_digits(1, keys[0] >> 4,    keys[1] >> 4);
 
-        writeDigits(2, keys[2] & 0x0F,  keys[3] & 0x0F);
-        writeDigits(3, keys[2] >> 4,    keys[3] >> 4);
+        write_digits(2, keys[2] & 0x0F,  keys[3] & 0x0F);
+        write_digits(3, keys[2] >> 4,    keys[3] >> 4);
 
-        port1 = readPort1();
-        port2 = readPort2();
+        port1 = read_port1();
+        port2 = read_port2();
 
-        writeLamps(6, port1);
-        writeDigits(4, port1 & 0x0F,  port1 & 0x0F);
-        writeDigits(5, port1 >> 4,    port1 >> 4);
+        write_lamps(6, port1);
+        write_digits(4, port1 & 0x0F,  port1 & 0x0F);
+        write_digits(5, port1 >> 4,    port1 >> 4);
 
-        writeLamps(7, port2);
-        writeDigits(6, port2 & 0x0F,  port2 & 0x0F);
-        writeDigits(7, port2 >> 4,    port2 >> 4);
+        write_lamps(7, port2);
+        write_digits(6, port2 & 0x0F,  port2 & 0x0F);
+        write_digits(7, port2 >> 4,    port2 >> 4);
 
         if (i<6)
-            writeLamps(i, keys[i]);
+            write_lamps(i, keys[i]);
         
         kdc_cmd_out(I8279_END_INTERRUPT);
 
@@ -505,11 +433,11 @@ void main(void) {
             kdc_cmd_out(I8279_CLEAR | I8279_CLEAR_FIFO);
         }
 
-        if(readStatus() & I8256_STATUS_RBF) {
-            uint8_t rcv = readSerialChar();
+        if(read_status() & I8256_STATUS_RBF) {
+            uint8_t rcv = read_serial_char();
             // Echo received character
-            waitTxReady();
-            printSerialChar(rcv);
+            wait_tx_ready();
+            print_serial_char(rcv);
         }
     }
 }

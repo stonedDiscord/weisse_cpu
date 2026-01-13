@@ -99,4 +99,76 @@
 #define I8256_STATUS_RBF    0x40
 #define I8256_STATUS_INT    0x80
 
+/**
+ * @brief Set Timer 3
+ *
+ * @param data Timer value
+ */
+void set_timer3(uint8_t data) {
+    uint8_t test = data;
+    __asm
+        OUT I8256_TIMER3
+    __endasm;
+}
+
+/**
+ * @brief Read data from the 8256 MUART's Port 1
+ *
+ * @return uint8_t Data read from port
+ */
+uint8_t read_port1() {
+    uint8_t out=0xaa;
+    __asm
+        POP HL
+        IN I8256_PORT1
+        MOV L,A
+        PUSH HL
+    __endasm;
+    return out;
+}
+
+/**
+ * @brief Read data from the 8256 MUART's Port 2
+ * @return uint8_t Data read from port
+ */
+uint8_t read_port2() {
+    uint8_t out=0xaa;
+    __asm
+        POP HL
+        IN I8256_PORT2
+        MOV L,A
+        PUSH HL
+    __endasm;
+    return out;
+}
+
+/**
+ * @brief Enable Interrupts
+ *
+ * @param data Interrupt array
+ */
+void enable_interrupts(uint8_t data) {
+    uint8_t test = data;
+    __asm
+        OUT I8256_INTEN
+        EI
+    __endasm;
+}
+
+/**
+ * @brief Read status from the 8256 MUART
+ *
+ * @return uint8_t Status byte
+ */
+uint8_t read_status() {
+    uint8_t out=0xaa;
+    __asm
+        POP HL
+        IN I8256_STATUS
+        MOV L,A
+        PUSH HL
+    __endasm;
+    return out;
+}
+
 #endif
