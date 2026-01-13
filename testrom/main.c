@@ -161,6 +161,22 @@ void write_digit(uint8_t digit, uint8_t mon, uint8_t srv) {
 }
 
 /**
+ * @brief Write a decimal number to the Serie display in the first 3 digits
+ *
+ * @param number Number to write to the lamp line
+ */
+void write_serie(uint8_t number) {
+        // Convert data1 to decimal and display on digits 7-5
+        uint8_t hundreds = number / 100;
+        uint8_t tens = (number % 100) / 10;
+        uint8_t ones = number % 10;
+        
+        write_digit(7, hundreds, hundreds);
+        write_digit(6, tens, tens);
+        write_digit(5, ones, ones);
+}
+
+/**
  * @brief Initialize the 8279 keyboard/display controller
  *
  * Sets up the controller in 16-bit display mode, left entry,
@@ -257,7 +273,7 @@ void wait_tx_ready() {
     }
 }
 
-print_string(const char* str) {
+void print_string(const char* str) {
     while (*str) {
         print_serial_char(*str);
         str++;
@@ -357,8 +373,7 @@ void main(void) {
 
         data1 = read_sram(i);
         
-        write_digit(6, data1 & 0x0F,  data1 & 0x0F);
-        write_digit(7, data1 >> 4,    data1 >> 4);
+        write_serie(data1);
 
         write_digit(0, i, i);
 
