@@ -124,20 +124,6 @@ void wait_timer3(uint8_t data) {
 }
 
 /**
- * @brief Set data to be sent via MUART
- *
- * @param txdata Data to transmit
- */
-void print_serial_char(uint8_t txdata) {
-    wait_tx_ready();
-    write_buffer(txdata);
-}
-
-uint8_t read_serial_char() {
-    return read_buffer();
-}
-
-/**
  * @brief Write data to indicator lamps
  *
  * @param line Lamp line number (0-7)
@@ -255,6 +241,20 @@ void wait_tx_ready() {
     while ((read_status() & I8256_STATUS_TBE) == 0) {
         delay(1);
     }
+}
+
+/**
+ * @brief Set data to be sent via MUART
+ *
+ * @param txdata Data to transmit
+ */
+void print_serial_char(uint8_t txdata) {
+    wait_tx_ready();
+    write_buffer(txdata);
+}
+
+uint8_t read_serial_char() {
+    return read_buffer();
 }
 
 print_string(const char* str) {
