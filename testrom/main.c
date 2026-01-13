@@ -295,7 +295,7 @@ void play_track()
             print_string(" ");
         }
 
-        delay(track[i].length * 3);
+        delay(track[i].length * 2);
     }
 }
 
@@ -340,14 +340,13 @@ bool check_button(uint8_t button) {
  * and echoes back any serial input
  */
 void main(void) {
-    uint8_t i;
+    int8_t i;
 
     init_kdc();
     init_muart();
 
     uint8_t keys[16];
-    uint8_t port1;
-    uint8_t port2;
+    uint8_t data1;
 
     delay(80);
 
@@ -356,31 +355,23 @@ void main(void) {
     // Infinite loop to scan the keyboard
     while (1) {
 
-        keys[i] = read_sram(i);
-
-        write_digit(0, keys[0] & 0x0F,  keys[1] & 0x0F);
-        write_digit(1, keys[0] >> 4,    keys[1] >> 4);
-
-        write_digit(2, keys[2] & 0x0F,  keys[3] & 0x0F);
-        write_digit(3, keys[2] >> 4,    keys[3] >> 4);
-
-        port1 = read_port1();
-        port2 = read_port2();
-
-        write_lamps(6, port1);
-        write_digit(4, port1 & 0x0F,  port1 & 0x0F);
-        write_digit(5, port1 >> 4,    port1 >> 4);
-
-        write_lamps(7, port2);
-        write_digit(6, port2 & 0x0F,  port2 & 0x0F);
-        write_digit(7, port2 >> 4,    port2 >> 4);
-
-        if (i<6)
-            write_lamps(i, keys[i]);
+        data1 = read_sram(i);
         
+        write_digit(6, data1 & 0x0F,  data1 & 0x0F);
+        write_digit(7, data1 >> 4,    data1 >> 4);
+
+        if (check_button(RISK_LEFT)) {
+            i--;
+        } else if (check_button(RISK_RIGHT)) {
+            i++;
+        }
+
         kdc_cmd_out(I8279_END_INTERRUPT);
 
-        i++;
+        if (i < 0) {
+            i = 7;
+        }
+
         if (i >= 8) {
             i = 0;
             kdc_cmd_out(I8279_CLEAR | I8279_CLEAR_FIFO);
