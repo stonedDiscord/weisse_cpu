@@ -360,6 +360,8 @@ void main(void) {
         write_digit(6, data1 & 0x0F,  data1 & 0x0F);
         write_digit(7, data1 >> 4,    data1 >> 4);
 
+        write_digit(0, i, i);
+
         if (check_button(RISK_LEFT)) {
             i--;
         } else if (check_button(RISK_RIGHT)) {
