@@ -556,7 +556,7 @@ void main(void) {
         kdc_cmd_out(I8279_END_INTERRUPT);
 
         i++;
-        if (i >= 16) {
+        if (i >= 8) {
             i = 0;
             kdc_cmd_out(I8279_CLEAR | I8279_CLEAR_FIFO);
         }
