@@ -349,7 +349,9 @@ void main(void) {
     uint8_t port1;
     uint8_t port2;
 
-    delay(800);
+    delay(80);
+
+    play_track();
 
     // Infinite loop to scan the keyboard
     while (1) {
