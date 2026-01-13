@@ -133,4 +133,43 @@ uint8_t kdc_data_in() {
     return out;
 }
 
+/**
+ * @brief Set the 8279 keyboard/display controller clock divider
+ *
+ * @param divider Clock divider value (2-31)
+ *
+ * Sets the clock frequency for the 8279 controller. 
+ *
+ * @note Values outside the valid range will be clamped
+ */
+void set_kdc_clock(uint8_t divider) {
+    // Ensure divider is within valid range (2-31)
+    if (divider < 2) divider = 2;
+    if (divider > 31) divider = 31;
+    
+    kdc_cmd_out(I8279_CLOCK_DIVIDER_SET | divider);
+}
+
+/**
+ * @brief Read data from the 8279's display RAM
+ *
+ * @param addr Address in display RAM (0-15)
+ * @return uint8_t Data read from display RAM
+ */
+uint8_t read_dram(uint8_t addr) {
+    kdc_cmd_out(I8279_READ_DISPLAY_RAM | (addr & 0x0F));
+    return kdc_data_in();
+}
+
+/**
+ * @brief Read data from the 8279's sensor RAM
+ *
+ * @param addr Address in sensor RAM (0-7)
+ * @return uint8_t Data read from sensor RAM
+ */
+uint8_t read_sram(uint8_t addr) {
+    kdc_cmd_out(I8279_READ_SENSOR_RAM | (addr & 7));
+    return kdc_data_in();
+}
+
 #endif

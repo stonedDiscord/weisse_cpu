@@ -171,4 +171,27 @@ uint8_t read_status() {
     return out;
 }
 
+/**
+ * @brief Set data to be sent via MUART
+ *
+ * @param txdata Data to transmit
+ */
+void write_buffer(uint8_t txdata) {
+    uint8_t test = txdata;
+    __asm
+        OUT I8256_BUFFER
+    __endasm;
+}
+
+uint8_t read_buffer() {
+    uint8_t out=0xaa;
+    __asm
+        POP HL
+        IN I8256_BUFFER
+        MOV L,A
+        PUSH HL
+    __endasm;
+    return out;
+}
+
 #endif

@@ -129,43 +129,12 @@ void wait_timer3(uint8_t data) {
  * @param txdata Data to transmit
  */
 void print_serial_char(uint8_t txdata) {
-    uint8_t test = txdata;
-    __asm
-        OUT I8256_BUFFER
-    __endasm;
+    wait_tx_ready();
+    write_buffer(txdata);
 }
 
 uint8_t read_serial_char() {
-    uint8_t out=0xaa;
-    __asm
-        POP HL
-        IN I8256_BUFFER
-        MOV L,A
-        PUSH HL
-    __endasm;
-    return out;
-}
-
-/**
- * @brief Read data from the 8279's display RAM
- *
- * @param addr Address in display RAM (0-15)
- * @return uint8_t Data read from display RAM
- */
-uint8_t read_dram(uint8_t addr) {
-    kdc_cmd_out(I8279_READ_DISPLAY_RAM | (addr & 0x0F));
-    return kdc_data_in();
-}
-
-/**
- * @brief Read data from the 8279's sensor RAM
- *
- * @param addr Address in sensor RAM (0-7)
- * @return uint8_t Data read from sensor RAM
- */
-uint8_t read_sram(uint8_t addr) {
-    kdc_cmd_out(I8279_READ_SENSOR_RAM | (addr & 7));
-    return kdc_data_in();
+    return read_buffer();
 }
 
 /**
@@ -186,26 +155,9 @@ void write_lamps(uint8_t line, uint8_t data) {
  * @param mon Digit on the money display
  * @param srv Digit on the service display
  */
-void write_digits(uint8_t digit, uint8_t mon, uint8_t srv) {
+void write_digit(uint8_t digit, uint8_t mon, uint8_t srv) {
     kdc_cmd_out(I8279_WRITE_DISPLAY_RAM | ((digit & 7) + 8));
     kdc_data_out((mon << 4) | srv);
-}
-
-/**
- * @brief Set the 8279 keyboard/display controller clock divider
- *
- * @param divider Clock divider value (2-31)
- *
- * Sets the clock frequency for the 8279 controller. 
- *
- * @note Values outside the valid range will be clamped
- */
-void set_kdc_clock(uint8_t divider) {
-    // Ensure divider is within valid range (2-31)
-    if (divider < 2) divider = 2;
-    if (divider > 31) divider = 31;
-    
-    kdc_cmd_out(I8279_CLOCK_DIVIDER_SET | divider);
 }
 
 /**
@@ -307,7 +259,6 @@ void wait_tx_ready() {
 
 print_string(const char* str) {
     while (*str) {
-        wait_tx_ready();
         print_serial_char(*str);
         str++;
     }
@@ -330,11 +281,11 @@ void play_track()
     for (uint16_t i = 0; i < sizeof(track) / sizeof(track[0]); i++)
     {
         play_note(track[i].note, track[i].octave, track[i].duration);
-        write_digits(0, track[i].note, track[i].note);
-        write_digits(1, track[i].octave, track[i].octave);
-        write_digits(2, track[i].duration, track[i].duration);
-        write_digits(3, track[i].length, track[i].length);
-        write_digits(4, i, i);
+        write_digit(0, track[i].note, track[i].note);
+        write_digit(1, track[i].octave, track[i].octave);
+        write_digit(2, track[i].duration, track[i].duration);
+        write_digit(3, track[i].length, track[i].length);
+        write_digit(4, i, i);
 
         // Print lyric to serial port
         if (track[i].lyric != 0)
@@ -405,22 +356,22 @@ void main(void) {
 
         keys[i] = read_sram(i);
 
-        write_digits(0, keys[0] & 0x0F,  keys[1] & 0x0F);
-        write_digits(1, keys[0] >> 4,    keys[1] >> 4);
+        write_digit(0, keys[0] & 0x0F,  keys[1] & 0x0F);
+        write_digit(1, keys[0] >> 4,    keys[1] >> 4);
 
-        write_digits(2, keys[2] & 0x0F,  keys[3] & 0x0F);
-        write_digits(3, keys[2] >> 4,    keys[3] >> 4);
+        write_digit(2, keys[2] & 0x0F,  keys[3] & 0x0F);
+        write_digit(3, keys[2] >> 4,    keys[3] >> 4);
 
         port1 = read_port1();
         port2 = read_port2();
 
         write_lamps(6, port1);
-        write_digits(4, port1 & 0x0F,  port1 & 0x0F);
-        write_digits(5, port1 >> 4,    port1 >> 4);
+        write_digit(4, port1 & 0x0F,  port1 & 0x0F);
+        write_digit(5, port1 >> 4,    port1 >> 4);
 
         write_lamps(7, port2);
-        write_digits(6, port2 & 0x0F,  port2 & 0x0F);
-        write_digits(7, port2 >> 4,    port2 >> 4);
+        write_digit(6, port2 & 0x0F,  port2 & 0x0F);
+        write_digit(7, port2 >> 4,    port2 >> 4);
 
         if (i<6)
             write_lamps(i, keys[i]);
@@ -435,8 +386,6 @@ void main(void) {
 
         if(read_status() & I8256_STATUS_RBF) {
             uint8_t rcv = read_serial_char();
-            // Echo received character
-            wait_tx_ready();
             print_serial_char(rcv);
         }
     }
