@@ -16,7 +16,7 @@
 
 
 #define I8279_DATA    I8279_IO
-#define I8279_CMD     (I8279_DATA + 1)
+#define I8279_CMD     I8279_DATA + 1
 
 #define I8279_MODE_SET 0x00
 #define I8279_MODE_DISPLAY_8BIT 0x00

@@ -14,22 +14,22 @@
 #error "Please set the I8256_IO base address before including this file."
 #endif
 
-#define I8256_CMD1          (I8256_IO + 0x00)
-#define I8256_CMD2          (I8256_IO + 0x01)
-#define I8256_CMD3          (I8256_IO + 0x02)
-#define I8256_MODE          (I8256_IO + 0x03)
-#define I8256_PORT1C        (I8256_IO + 0x04)
-#define I8256_INTEN         (I8256_IO + 0x05)
-#define I8256_INTAD         (I8256_IO + 0x06)
-#define I8256_BUFFER        (I8256_IO + 0x07)
-#define I8256_PORT1         (I8256_IO + 0x08)
-#define I8256_PORT2         (I8256_IO + 0x09)
-#define I8256_TIMER1        (I8256_IO + 0x0a)
-#define I8256_TIMER2        (I8256_IO + 0x0b)
-#define I8256_TIMER3        (I8256_IO + 0x0c)
-#define I8256_TIMER4        (I8256_IO + 0x0d)
-#define I8256_TIMER5        (I8256_IO + 0x0e)
-#define I8256_STATUS        (I8256_IO + 0x0f)
+#define I8256_CMD1          I8256_IO + 0x00
+#define I8256_CMD2          I8256_IO + 0x01
+#define I8256_CMD3          I8256_IO + 0x02
+#define I8256_MODE          I8256_IO + 0x03
+#define I8256_PORT1C        I8256_IO + 0x04
+#define I8256_INTEN         I8256_IO + 0x05
+#define I8256_INTAD         I8256_IO + 0x06
+#define I8256_BUFFER        I8256_IO + 0x07
+#define I8256_PORT1         I8256_IO + 0x08
+#define I8256_PORT2         I8256_IO + 0x09
+#define I8256_TIMER1        I8256_IO + 0x0a
+#define I8256_TIMER2        I8256_IO + 0x0b
+#define I8256_TIMER3        I8256_IO + 0x0c
+#define I8256_TIMER4        I8256_IO + 0x0d
+#define I8256_TIMER5        I8256_IO + 0x0e
+#define I8256_STATUS        I8256_IO + 0x0f
 
 
 #define I8256_CMD1_FRQ_16    0x00

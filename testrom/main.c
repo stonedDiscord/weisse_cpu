@@ -71,7 +71,7 @@ void _8085_int7() {
 void en_ints(uint8_t data) {
     uint8_t test = data;
     __asm
-        OUT (I8256_INTEN)
+        OUT I8256_INTEN
         EI
     __endasm;
 }
@@ -84,7 +84,7 @@ void en_ints(uint8_t data) {
 void set_timer3(uint8_t data) {
     uint8_t test = data;
     __asm
-        OUT (I8256_TIMER3)
+        OUT I8256_TIMER3
     __endasm;
 }
 
@@ -213,7 +213,7 @@ uint8_t readPort1() {
     uint8_t out=0xaa;
     __asm
         POP HL
-        IN (I8256_PORT1)
+        IN I8256_PORT1
         MOV L,A
         PUSH HL
     __endasm;
@@ -228,7 +228,7 @@ uint8_t readPort2() {
     uint8_t out=0xaa;
     __asm
         POP HL
-        IN (I8256_PORT2)
+        IN I8256_PORT2
         MOV L,A
         PUSH HL
     __endasm;
@@ -244,7 +244,7 @@ uint8_t readStatus() {
     uint8_t out=0xaa;
     __asm
         POP HL
-        IN (I8256_STATUS)
+        IN I8256_STATUS
         MOV L,A
         PUSH HL
     __endasm;
@@ -267,7 +267,7 @@ uint8_t readSerialChar() {
     uint8_t out=0xaa;
     __asm
         POP HL
-        IN (I8256_BUFFER)
+        IN I8256_BUFFER
         MOV L,A
         PUSH HL
     __endasm;
@@ -366,23 +366,23 @@ void init_kdc() {
 void init_muart() {
     __asm
         MVI A, I8256_CMD1_FRQ_1K | I8256_CMD1_8085 | I8256_CMD1_STOP_1 | I8256_CMD1_CHARLEN_8
-        OUT (I8256_CMD1)
-        MVI A, (I8256_CMD2_SCLK_DIV3 | 5) //4800baud
-        OUT (I8256_CMD2)
-        MVI A, (I8256_CMD3_RESET | I8256_CMD3_IAE | I8256_CMD3_RXE | I8256_CMD3_SET)
-        OUT (I8256_CMD3)
-        MVI A, (I8256_MODE_PORT2C_OO)
-        OUT (I8256_MODE)
+        OUT I8256_CMD1
+        MVI A, I8256_CMD2_SCLK_DIV3 | 5 //4800baud
+        OUT I8256_CMD2
+        MVI A, I8256_CMD3_RESET | I8256_CMD3_IAE | I8256_CMD3_RXE | I8256_CMD3_SET
+        OUT I8256_CMD3
+        MVI A, I8256_MODE_PORT2C_OO
+        OUT I8256_MODE
         MVI A, 0x70
-        OUT (I8256_PORT1C)
+        OUT I8256_PORT1C
         MVI A, 0xff
-        OUT (I8256_PORT2)
+        OUT I8256_PORT2
         MVI A, 0x30
-        OUT (I8256_PORT1)
+        OUT I8256_PORT1
         MVI A, 0x08
-        OUT (I8256_INTEN)
+        OUT I8256_INTEN
         MVI A, 0xBA
-        OUT (I8256_INTAD)
+        OUT I8256_INTAD
     __endasm;
 }
 
