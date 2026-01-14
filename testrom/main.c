@@ -46,13 +46,29 @@ enum COUNTER_VALS {
 bool timer3_flag = false;
 bool timer5_flag = false;
 
+uint8_t sensor_ram[8];
+uint8_t sensor_row = 0;
+
+/**
+ * @brief Enable Interrupts
+ *
+ * @param data Interrupt array
+ */
+void enable_interrupts() {
+    __asm
+        EI
+    __endasm;
+}
+
 // timer2
 void _8085_int1() {
     uint8_t out=0xaa;
+    enable_interrupts();
 }
 // timer3
 void _8085_int3() {
     timer3_flag = false;
+    enable_interrupts();
 }
 // tx int
 void _8085_int5() {
@@ -61,6 +77,7 @@ void _8085_int5() {
 //timer5
 void _8085_int7() {
     timer5_flag = false;
+    enable_interrupts();
 }
 
 /**
@@ -69,7 +86,17 @@ void _8085_int7() {
  * Currently a placeholder function.
  */
 void _8085_int65() {
-    uint8_t out=0xaa;
+    sensor_ram[sensor_row] = read_sram(sensor_row);
+    sensor_row++;
+    if (sensor_row > 7) sensor_row = 0;
+    kdc_cmd_out(I8279_END_INTERRUPT);
+    enable_interrupts();
+}
+
+void read_sensor_matrix() {
+    for (uint8_t row = 0; row < 8; row++) {
+        sensor_ram[row] = read_sram(row);
+    }
 }
 
 /**
@@ -78,7 +105,8 @@ void _8085_int65() {
  * Currently a placeholder function.
  */
 void _8085_int75() {
-    uint8_t out=0xaa;
+    read_sensor_matrix();
+    enable_interrupts();
 }
 
 /**
@@ -88,6 +116,7 @@ void _8085_int75() {
  */
 void _8085_int55() {
     uint8_t out=0xaa;
+    enable_interrupts();
 }
 
 /**
@@ -116,7 +145,7 @@ void set_sound(uint8_t note) {
 
 void wait_timer3(uint8_t data) {
     timer3_flag = true;
-    enable_interrupts(I8256_INT_L3);
+    enable_muart_interrupts(I8256_INT_L3);
     set_timer3(data); // Set timer value as needed
     while (timer3_flag) {
         // Wait for timer3_flag to be cleared in interrupt
@@ -311,7 +340,7 @@ void play_track()
             print_string(" ");
         }
 
-        delay(track[i].length * 2);
+        delay(track[i].length * 3);
     }
 }
 
@@ -326,6 +355,7 @@ void play_track()
 
 // Button definitions
 #define RISK_LEFT  BUTTON(3, 1, 1)
+#define STOP_MID   BUTTON(3, 3, 1)
 #define RISK_RIGHT BUTTON(3, 0, 1)
 /**
  * @brief Check the state of a button
@@ -338,8 +368,7 @@ bool check_button(uint8_t button) {
     uint8_t col = button & 0x0F;
     uint8_t inverted = (button >> 7) & 0x01;
     
-    uint8_t sram_data = read_sram(row);
-    bool button_state = (sram_data >> col) & 0x01;
+    bool button_state = (sensor_ram[row] >> col) & 0x01;
     
     if (inverted) {
         return !button_state;
@@ -361,29 +390,45 @@ void main(void) {
     init_kdc();
     init_muart();
 
+    enable_interrupts();
+
     uint8_t keys[16];
     uint8_t data1;
 
     delay(80);
 
-    play_track();
-
     // Infinite loop to scan the keyboard
     while (1) {
+        read_sensor_matrix();
 
-        data1 = read_sram(i);
-        
-        write_serie(data1);
+        write_serie(sensor_ram[i]);
+        dumb_delay(10);
 
         write_digit(0, i, i);
+        dumb_delay(10);
 
-        if (check_button(RISK_LEFT)) {
+        write_lamps(i, sensor_ram[i]);
+        dumb_delay(10);
+
+        bool buttonl = check_button(RISK_LEFT);
+        bool buttons = check_button(STOP_MID);
+        bool buttonr = check_button(RISK_RIGHT);
+
+        write_digit(1, 0xff, 0xff);
+        write_digit(2, 0xff, 0xff);
+        write_digit(3, 0xff, 0xff);
+        write_digit(4, 0xff, 0xff);
+
+        dumb_delay(10);
+
+        if (buttonl) {
             i--;
-        } else if (check_button(RISK_RIGHT)) {
+        } else if (buttonr) {
             i++;
         }
 
-        kdc_cmd_out(I8279_END_INTERRUPT);
+        if (buttons)
+            play_track();
 
         if (i < 0) {
             i = 7;
@@ -391,7 +436,6 @@ void main(void) {
 
         if (i >= 8) {
             i = 0;
-            kdc_cmd_out(I8279_CLEAR | I8279_CLEAR_FIFO);
         }
 
         if(read_status() & I8256_STATUS_RBF) {

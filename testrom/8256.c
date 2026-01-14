@@ -147,7 +147,7 @@ uint8_t read_port2() {
  *
  * @param data Interrupt array
  */
-void enable_interrupts(uint8_t data) {
+void enable_muart_interrupts(uint8_t data) {
     uint8_t test = data;
     __asm
         OUT I8256_INTEN
