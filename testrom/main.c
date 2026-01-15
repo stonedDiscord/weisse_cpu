@@ -41,6 +41,8 @@ enum COUNTER_VALS {
 
 #include "hd146818.c"
 
+struct rtc_state *rtc = (struct rtc_state *)0x9000;
+
 #define COINS       0x70
 #define COUNTERS    0x71
 #define SOUND       0x72
@@ -380,11 +382,8 @@ bool check_button(uint8_t button) {
     }
 }
 
-// Function to display the date from the RTC
 void display_rtc_date()
 {
-    struct rtc_state *rtc = (struct rtc_state *)0x9000;
-
     write_digit(7, (rtc->day_of_month / 10), (rtc->day_of_month / 10));
     write_digit(6, (rtc->day_of_month % 10), (rtc->day_of_month % 10));
 
@@ -397,6 +396,23 @@ void display_rtc_date()
 
     write_digit(1, (rtc->year / 10), (rtc->year / 10));
     write_digit(0, (rtc->year % 10), (rtc->year % 10));
+}
+
+// Function to display the date from the RTC
+void display_rtc_time()
+{
+    write_digit(7, (rtc->hours / 10), (rtc->hours / 10));
+    write_digit(6, (rtc->hours % 10), (rtc->hours % 10));
+
+    write_digit(5, 0xff, 0xff);
+
+    write_digit(4, (rtc->minutes / 10), (rtc->minutes / 10));
+    write_digit(3, (rtc->minutes % 10), (rtc->minutes % 10));
+
+    write_digit(2, 0xff, 0xff);
+
+    write_digit(1, (rtc->seconds / 10), (rtc->seconds / 10));
+    write_digit(0, (rtc->seconds % 10), (rtc->seconds % 10));
 }
 
 /**
@@ -450,6 +466,10 @@ void main(void) {
                     break;
                 case 6:
                     display_rtc_date();
+                    delay(2000);
+                    break;
+                case 7:
+                    display_rtc_time();
                     delay(2000);
                     break;
             }
