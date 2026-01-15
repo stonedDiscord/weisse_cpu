@@ -667,7 +667,6 @@ void main(void) {
         } else {
             write_serie(sensor_ram[i]);
             write_both(0, i);
-            write_lamps(i, sensor_ram[i]);
             write_both(1, 0xff);
             write_both(2, 0xff);
             write_both(3, 0xff);
@@ -696,10 +695,6 @@ void main(void) {
                         refresh_display();
                         break;
                     case 3:
-                        display_rtc_time();
-                        delay(4000);
-                        break;
-                    case 4:
                         time_edit_mode = true;
                         selected_digit = 7;  // Start with first digit (hours tens place)
                         display_rtc_time();
@@ -707,6 +702,16 @@ void main(void) {
                         break;
                     case 5:
                         play_track();
+                        break;
+                    case 7:
+                        write_lamps(0,0xff);
+                        write_lamps(1,0xff);
+                        write_lamps(2,0xff);
+                        write_lamps(3,0xff);
+                        write_lamps(4,0xff);
+                        write_lamps(5,0xff);
+                        write_lamps(6,0xff);
+                        write_lamps(7,0xff);
                         break;
                 }
                 dumb_delay(200);
