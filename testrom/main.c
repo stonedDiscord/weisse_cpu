@@ -81,7 +81,6 @@ struct rtc_state *rtc = (struct rtc_state *)0x9000;
 #define SOUND       0x72
 
 bool timer3_flag = false;
-bool timer5_flag = false;
 bool blink_flag = false;
 
 uint8_t sensor_ram[8];
@@ -118,10 +117,10 @@ void _8085_int5() {
 }
 //timer5
 void _8085_int7() {
-    timer5_flag = false;
     blink_flag = !blink_flag;
     refresh_display();
-    enable_interrupts();
+    set_timer5(250);
+    enable_muart_interrupts(I8256_INT_L7);
 }
 
 /**
@@ -227,7 +226,22 @@ void write_both(uint8_t digit, uint8_t value) {
 void refresh_display() {
     kdc_cmd_out(I8279_WRITE_DISPLAY_RAM | I8279_RW_AUTO_INCREMENT | 8);
     for (uint8_t digit = 0; digit < 8; digit++) {
-        kdc_data_out((money_display[digit] << 4) | service_display[digit] & 0x0f);
+
+        // blink logic: if any of the upper nibbles are set, blink the digit
+        uint8_t money_digit, service_digit;
+
+        if ((money_display[digit] >> 4) && blink_flag)
+           money_digit = 0xf0;
+        else
+           money_digit = money_display[digit] << 4;
+
+
+        if ((service_display[digit] >> 4) && blink_flag)
+           service_digit = 0x0f;
+        else
+           service_digit = service_display[digit] & 0x0f;
+        
+        kdc_data_out(money_digit | service_digit);
     }
 }
 
@@ -479,6 +493,7 @@ void main(void) {
     init_kdc();
     init_muart();
 
+    _8085_int7();
     enable_interrupts();
 
     bool buttonl = false;
@@ -523,11 +538,11 @@ void main(void) {
                     break;
                 case 6:
                     display_rtc_date();
-                    delay(2000);
+                    delay(4000);
                     break;
                 case 7:
                     display_rtc_time();
-                    delay(2000);
+                    delay(4000);
                     break;
             }
 

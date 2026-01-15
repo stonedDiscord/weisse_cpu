@@ -33,6 +33,7 @@
 
 // Function prototypes
 void set_timer3(uint8_t data);
+void set_timer5(uint8_t data);
 uint8_t read_port1();
 uint8_t read_port2();
 void enable_muart_interrupts(uint8_t data);
@@ -117,6 +118,18 @@ void set_timer3(uint8_t data) {
     uint8_t test = data;
     __asm
         OUT I8256_TIMER3
+    __endasm;
+}
+
+/**
+ * @brief Set Timer 5
+ *
+ * @param data Timer value
+ */
+void set_timer5(uint8_t data) {
+    uint8_t test = data;
+    __asm
+        OUT I8256_TIMER5
     __endasm;
 }
 
