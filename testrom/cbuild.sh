@@ -1,4 +1,4 @@
-./build.sh
+docker run  -v .:/src/ z88dk/z88dk sh ./build.sh
 
 rm testromc.zip
 7z a testromc.zip a.rom

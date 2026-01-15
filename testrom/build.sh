@@ -1,1 +1,1 @@
-docker run  -v .:/src/ z88dk/z88dk zcc +z80 -clib=8085 -crt0=crt0.asm main.c -create-app
+zcc +z80 -clib=8085 -crt0=crt0.asm main.c -create-app
