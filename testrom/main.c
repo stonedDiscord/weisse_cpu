@@ -74,7 +74,7 @@ bool check_button(uint8_t button);
 void display_rtc_date();
 void display_rtc_time();
 
-struct rtc_state *rtc = (struct rtc_state *)0x9000;
+volatile struct rtc_state *rtc = (struct rtc_state *)0x9000;
 
 #define COINS       0x70
 #define COUNTERS    0x71
@@ -82,6 +82,8 @@ struct rtc_state *rtc = (struct rtc_state *)0x9000;
 
 bool timer3_flag = false;
 bool blink_flag = false;
+bool date_edit_mode = false;
+int8_t selected_date_digit = -1;
 
 uint8_t sensor_ram[8];
 uint8_t sensor_row = 0;
@@ -449,18 +451,51 @@ bool check_button(uint8_t button) {
 
 void display_rtc_date()
 {
-    write_both(7, (rtc->day_of_month / 10));
-    write_both(6, (rtc->day_of_month % 10));
+    // Clear all blink flags first
+    for (uint8_t digit = 0; digit < 8; digit++) {
+        money_display[digit] &= 0x0F;
+        service_display[digit] &= 0x0F;
+    }
+
+    // Day of month - tens place
+    if (selected_date_digit == 7)
+        write_both(7, (rtc->day_of_month / 10) | 0x10);  // Set blink flag
+    else
+        write_both(7, (rtc->day_of_month / 10));
+    
+    // Day of month - ones place
+    if (selected_date_digit == 6)
+        write_both(6, (rtc->day_of_month % 10) | 0x10);  // Set blink flag
+    else
+        write_both(6, (rtc->day_of_month % 10));
 
     write_both(5, 0xff);
 
-    write_both(4, (rtc->month / 10));
-    write_both(3, (rtc->month % 10));
+    // Month - tens place
+    if (selected_date_digit == 4)
+        write_both(4, (rtc->month / 10) | 0x10);  // Set blink flag
+    else
+        write_both(4, (rtc->month / 10));
+    
+    // Month - ones place
+    if (selected_date_digit == 3)
+        write_both(3, (rtc->month % 10) | 0x10);  // Set blink flag
+    else
+        write_both(3, (rtc->month % 10));
 
     write_both(2, 0xff);
 
-    write_both(1, (rtc->year / 10));
-    write_both(0, (rtc->year % 10));
+    // Year - tens place
+    if (selected_date_digit == 1)
+        write_both(1, (rtc->year / 10) | 0x10);  // Set blink flag
+    else
+        write_both(1, (rtc->year / 10));
+    
+    // Year - ones place
+    if (selected_date_digit == 0)
+        write_both(0, (rtc->year % 10) | 0x10);  // Set blink flag
+    else
+        write_both(0, (rtc->year % 10));
 }
 
 // Function to display the date from the RTC
@@ -505,46 +540,118 @@ void main(void) {
     while (1) {
         read_sensor_matrix();
 
-        write_serie(sensor_ram[i]);
-
-        write_both(0, i);
-
-        write_lamps(i, sensor_ram[i]);
-
         bool buttonl = check_button(RISK_LEFT);
         bool buttons = check_button(STOP_MID);
         bool buttonr = check_button(RISK_RIGHT);
         bool buttonret = check_button(RETURN);
 
-        write_both(1, 0xff);
-        write_both(2, 0xff);
-        write_both(3, 0xff);
-        write_both(4, 0xff);
-
-        if (buttonl) {
-            i--;
-        } else if (buttonr) {
-            i++;
-        }
-
-        if (buttonret) {
-            i = 0;
-        }
-
-        if (buttons)
-            switch (i) {
-                case 5:
-                    play_track();
-                    break;
-                case 6:
-                    display_rtc_date();
-                    delay(4000);
-                    break;
-                case 7:
-                    display_rtc_time();
-                    delay(4000);
-                    break;
+        // Date edit mode handling
+        if (date_edit_mode) {
+            // Navigate between date digits (only valid digits: 7,6,4,3,1,0)
+            if (buttonl) {
+                do {
+                    selected_date_digit++;
+                    if (selected_date_digit > 7)
+                        selected_date_digit = 7;
+                } while (selected_date_digit == 5 || selected_date_digit == 2);  // Skip separator positions
+                display_rtc_date();
+                refresh_display();
+                dumb_delay(200);
+            } else if (buttonr) {
+                do {
+                    selected_date_digit--;
+                    if (selected_date_digit < 0)
+                        selected_date_digit = 0;
+                } while (selected_date_digit == 5 || selected_date_digit == 2);  // Skip separator positions
+                display_rtc_date();
+                refresh_display();
+                dumb_delay(200);
             }
+
+            // Change selected digit value
+            if (buttons) {
+                switch (selected_date_digit) {
+                    case 7:  // Day tens place
+                        rtc->day_of_month = ((rtc->day_of_month / 10 + 1) % 3) * 10 + (rtc->day_of_month % 10);
+                        if (rtc->day_of_month > 31)
+                            rtc->day_of_month = 01;
+                        break;
+                    case 6:  // Day ones place
+                        rtc->day_of_month = (rtc->day_of_month / 10) * 10 + ((rtc->day_of_month % 10 + 1) % 10);
+                        if (rtc->day_of_month > 31)
+                            rtc->day_of_month = (rtc->day_of_month / 10) * 10 + 0;
+                        break;
+                    case 4:  // Month tens place
+                        rtc->month = ((rtc->month / 10 + 1) % 2) * 10 + (rtc->month % 10);
+                        if (rtc->month > 12)
+                            rtc->month = 01;
+                        break;
+                    case 3:  // Month ones place
+                        rtc->month = (rtc->month / 10) * 10 + ((rtc->month % 10 + 1) % 10);
+                        if (rtc->month > 12)
+                            rtc->month = (rtc->month / 10) * 10 + 0;
+                        break;
+                    case 1:  // Year tens place
+                        rtc->year = ((rtc->year / 10 + 1) % 10) * 10 + (rtc->year % 10);
+                        break;
+                    case 0:  // Year ones place
+                        rtc->year = (rtc->year / 10) * 10 + ((rtc->year % 10 + 1) % 10);
+                        break;
+                }
+                display_rtc_date();
+                refresh_display();
+                dumb_delay(200);
+            }
+
+            // Exit edit mode
+            if (buttonret) {
+                date_edit_mode = false;
+                selected_date_digit = -1;
+                display_rtc_date();  // Refresh without blinking
+                refresh_display();
+            }
+        } else {
+            write_serie(sensor_ram[i]);
+            write_both(0, i);
+            write_lamps(i, sensor_ram[i]);
+            write_both(1, 0xff);
+            write_both(2, 0xff);
+            write_both(3, 0xff);
+            write_both(4, 0xff);
+
+            // Normal mode operations
+            if (buttonl) {
+                i--;
+                dumb_delay(200);
+            } else if (buttonr) {
+                i++;
+                dumb_delay(200);
+            }
+
+            if (buttonret) {
+                i = 0;
+                dumb_delay(200);
+            }
+
+            if (buttons) {
+                switch (i) {
+                    case 5:
+                        play_track();
+                        break;
+                    case 6:
+                        date_edit_mode = true;
+                        selected_date_digit = 7;  // Start with first digit (day tens place)
+                        display_rtc_date();
+                        refresh_display();
+                        break;
+                    case 7:
+                        display_rtc_time();
+                        delay(4000);
+                        break;
+                }
+                dumb_delay(200);
+            }
+        }
 
         if (i < 0) {
             i = 7;
