@@ -53,6 +53,9 @@ bool timer5_flag = false;
 uint8_t sensor_ram[8];
 uint8_t sensor_row = 0;
 
+uint8_t money_display[8];
+uint8_t service_display[8];
+
 /**
  * @brief Enable Interrupts
  *
@@ -110,7 +113,10 @@ void read_sensor_matrix() {
  * Currently a placeholder function.
  */
 void _8085_int75() {
-    uint8_t out=0xaa;
+    kdc_cmd_out(I8279_WRITE_DISPLAY_RAM | I8279_RW_AUTO_INCREMENT | 8);
+    for (uint8_t digit = 0; digit < 8; digit++) {        
+        kdc_data_out((money_display[digit] << 4) | service_display[digit]);
+    }
     enable_interrupts();
 }
 
@@ -175,9 +181,17 @@ void write_lamps(uint8_t line, uint8_t data) {
  * @param mon Digit on the money display
  * @param srv Digit on the service display
  */
-void write_digit(uint8_t digit, uint8_t mon, uint8_t srv) {
-    kdc_cmd_out(I8279_WRITE_DISPLAY_RAM | ((digit & 7) + 8));
-    kdc_data_out((mon << 4) | srv);
+void write_money(uint8_t digit, uint8_t value) {
+    money_display[digit] = value;
+}
+
+void write_service(uint8_t digit, uint8_t value) {
+    service_display[digit] = value;
+}
+
+void write_both(uint8_t digit, uint8_t value) {
+    money_display[digit] = value;
+    service_display[digit] = value;
 }
 
 /**
@@ -191,9 +205,9 @@ void write_serie(uint8_t number) {
         uint8_t tens = (number % 100) / 10;
         uint8_t ones = number % 10;
         
-        write_digit(7, hundreds, hundreds);
-        write_digit(6, tens, tens);
-        write_digit(5, ones, ones);
+        write_money(7, hundreds);
+        write_money(6, tens);
+        write_money(5, ones);
 }
 
 /**
@@ -331,12 +345,11 @@ void play_track()
     for (uint16_t i = 0; i < sizeof(track) / sizeof(track[0]); i++)
     {
         play_note(track[i].note, track[i].octave, track[i].duration);
-        write_digit(0, track[i].note, track[i].note);
-        write_digit(1, track[i].octave, track[i].octave);
-        write_digit(2, track[i].duration, track[i].duration);
-        write_digit(3, track[i].length, track[i].length);
-        write_digit(4, i, i);
-
+        write_both(0, track[i].note);
+        write_both(1, track[i].octave);
+        write_both(2, track[i].duration);
+        write_both(3, track[i].length);
+        write_both(4, i);
         // Print lyric to serial port
         if (track[i].lyric != 0)
         {
@@ -385,35 +398,35 @@ bool check_button(uint8_t button) {
 
 void display_rtc_date()
 {
-    write_digit(7, (rtc->day_of_month / 10), (rtc->day_of_month / 10));
-    write_digit(6, (rtc->day_of_month % 10), (rtc->day_of_month % 10));
+    write_both(7, (rtc->day_of_month / 10));
+    write_both(6, (rtc->day_of_month % 10));
 
-    write_digit(5, 0xff, 0xff);
+    write_both(5, 0xff);
 
-    write_digit(4, (rtc->month / 10), (rtc->month / 10));
-    write_digit(3, (rtc->month % 10), (rtc->month % 10));
+    write_both(4, (rtc->month / 10));
+    write_both(3, (rtc->month % 10));
 
-    write_digit(2, 0xff, 0xff);
+    write_both(2, 0xff);
 
-    write_digit(1, (rtc->year / 10), (rtc->year / 10));
-    write_digit(0, (rtc->year % 10), (rtc->year % 10));
+    write_both(1, (rtc->year / 10));
+    write_both(0, (rtc->year % 10));
 }
 
 // Function to display the date from the RTC
 void display_rtc_time()
 {
-    write_digit(7, (rtc->hours / 10), (rtc->hours / 10));
-    write_digit(6, (rtc->hours % 10), (rtc->hours % 10));
+    write_both(7, (rtc->hours / 10));
+    write_both(6, (rtc->hours % 10));
 
-    write_digit(5, 0xff, 0xff);
+    write_both(5, 0xff);
 
-    write_digit(4, (rtc->minutes / 10), (rtc->minutes / 10));
-    write_digit(3, (rtc->minutes % 10), (rtc->minutes % 10));
+    write_both(4, (rtc->minutes / 10));
+    write_both(3, (rtc->minutes % 10));
 
-    write_digit(2, 0xff, 0xff);
+    write_both(2, 0xff);
 
-    write_digit(1, (rtc->seconds / 10), (rtc->seconds / 10));
-    write_digit(0, (rtc->seconds % 10), (rtc->seconds % 10));
+    write_both(1, (rtc->seconds / 10));
+    write_both(0, (rtc->seconds % 10));
 }
 
 /**
@@ -442,7 +455,7 @@ void main(void) {
 
         write_serie(sensor_ram[i]);
 
-        write_digit(0, i, i);
+        write_both(0, i);
 
         write_lamps(i, sensor_ram[i]);
 
@@ -451,10 +464,10 @@ void main(void) {
         bool buttonr = check_button(RISK_RIGHT);
         bool buttonret = check_button(RETURN);
 
-        write_digit(1, 0xff, 0xff);
-        write_digit(2, 0xff, 0xff);
-        write_digit(3, 0xff, 0xff);
-        write_digit(4, 0xff, 0xff);
+        write_both(1, 0xff);
+        write_both(2, 0xff);
+        write_both(3, 0xff);
+        write_both(4, 0xff);
 
         if (buttonl) {
             i--;
