@@ -83,7 +83,8 @@ volatile struct rtc_state *rtc;
 bool timer3_flag = false;
 bool blink_flag = false;
 bool date_edit_mode = false;
-int8_t selected_date_digit = -1;
+bool time_edit_mode = false;
+int8_t selected_digit = -1;
 
 uint8_t sensor_ram[8];
 uint8_t sensor_row = 0;
@@ -458,13 +459,13 @@ void display_rtc_date()
     }
 
     // Day of month - tens place
-    if (selected_date_digit == 7)
+    if (selected_digit == 7)
         write_both(7, (rtc->day_of_month / 10) | 0x10);  // Set blink flag
     else
         write_both(7, (rtc->day_of_month / 10));
 
     // Day of month - ones place
-    if (selected_date_digit == 6)
+    if (selected_digit == 6)
         write_both(6, (rtc->day_of_month % 10) | 0x10);  // Set blink flag
     else
         write_both(6, (rtc->day_of_month % 10));
@@ -472,13 +473,13 @@ void display_rtc_date()
     write_both(5, 0xff);
 
     // Month - tens place
-    if (selected_date_digit == 4)
+    if (selected_digit == 4)
         write_both(4, (rtc->month / 10) | 0x10);  // Set blink flag
     else
         write_both(4, (rtc->month / 10));
 
     // Month - ones place
-    if (selected_date_digit == 3)
+    if (selected_digit == 3)
         write_both(3, (rtc->month % 10) | 0x10);  // Set blink flag
     else
         write_both(3, (rtc->month % 10));
@@ -486,13 +487,13 @@ void display_rtc_date()
     write_both(2, 0xff);
 
     // Year - tens place
-    if (selected_date_digit == 1)
+    if (selected_digit == 1)
         write_both(1, (rtc->year / 10) | 0x10);  // Set blink flag
     else
         write_both(1, (rtc->year / 10));
 
     // Year - ones place
-    if (selected_date_digit == 0)
+    if (selected_digit == 0)
         write_both(0, (rtc->year % 10) | 0x10);  // Set blink flag
     else
         write_both(0, (rtc->year % 10));
@@ -552,19 +553,19 @@ void main(void) {
             // Navigate between date digits (only valid digits: 7,6,4,3,1,0)
             if (buttonl) {
                 do {
-                    selected_date_digit++;
-                    if (selected_date_digit > 7)
-                        selected_date_digit = 7;
-                } while (selected_date_digit == 5 || selected_date_digit == 2);  // Skip separator positions
+                    selected_digit++;
+                    if (selected_digit > 7)
+                        selected_digit = 7;
+                } while (selected_digit == 5 || selected_digit == 2);  // Skip separator positions
                 display_rtc_date();
                 refresh_display();
                 dumb_delay(200);
             } else if (buttonr) {
                 do {
-                    selected_date_digit--;
-                    if (selected_date_digit < 0)
-                        selected_date_digit = 0;
-                } while (selected_date_digit == 5 || selected_date_digit == 2);  // Skip separator positions
+                    selected_digit--;
+                    if (selected_digit < 0)
+                        selected_digit = 0;
+                } while (selected_digit == 5 || selected_digit == 2);  // Skip separator positions
                 display_rtc_date();
                 refresh_display();
                 dumb_delay(200);
@@ -572,7 +573,7 @@ void main(void) {
 
             // Change selected digit value
             if (buttons) {
-                switch (selected_date_digit) {
+                switch (selected_digit) {
                     case 7:  // Day tens place
                         rtc->day_of_month = ((rtc->day_of_month / 10 + 1) % 3) * 10 + (rtc->day_of_month % 10);
                         if (rtc->day_of_month > 31)
@@ -608,7 +609,7 @@ void main(void) {
             // Exit edit mode
             if (buttonret) {
                 date_edit_mode = false;
-                selected_date_digit = -1;
+                selected_digit = -1;
                 display_rtc_date();  // Refresh without blinking
                 refresh_display();
             }
@@ -637,18 +638,18 @@ void main(void) {
 
             if (buttons) {
                 switch (i) {
-                    case 5:
-                        play_track();
-                        break;
-                    case 6:
+                    case 2:
                         date_edit_mode = true;
-                        selected_date_digit = 7;  // Start with first digit (day tens place)
+                        selected_digit = 7;  // Start with first digit (day tens place)
                         display_rtc_date();
                         refresh_display();
                         break;
-                    case 7:
+                    case 3:
                         display_rtc_time();
                         delay(4000);
+                        break;
+                    case 5:
+                        play_track();
                         break;
                 }
                 dumb_delay(200);
