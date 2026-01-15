@@ -423,20 +423,15 @@ void main(void) {
     bool buttons = false;
     bool buttonr = false;
 
-    delay(80);
-
     // Infinite loop to scan the keyboard
     while (1) {
         read_sensor_matrix();
 
         write_serie(sensor_ram[i]);
-        dumb_delay(10);
 
         write_digit(0, i, i);
-        dumb_delay(10);
 
         write_lamps(i, sensor_ram[i]);
-        dumb_delay(10);
 
         bool buttonl = check_button(RISK_LEFT);
         bool buttons = check_button(STOP_MID);
@@ -446,8 +441,6 @@ void main(void) {
         write_digit(2, 0xff, 0xff);
         write_digit(3, 0xff, 0xff);
         write_digit(4, 0xff, 0xff);
-
-        dumb_delay(10);
 
         if (buttonl) {
             i--;
