@@ -39,6 +39,8 @@ enum COUNTER_VALS {
 
 #include "track.c"
 
+#include "hd146818.c"
+
 #define COINS       0x70
 #define COUNTERS    0x71
 #define SOUND       0x72
@@ -46,21 +48,39 @@ enum COUNTER_VALS {
 bool timer3_flag = false;
 bool timer5_flag = false;
 
+uint8_t sensor_ram[8];
+uint8_t sensor_row = 0;
+
+/**
+ * @brief Enable Interrupts
+ *
+ * @param data Interrupt array
+ */
+void enable_interrupts() {
+    __asm
+        EI
+    __endasm;
+}
+
 // timer2
 void _8085_int1() {
     uint8_t out=0xaa;
+    enable_interrupts();
 }
 // timer3
 void _8085_int3() {
     timer3_flag = false;
+    enable_interrupts();
 }
 // tx int
 void _8085_int5() {
     uint8_t out=0xaa;
+    enable_interrupts();
 }
 //timer5
 void _8085_int7() {
     timer5_flag = false;
+    enable_interrupts();
 }
 
 /**
@@ -69,7 +89,17 @@ void _8085_int7() {
  * Currently a placeholder function.
  */
 void _8085_int65() {
-    uint8_t out=0xaa;
+    sensor_ram[sensor_row] = read_sram(sensor_row);
+    sensor_row++;
+    if (sensor_row > 7) sensor_row = 0;
+    kdc_cmd_out(I8279_END_INTERRUPT);
+    enable_interrupts();
+}
+
+void read_sensor_matrix() {
+    for (uint8_t row = 0; row < 8; row++) {
+        sensor_ram[row] = read_sram(row);
+    }
 }
 
 /**
@@ -79,6 +109,7 @@ void _8085_int65() {
  */
 void _8085_int75() {
     uint8_t out=0xaa;
+    enable_interrupts();
 }
 
 /**
@@ -88,6 +119,7 @@ void _8085_int75() {
  */
 void _8085_int55() {
     uint8_t out=0xaa;
+    enable_interrupts();
 }
 
 /**
@@ -116,8 +148,8 @@ void set_sound(uint8_t note) {
 
 void wait_timer3(uint8_t data) {
     timer3_flag = true;
-    enable_interrupts(I8256_INT_L3);
     set_timer3(data); // Set timer value as needed
+    enable_muart_interrupts(I8256_INT_L3);
     while (timer3_flag) {
         // Wait for timer3_flag to be cleared in interrupt
     }
@@ -144,6 +176,22 @@ void write_lamps(uint8_t line, uint8_t data) {
 void write_digit(uint8_t digit, uint8_t mon, uint8_t srv) {
     kdc_cmd_out(I8279_WRITE_DISPLAY_RAM | ((digit & 7) + 8));
     kdc_data_out((mon << 4) | srv);
+}
+
+/**
+ * @brief Write a decimal number to the Serie display in the first 3 digits
+ *
+ * @param number Number to write to the lamp line
+ */
+void write_serie(uint8_t number) {
+        // Convert data1 to decimal and display on digits 7-5
+        uint8_t hundreds = number / 100;
+        uint8_t tens = (number % 100) / 10;
+        uint8_t ones = number % 10;
+        
+        write_digit(7, hundreds, hundreds);
+        write_digit(6, tens, tens);
+        write_digit(5, ones, ones);
 }
 
 /**
@@ -257,7 +305,7 @@ uint8_t read_serial_char() {
     return read_buffer();
 }
 
-print_string(const char* str) {
+void print_string(const char* str) {
     while (*str) {
         print_serial_char(*str);
         str++;
@@ -310,6 +358,7 @@ void play_track()
 
 // Button definitions
 #define RISK_LEFT  BUTTON(3, 1, 1)
+#define STOP_MID   BUTTON(3, 3, 1)
 #define RISK_RIGHT BUTTON(3, 0, 1)
 /**
  * @brief Check the state of a button
@@ -322,14 +371,32 @@ bool check_button(uint8_t button) {
     uint8_t col = button & 0x0F;
     uint8_t inverted = (button >> 7) & 0x01;
     
-    uint8_t sram_data = read_sram(row);
-    bool button_state = (sram_data >> col) & 0x01;
+    bool button_state = (sensor_ram[row] >> col) & 0x01;
     
     if (inverted) {
         return !button_state;
     } else {
         return button_state;
     }
+}
+
+// Function to display the date from the RTC
+void display_rtc_date()
+{
+    struct rtc_state *rtc = (struct rtc_state *)0x9000;
+
+    write_digit(7, (rtc->day_of_month / 10), (rtc->day_of_month / 10));
+    write_digit(6, (rtc->day_of_month % 10), (rtc->day_of_month % 10));
+
+    write_digit(5, 0xff, 0xff);
+
+    write_digit(4, (rtc->month / 10), (rtc->month / 10));
+    write_digit(3, (rtc->month % 10), (rtc->month % 10));
+
+    write_digit(2, 0xff, 0xff);
+
+    write_digit(1, (rtc->year / 10), (rtc->year / 10));
+    write_digit(0, (rtc->year % 10), (rtc->year % 10));
 }
 
 /**
@@ -340,50 +407,60 @@ bool check_button(uint8_t button) {
  * and echoes back any serial input
  */
 void main(void) {
-    uint8_t i;
+    int8_t i;
 
     init_kdc();
     init_muart();
 
-    uint8_t keys[16];
-    uint8_t port1;
-    uint8_t port2;
+    enable_interrupts();
 
-    delay(80);
-
-    play_track();
+    bool buttonl = false;
+    bool buttons = false;
+    bool buttonr = false;
 
     // Infinite loop to scan the keyboard
     while (1) {
+        read_sensor_matrix();
 
-        keys[i] = read_sram(i);
+        write_serie(sensor_ram[i]);
 
-        write_digit(0, keys[0] & 0x0F,  keys[1] & 0x0F);
-        write_digit(1, keys[0] >> 4,    keys[1] >> 4);
+        write_digit(0, i, i);
 
-        write_digit(2, keys[2] & 0x0F,  keys[3] & 0x0F);
-        write_digit(3, keys[2] >> 4,    keys[3] >> 4);
+        write_lamps(i, sensor_ram[i]);
 
-        port1 = read_port1();
-        port2 = read_port2();
+        bool buttonl = check_button(RISK_LEFT);
+        bool buttons = check_button(STOP_MID);
+        bool buttonr = check_button(RISK_RIGHT);
 
-        write_lamps(6, port1);
-        write_digit(4, port1 & 0x0F,  port1 & 0x0F);
-        write_digit(5, port1 >> 4,    port1 >> 4);
+        write_digit(1, 0xff, 0xff);
+        write_digit(2, 0xff, 0xff);
+        write_digit(3, 0xff, 0xff);
+        write_digit(4, 0xff, 0xff);
 
-        write_lamps(7, port2);
-        write_digit(6, port2 & 0x0F,  port2 & 0x0F);
-        write_digit(7, port2 >> 4,    port2 >> 4);
+        if (buttonl) {
+            i--;
+        } else if (buttonr) {
+            i++;
+        }
 
-        if (i<6)
-            write_lamps(i, keys[i]);
-        
-        kdc_cmd_out(I8279_END_INTERRUPT);
+        if (buttons)
+            switch (i) {
+                case 5:
+                    play_track();
+                    break;
+                case 6:
+                    display_rtc_date();
+                    delay(2000);
+                    break;
+            }
 
-        i++;
+
+        if (i < 0) {
+            i = 7;
+        }
+
         if (i >= 8) {
             i = 0;
-            kdc_cmd_out(I8279_CLEAR | I8279_CLEAR_FIFO);
         }
 
         if(read_status() & I8256_STATUS_RBF) {
