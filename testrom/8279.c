@@ -18,6 +18,15 @@
 #define I8279_DATA    I8279_IO
 #define I8279_CMD     I8279_DATA + 1
 
+// Function prototypes
+void kdc_cmd_out(uint8_t data);
+void kdc_data_out(uint8_t data);
+uint8_t kdc_cmd_in();
+uint8_t kdc_data_in();
+void set_kdc_clock(uint8_t divider);
+uint8_t read_dram(uint8_t addr);
+uint8_t read_sram(uint8_t addr);
+
 #define I8279_MODE_SET 0x00
 #define I8279_MODE_DISPLAY_8BIT 0x00
 #define I8279_MODE_DISPLAY_16BIT 0x08

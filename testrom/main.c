@@ -41,6 +41,39 @@ enum COUNTER_VALS {
 
 #include "hd146818.c"
 
+// Function prototypes
+void enable_interrupts();
+void _8085_int1();
+void _8085_int3();
+void _8085_int5();
+void _8085_int7();
+void _8085_int65();
+void read_sensor_matrix();
+void _8085_int75();
+void _8085_int55();
+void counter_out(uint8_t data);
+void set_sound(uint8_t note);
+void wait_timer3(uint8_t data);
+void write_lamps(uint8_t line, uint8_t data);
+void write_money(uint8_t digit, uint8_t value);
+void write_service(uint8_t digit, uint8_t value);
+void write_both(uint8_t digit, uint8_t value);
+void refresh_display();
+void write_serie(uint8_t number);
+void init_kdc();
+void init_muart();
+void delay(uint16_t ms);
+void dumb_delay(uint16_t ms);
+void wait_tx_ready();
+void print_serial_char(uint8_t txdata);
+uint8_t read_serial_char();
+void print_string(const char* str);
+void play_note(uint8_t note, uint8_t octave, uint8_t duration);
+void play_track();
+bool check_button(uint8_t button);
+void display_rtc_date();
+void display_rtc_time();
+
 struct rtc_state *rtc = (struct rtc_state *)0x9000;
 
 #define COINS       0x70

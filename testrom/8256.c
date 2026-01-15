@@ -31,6 +31,15 @@
 #define I8256_TIMER5        I8256_IO + 0x0e
 #define I8256_STATUS        I8256_IO + 0x0f
 
+// Function prototypes
+void set_timer3(uint8_t data);
+uint8_t read_port1();
+uint8_t read_port2();
+void enable_muart_interrupts(uint8_t data);
+uint8_t read_status();
+void write_buffer(uint8_t txdata);
+uint8_t read_buffer();
+
 
 #define I8256_CMD1_FRQ_16    0x00
 #define I8256_CMD1_FRQ_1K    0x01
