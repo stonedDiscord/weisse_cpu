@@ -362,6 +362,7 @@ void play_track()
 #define RISK_LEFT  BUTTON(3, 1, 1)
 #define STOP_MID   BUTTON(3, 3, 1)
 #define RISK_RIGHT BUTTON(3, 0, 1)
+#define RETURN     BUTTON(0, 3, 1)
 /**
  * @brief Check the state of a button
  *
@@ -433,6 +434,7 @@ void main(void) {
     bool buttonl = false;
     bool buttons = false;
     bool buttonr = false;
+    bool buttonret = false;
 
     // Infinite loop to scan the keyboard
     while (1) {
@@ -447,6 +449,7 @@ void main(void) {
         bool buttonl = check_button(RISK_LEFT);
         bool buttons = check_button(STOP_MID);
         bool buttonr = check_button(RISK_RIGHT);
+        bool buttonret = check_button(RETURN);
 
         write_digit(1, 0xff, 0xff);
         write_digit(2, 0xff, 0xff);
@@ -457,6 +460,10 @@ void main(void) {
             i--;
         } else if (buttonr) {
             i++;
+        }
+
+        if (buttonret) {
+            i = 0;
         }
 
         if (buttons)
