@@ -226,7 +226,23 @@ void write_both(uint8_t digit, uint8_t value) {
     service_display[digit] = value;
 }
 
+void update_blink()
+{
+    // Clear all blink flags first
+    for (uint8_t digit = 0; digit < 8; digit++) {
+        money_display[digit] &= 0x0F;
+        service_display[digit] &= 0x0F;
+    }
+
+    // Set the blink flag for the selected digit
+    if (selected_digit >= 0 && selected_digit < 8) {
+    money_display[selected_digit] |= 0xF0;
+    service_display[selected_digit] |= 0xF0;
+    }    
+}
+
 void refresh_display() {
+    update_blink();
     kdc_cmd_out(I8279_WRITE_DISPLAY_RAM | I8279_RW_AUTO_INCREMENT | 8);
     for (uint8_t digit = 0; digit < 8; digit++) {
 
@@ -452,51 +468,18 @@ bool check_button(uint8_t button) {
 
 void display_rtc_date()
 {
-    // Clear all blink flags first
-    for (uint8_t digit = 0; digit < 8; digit++) {
-        money_display[digit] &= 0x0F;
-        service_display[digit] &= 0x0F;
-    }
-
-    // Day of month - tens place
-    if (selected_digit == 7)
-        write_both(7, (rtc->day_of_month / 10) | 0x10);  // Set blink flag
-    else
-        write_both(7, (rtc->day_of_month / 10));
-
-    // Day of month - ones place
-    if (selected_digit == 6)
-        write_both(6, (rtc->day_of_month % 10) | 0x10);  // Set blink flag
-    else
-        write_both(6, (rtc->day_of_month % 10));
+    write_both(7, (rtc->day_of_month / 10));
+    write_both(6, (rtc->day_of_month % 10));
 
     write_both(5, 0xff);
 
-    // Month - tens place
-    if (selected_digit == 4)
-        write_both(4, (rtc->month / 10) | 0x10);  // Set blink flag
-    else
-        write_both(4, (rtc->month / 10));
-
-    // Month - ones place
-    if (selected_digit == 3)
-        write_both(3, (rtc->month % 10) | 0x10);  // Set blink flag
-    else
-        write_both(3, (rtc->month % 10));
+    write_both(4, (rtc->month / 10));
+    write_both(3, (rtc->month % 10));
 
     write_both(2, 0xff);
 
-    // Year - tens place
-    if (selected_digit == 1)
-        write_both(1, (rtc->year / 10) | 0x10);  // Set blink flag
-    else
-        write_both(1, (rtc->year / 10));
-
-    // Year - ones place
-    if (selected_digit == 0)
-        write_both(0, (rtc->year % 10) | 0x10);  // Set blink flag
-    else
-        write_both(0, (rtc->year % 10));
+    write_both(1, (rtc->year / 10));
+    write_both(0, (rtc->year % 10));
 }
 
 // Function to display the date from the RTC
