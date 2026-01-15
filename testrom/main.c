@@ -74,7 +74,7 @@ bool check_button(uint8_t button);
 void display_rtc_date();
 void display_rtc_time();
 
-volatile struct rtc_state *rtc = (struct rtc_state *)0x9000;
+volatile struct rtc_state *rtc;
 
 #define COINS       0x70
 #define COUNTERS    0x71
@@ -462,7 +462,7 @@ void display_rtc_date()
         write_both(7, (rtc->day_of_month / 10) | 0x10);  // Set blink flag
     else
         write_both(7, (rtc->day_of_month / 10));
-    
+
     // Day of month - ones place
     if (selected_date_digit == 6)
         write_both(6, (rtc->day_of_month % 10) | 0x10);  // Set blink flag
@@ -476,7 +476,7 @@ void display_rtc_date()
         write_both(4, (rtc->month / 10) | 0x10);  // Set blink flag
     else
         write_both(4, (rtc->month / 10));
-    
+
     // Month - ones place
     if (selected_date_digit == 3)
         write_both(3, (rtc->month % 10) | 0x10);  // Set blink flag
@@ -490,7 +490,7 @@ void display_rtc_date()
         write_both(1, (rtc->year / 10) | 0x10);  // Set blink flag
     else
         write_both(1, (rtc->year / 10));
-    
+
     // Year - ones place
     if (selected_date_digit == 0)
         write_both(0, (rtc->year % 10) | 0x10);  // Set blink flag
@@ -527,6 +527,8 @@ void main(void) {
 
     init_kdc();
     init_muart();
+
+    rtc = (struct rtc_state *)0x9000;
 
     _8085_int7();
     enable_interrupts();
