@@ -385,23 +385,18 @@ void display_rtc_date()
 {
     struct rtc_state *rtc = (struct rtc_state *)0x9000;
 
-    // Write day of month to digits 0 and 1
-    write_digit(0, (rtc->day_of_month / 10), (rtc->day_of_month / 10));
-    write_digit(1, (rtc->day_of_month % 10), (rtc->day_of_month % 10));
+    write_digit(7, (rtc->day_of_month / 10), (rtc->day_of_month / 10));
+    write_digit(6, (rtc->day_of_month % 10), (rtc->day_of_month % 10));
 
-    // Write space to digit 2
-    write_digit(2, 0xff, 0xff);
-
-    // Write month to digits 3 and 4
-    write_digit(3, (rtc->month / 10), (rtc->month / 10));
-    write_digit(4, (rtc->month % 10), (rtc->month % 10));
-
-    // Write space to digit 5
     write_digit(5, 0xff, 0xff);
 
-    // Write year to digits 6 and 7
-    write_digit(6, (rtc->year / 10), (rtc->year / 10));
-    write_digit(7, (rtc->year % 10), (rtc->year % 10));
+    write_digit(4, (rtc->month / 10), (rtc->month / 10));
+    write_digit(3, (rtc->month % 10), (rtc->month % 10));
+
+    write_digit(2, 0xff, 0xff);
+
+    write_digit(1, (rtc->year / 10), (rtc->year / 10));
+    write_digit(0, (rtc->year % 10), (rtc->year % 10));
 }
 
 /**

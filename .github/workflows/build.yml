@@ -16,7 +16,7 @@ jobs:
 
     - name: Build with z88dk
       working-directory: testrom
-      run: zcc +z80 -clib=8085 -pragma-define:CRT_ORG_BSS=0xc000 -pragma-define:REGISTER_SP=0xc7f0 main.c -create-app
+      run: ./build.sh
 
     - name: Upload ROM artifact
       uses: actions/upload-artifact@v6
