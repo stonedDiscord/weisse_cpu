@@ -75,6 +75,7 @@ void _8085_int3() {
 // tx int
 void _8085_int5() {
     uint8_t out=0xaa;
+    enable_interrupts();
 }
 //timer5
 void _8085_int7() {
@@ -107,7 +108,7 @@ void read_sensor_matrix() {
  * Currently a placeholder function.
  */
 void _8085_int75() {
-    read_sensor_matrix();
+    uint8_t out=0xaa;
     enable_interrupts();
 }
 
@@ -147,8 +148,8 @@ void set_sound(uint8_t note) {
 
 void wait_timer3(uint8_t data) {
     timer3_flag = true;
-    enable_muart_interrupts(I8256_INT_L3);
     set_timer3(data); // Set timer value as needed
+    enable_muart_interrupts(I8256_INT_L3);
     while (timer3_flag) {
         // Wait for timer3_flag to be cleared in interrupt
     }
