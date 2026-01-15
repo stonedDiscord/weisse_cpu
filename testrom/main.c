@@ -39,6 +39,9 @@ enum COUNTER_VALS {
 
 #include "track.c"
 
+#include "hd146818.c"
+#include "rtc_display.c"
+
 #define COINS       0x70
 #define COUNTERS    0x71
 #define SOUND       0x72
@@ -392,8 +395,9 @@ void main(void) {
 
     enable_interrupts();
 
-    uint8_t keys[16];
-    uint8_t data1;
+    bool buttonl = false;
+    bool buttons = false;
+    bool buttonr = false;
 
     delay(80);
 

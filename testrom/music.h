@@ -1,3 +1,6 @@
+#ifndef HEADER_MUSIC
+#define HEADER_MUSIC
+
 #include <stdint.h>
 
 typedef enum note {
@@ -38,3 +41,5 @@ struct noteData
     uint8_t length; //divided by 8
     const char* lyric; //lyric text for this note
 };
+
+#endif
