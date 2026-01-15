@@ -596,6 +596,74 @@ void main(void) {
                 display_rtc_date();  // Refresh without blinking
                 refresh_display();
             }
+        } else if (time_edit_mode) {
+            // Navigate between time digits (only valid digits: 7,6,4,3,1,0)
+            if (buttonl) {
+                do {
+                    selected_digit++;
+                    if (selected_digit > 7)
+                        selected_digit = 7;
+                } while (selected_digit == 5 || selected_digit == 2);  // Skip separator positions
+                display_rtc_time();
+                refresh_display();
+                dumb_delay(200);
+            } else if (buttonr) {
+                do {
+                    selected_digit--;
+                    if (selected_digit < 0)
+                        selected_digit = 0;
+                } while (selected_digit == 5 || selected_digit == 2);  // Skip separator positions
+                display_rtc_time();
+                refresh_display();
+                dumb_delay(200);
+            }
+
+            // Change selected digit value
+            if (buttons) {
+                switch (selected_digit) {
+                    case 7:  // Hours tens place
+                        rtc->hours = ((rtc->hours / 10 + 1) % 3) * 10 + (rtc->hours % 10);
+                        if (rtc->hours > 23)
+                            rtc->hours -= 20;
+                        break;
+                    case 6:  // Hours ones place
+                        rtc->hours = (rtc->hours / 10) * 10 + ((rtc->hours % 10 + 1) % 10);
+                        if (rtc->hours > 23)
+                            rtc->hours = (rtc->hours / 10) * 10;
+                        break;
+                    case 4:  // Minutes tens place
+                        rtc->minutes = ((rtc->minutes / 10 + 1) % 6) * 10 + (rtc->minutes % 10);
+                        if (rtc->minutes > 59)
+                            rtc->minutes = 00;
+                        break;
+                    case 3:  // Minutes ones place
+                        rtc->minutes = (rtc->minutes / 10) * 10 + ((rtc->minutes % 10 + 1) % 10);
+                        if (rtc->minutes > 59)
+                            rtc->minutes = (rtc->minutes / 10) * 10;
+                        break;
+                    case 1:  // Seconds tens place
+                        rtc->seconds = ((rtc->seconds / 10 + 1) % 6) * 10 + (rtc->seconds % 10);
+                        if (rtc->seconds > 59)
+                            rtc->seconds = 00;
+                        break;
+                    case 0:  // Seconds ones place
+                        rtc->seconds = (rtc->seconds / 10) * 10 + ((rtc->seconds % 10 + 1) % 10);
+                        if (rtc->seconds > 59)
+                            rtc->seconds = (rtc->seconds / 10) * 10;
+                        break;
+                }
+                display_rtc_time();
+                refresh_display();
+                dumb_delay(200);
+            }
+
+            // Exit edit mode
+            if (buttonret) {
+                time_edit_mode = false;
+                selected_digit = -1;
+                display_rtc_time();  // Refresh without blinking
+                refresh_display();
+            }
         } else {
             write_serie(sensor_ram[i]);
             write_both(0, i);
@@ -630,6 +698,12 @@ void main(void) {
                     case 3:
                         display_rtc_time();
                         delay(4000);
+                        break;
+                    case 4:
+                        time_edit_mode = true;
+                        selected_digit = 7;  // Start with first digit (hours tens place)
+                        display_rtc_time();
+                        refresh_display();
                         break;
                     case 5:
                         play_track();
