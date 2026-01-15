@@ -49,6 +49,7 @@ struct rtc_state *rtc = (struct rtc_state *)0x9000;
 
 bool timer3_flag = false;
 bool timer5_flag = false;
+bool blink_flag = false;
 
 uint8_t sensor_ram[8];
 uint8_t sensor_row = 0;
@@ -85,6 +86,8 @@ void _8085_int5() {
 //timer5
 void _8085_int7() {
     timer5_flag = false;
+    blink_flag = !blink_flag;
+    refresh_display();
     enable_interrupts();
 }
 
@@ -94,10 +97,7 @@ void _8085_int7() {
  * Currently a placeholder function.
  */
 void _8085_int65() {
-    sensor_ram[sensor_row] = read_sram(sensor_row);
-    sensor_row++;
-    if (sensor_row > 7) sensor_row = 0;
-    kdc_cmd_out(I8279_END_INTERRUPT);
+    read_sensor_matrix();
     enable_interrupts();
 }
 
@@ -113,10 +113,7 @@ void read_sensor_matrix() {
  * Currently a placeholder function.
  */
 void _8085_int75() {
-    kdc_cmd_out(I8279_WRITE_DISPLAY_RAM | I8279_RW_AUTO_INCREMENT | 8);
-    for (uint8_t digit = 0; digit < 8; digit++) {        
-        kdc_data_out((money_display[digit] << 4) | service_display[digit]);
-    }
+    refresh_display();
     enable_interrupts();
 }
 
@@ -192,6 +189,13 @@ void write_service(uint8_t digit, uint8_t value) {
 void write_both(uint8_t digit, uint8_t value) {
     money_display[digit] = value;
     service_display[digit] = value;
+}
+
+void refresh_display() {
+    kdc_cmd_out(I8279_WRITE_DISPLAY_RAM | I8279_RW_AUTO_INCREMENT | 8);
+    for (uint8_t digit = 0; digit < 8; digit++) {
+        kdc_data_out((money_display[digit] << 4) | service_display[digit] & 0x0f);
+    }
 }
 
 /**
