@@ -474,7 +474,6 @@ void main(void) {
                     break;
             }
 
-
         if (i < 0) {
             i = 7;
         }
