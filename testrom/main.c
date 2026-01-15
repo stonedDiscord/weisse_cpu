@@ -40,7 +40,6 @@ enum COUNTER_VALS {
 #include "track.c"
 
 #include "hd146818.c"
-#include "rtc_display.c"
 
 #define COINS       0x70
 #define COUNTERS    0x71
@@ -380,6 +379,30 @@ bool check_button(uint8_t button) {
     }
 }
 
+// Function to display the date from the RTC
+void display_rtc_date()
+{
+    struct rtc_state *rtc = (struct rtc_state *)0x9000;
+
+    // Write day of month to digits 0 and 1
+    write_digit(0, (rtc->day_of_month / 10) + '0', (rtc->day_of_month / 10) + '0');
+    write_digit(1, (rtc->day_of_month % 10) + '0', (rtc->day_of_month % 10) + '0');
+
+    // Write space to digit 2
+    write_digit(2, 0xff, 0xff);
+
+    // Write month to digits 3 and 4
+    write_digit(3, (rtc->month / 10) + '0', (rtc->month / 10) + '0');
+    write_digit(4, (rtc->month % 10) + '0', (rtc->month % 10) + '0');
+
+    // Write space to digit 5
+    write_digit(5, 0xff, 0xff);
+
+    // Write year to digits 6 and 7
+    write_digit(6, (rtc->year / 10) + '0', (rtc->year / 10) + '0');
+    write_digit(7, (rtc->year % 10) + '0', (rtc->year % 10) + '0');
+}
+
 /**
  * @brief Main program entry point
  *
@@ -432,7 +455,16 @@ void main(void) {
         }
 
         if (buttons)
-            play_track();
+            switch (i) {
+                case 5:
+                    play_track();
+                    break;
+                case 6:
+                    display_rtc_date();
+                    delay(2000);
+                    break;
+            }
+
 
         if (i < 0) {
             i = 7;
