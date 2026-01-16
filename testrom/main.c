@@ -39,6 +39,7 @@ enum COUNTER_VALS {
 
 #include "track.c"
 
+#define RTC_ADD     0x9000
 #include "hd146818.c"
 
 // Function prototypes
@@ -74,9 +75,9 @@ bool check_button(uint8_t button);
 void display_rtc_date();
 void display_rtc_time();
 
-volatile struct rtc_state *rtc;
-volatile uint8_t *rtc_a;
-volatile uint8_t *rtc_b;
+volatile struct rtc_state_t *rtc;
+volatile struct rtc_a_t *rtc_a;
+volatile struct rtc_b_t *rtc_b;
 
 #define COINS       0x70
 #define COUNTERS    0x71
@@ -514,12 +515,20 @@ int main(void) {
     init_kdc();
     init_muart();
 
-    rtc = (struct rtc_state *)0x9000;
-    rtc_a = (uint8_t *)0x900a;
-    rtc_b = (uint8_t *)0x900b;
+    rtc = (struct rtc_state_t *)RTC_ADD;
+    rtc_a = (struct rtc_a_t *)RTC_A_ADD;
+    rtc_b = (struct rtc_b_t *)RTC_B_ADD;
+
+    *rtc_a = 0x21;
+    rtc_a->rate_select = 0x01;
+    rtc_a->divider = 0x02;
     
     *rtc_b = 0x03;
-    
+
+    rtc_b->dst = 1;
+    rtc_b->hour_format = 1;
+    rtc_b->data_mode = 0;
+        
     _8085_int7();
     enable_interrupts();
 
@@ -604,7 +613,6 @@ int main(void) {
                 if (rtc->month < 1) rtc->month = 1;
                 if (rtc->month > 12) rtc->month = 12;
                 if (rtc->year > 99) rtc->year = 99;
-                *rtc_a = 0x21;
                 selected_digit = -1;
                 display_rtc_date();  // Refresh without blinking
                 refresh_display();
@@ -677,7 +685,6 @@ int main(void) {
                 if (rtc->hours > 23) rtc->hours = 23;
                 if (rtc->minutes > 59) rtc->minutes = 59;
                 if (rtc->seconds > 59) rtc->seconds = 59;
-                *rtc_a = 0x21;
                 selected_digit = -1;
                 display_rtc_time();  // Refresh without blinking
                 refresh_display();
@@ -706,16 +713,24 @@ int main(void) {
 
             if (buttons) {
                 switch (menu_item) {
+                    case 0:
+                        write_lamps(0,0x00);
+                        write_lamps(1,0x00);
+                        write_lamps(2,0x00);
+                        write_lamps(3,0x00);
+                        write_lamps(4,0x00);
+                        write_lamps(5,0x00);
+                        write_lamps(6,0x00);
+                        write_lamps(7,0x00);
+                        break;
                     case 2:
                         date_edit_mode = true;
-                        //*rtc_a = 0x70; //stop clock
                         selected_digit = 7;
                         display_rtc_date();
                         refresh_display();
                         break;
                     case 3:
                         time_edit_mode = true;
-                        //*rtc_a = 0x70;
                         selected_digit = 7;
                         display_rtc_time();
                         refresh_display();
