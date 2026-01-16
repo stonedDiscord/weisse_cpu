@@ -4,6 +4,10 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#ifndef RTC_ADD
+#error "Please set the RTC_ADD base address before including this file."
+#endif
+
 struct rtc_state_t
 {
     uint8_t seconds;
@@ -18,24 +22,16 @@ struct rtc_state_t
     uint8_t year;
 };
 
-struct rtc_a_t
-{
-    uint8_t rate_select: 4;
-    uint8_t divider: 3;
-    bool update_in_progress;
-};
+#define RTC_A_UIP 0x80
 
-struct rtc_b_t
-{
-    bool dst;
-    bool hour_format;
-    bool data_mode;
-    bool square_wave;
-    bool update_ended_interrupt;
-    bool alarm_interrupt;
-    bool periodic_interrupt;
-    bool set;
-};
+#define RTC_B_DS    0x01
+#define RTC_B_24    0x02
+#define RTC_B_DM    0x04
+#define RTC_B_SQ    0x08
+#define RTC_B_UI    0x10
+#define RTC_B_AI    0x20
+#define RTC_B_PI    0x40
+#define RTC_B_SET   0x80
 
 #define RTC_A_ADD RTC_ADD + 0x0A
 #define RTC_B_ADD RTC_ADD + 0x0B

@@ -76,8 +76,8 @@ void display_rtc_date();
 void display_rtc_time();
 
 volatile struct rtc_state_t *rtc;
-volatile struct rtc_a_t *rtc_a;
-volatile struct rtc_b_t *rtc_b;
+volatile uint8_t *rtc_a;
+volatile uint8_t *rtc_b;
 
 #define COINS       0x70
 #define COUNTERS    0x71
@@ -516,19 +516,14 @@ int main(void) {
     init_muart();
 
     rtc = (struct rtc_state_t *)RTC_ADD;
-    rtc_a = (struct rtc_a_t *)RTC_A_ADD;
-    rtc_b = (struct rtc_b_t *)RTC_B_ADD;
 
-    *rtc_a = 0x21;
-    rtc_a->rate_select = 0x01;
-    rtc_a->divider = 0x02;
+    rtc_a = (uint8_t *)RTC_A_ADD;
+    rtc_b = (uint8_t *)RTC_B_ADD;
     
-    *rtc_b = 0x03;
+    *rtc_a = 0x21; // 32kHz
+    
+    *rtc_b = RTC_B_DS | RTC_B_24;
 
-    rtc_b->dst = 1;
-    rtc_b->hour_format = 1;
-    rtc_b->data_mode = 0;
-        
     _8085_int7();
     enable_interrupts();
 
