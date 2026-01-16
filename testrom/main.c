@@ -231,6 +231,12 @@ void write_both(uint8_t digit, uint8_t value) {
 
 void update_blink()
 {
+    if (date_edit_mode)
+        display_rtc_date();
+
+    if (time_edit_mode)
+        display_rtc_time();
+
     // Clear all blink flags first
     for (uint8_t digit = 0; digit < 8; digit++) {
         money_display[digit] &= 0x0F;
