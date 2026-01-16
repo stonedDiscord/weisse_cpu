@@ -471,35 +471,35 @@ bool check_button(uint8_t button) {
 
 void display_rtc_date()
 {
-    write_both(7, (rtc->day_of_month / 10));
-    write_both(6, (rtc->day_of_month % 10));
+    write_both(7, (rtc->day_of_month.tens));
+    write_both(6, (rtc->day_of_month.ones));
 
     write_both(5, 0xff);
 
-    write_both(4, (rtc->month / 10));
-    write_both(3, (rtc->month % 10));
+    write_both(4, (rtc->month.tens));
+    write_both(3, (rtc->month.ones));
 
     write_both(2, 0xff);
 
-    write_both(1, (rtc->year / 10));
-    write_both(0, (rtc->year % 10));
+    write_both(1, (rtc->year.tens));
+    write_both(0, (rtc->year.ones));
 }
 
 // Function to display the date from the RTC
 void display_rtc_time()
 {
-    write_both(7, (rtc->hours / 10));
-    write_both(6, (rtc->hours % 10));
+    write_both(7, (rtc->hours.tens));
+    write_both(6, (rtc->hours.ones));
 
     write_both(5, 0xff);
 
-    write_both(4, (rtc->minutes / 10));
-    write_both(3, (rtc->minutes % 10));
+    write_both(4, (rtc->minutes.tens));
+    write_both(3, (rtc->minutes.ones));
 
     write_both(2, 0xff);
 
-    write_both(1, (rtc->seconds / 10));
-    write_both(0, (rtc->seconds % 10));
+    write_both(1, (rtc->seconds.tens));
+    write_both(0, (rtc->seconds.ones));
 }
 
 /**
