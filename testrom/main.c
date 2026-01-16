@@ -471,35 +471,35 @@ bool check_button(uint8_t button) {
 
 void display_rtc_date()
 {
-    write_both(7, (rtc->day_of_month.tens));
-    write_both(6, (rtc->day_of_month.ones));
+    write_both(7, (rtc->day_of_month >> 4) & 0xF);
+    write_both(6, rtc->day_of_month & 0xF);
 
     write_both(5, 0xff);
 
-    write_both(4, (rtc->month.tens));
-    write_both(3, (rtc->month.ones));
+    write_both(4, (rtc->month >> 4) & 0xF);
+    write_both(3, rtc->month & 0xF);
 
     write_both(2, 0xff);
 
-    write_both(1, (rtc->year.tens));
-    write_both(0, (rtc->year.ones));
+    write_both(1, (rtc->year >> 4) & 0xF);
+    write_both(0, rtc->year & 0xF);
 }
 
 // Function to display the date from the RTC
 void display_rtc_time()
 {
-    write_both(7, (rtc->hours.tens));
-    write_both(6, (rtc->hours.ones));
+    write_both(7, (rtc->hours >> 4) & 0xF);
+    write_both(6, rtc->hours & 0xF);
 
     write_both(5, 0xff);
 
-    write_both(4, (rtc->minutes.tens));
-    write_both(3, (rtc->minutes.ones));
+    write_both(4, (rtc->minutes >> 4) & 0xF);
+    write_both(3, rtc->minutes & 0xF);
 
     write_both(2, 0xff);
 
-    write_both(1, (rtc->seconds.tens));
-    write_both(0, (rtc->seconds.ones));
+    write_both(1, (rtc->seconds >> 4) & 0xF);
+    write_both(0, rtc->seconds & 0xF);
 }
 
 /**
@@ -573,30 +573,60 @@ int main(void) {
             if (buttons) {
                 switch (selected_digit) {
                     case 7:  // Day tens place
-                        rtc->day_of_month = ((rtc->day_of_month / 10 + 1) % 3) * 10 + (rtc->day_of_month % 10);
-                        if (rtc->day_of_month > 31)
-                            rtc->day_of_month = 01;
+                        {
+                            uint8_t tens = (rtc->day_of_month >> 4) & 0xF;
+                            uint8_t ones = rtc->day_of_month & 0xF;
+                            uint8_t new_tens = (tens + 1) % 4;
+                            rtc->day_of_month = (new_tens << 4) | ones;
+                        }
                         break;
                     case 6:  // Day ones place
-                        rtc->day_of_month = (rtc->day_of_month / 10) * 10 + ((rtc->day_of_month % 10 + 1) % 10);
-                        if (rtc->day_of_month > 31)
-                            rtc->day_of_month = (rtc->day_of_month / 10) * 10 + 0;
+                        {
+                            uint8_t tens = (rtc->day_of_month >> 4) & 0xF;
+                            uint8_t ones = rtc->day_of_month & 0xF;
+                            uint8_t new_ones = (ones + 1) % 10;
+                            rtc->day_of_month = (tens << 4) | new_ones;
+                            uint8_t full = tens * 10 + new_ones;
+                            if (full > 31) {
+                                rtc->day_of_month = (tens << 4) | 0;
+                            }
+                        }
                         break;
                     case 4:  // Month tens place
-                        rtc->month = ((rtc->month / 10 + 1) % 2) * 10 + (rtc->month % 10);
-                        if (rtc->month > 12)
-                            rtc->month = 01;
+                        {
+                            uint8_t tens = (rtc->month >> 4) & 0xF;
+                            uint8_t ones = rtc->month & 0xF;
+                            uint8_t new_tens = (tens + 1) % 2;
+                            rtc->month = (new_tens << 4) | ones;
+                        }
                         break;
                     case 3:  // Month ones place
-                        rtc->month = (rtc->month / 10) * 10 + ((rtc->month % 10 + 1) % 10);
-                        if (rtc->month > 12)
-                            rtc->month = (rtc->month / 10) * 10 + 0;
+                        {
+                            uint8_t tens = (rtc->month >> 4) & 0xF;
+                            uint8_t ones = rtc->month & 0xF;
+                            uint8_t new_ones = (ones + 1) % 10;
+                            rtc->month = (tens << 4) | new_ones;
+                            uint8_t full = tens * 10 + new_ones;
+                            if (full > 12) {
+                                rtc->month = (tens << 4) | 0;
+                            }
+                        }
                         break;
                     case 1:  // Year tens place
-                        rtc->year = ((rtc->year / 10 + 1) % 10) * 10 + (rtc->year % 10);
+                        {
+                            uint8_t tens = (rtc->year >> 4) & 0xF;
+                            uint8_t ones = rtc->year & 0xF;
+                            uint8_t new_tens = (tens + 1) % 10;
+                            rtc->year = (new_tens << 4) | ones;
+                        }
                         break;
                     case 0:  // Year ones place
-                        rtc->year = (rtc->year / 10) * 10 + ((rtc->year % 10 + 1) % 10);
+                        {
+                            uint8_t tens = (rtc->year >> 4) & 0xF;
+                            uint8_t ones = rtc->year & 0xF;
+                            uint8_t new_ones = (ones + 1) % 10;
+                            rtc->year = (tens << 4) | new_ones;
+                        }
                         break;
                 }
                 display_rtc_date();
@@ -608,11 +638,30 @@ int main(void) {
             if (buttonret) {
                 date_edit_mode = false;
                 // Clamp date values to valid ranges
-                if (rtc->day_of_month < 1) rtc->day_of_month = 1;
-                if (rtc->day_of_month > 31) rtc->day_of_month = 31;
-                if (rtc->month < 1) rtc->month = 1;
-                if (rtc->month > 12) rtc->month = 12;
-                if (rtc->year > 99) rtc->year = 99;
+                {
+                    uint8_t full_day = ((rtc->day_of_month >> 4) & 0xF) * 10 + (rtc->day_of_month & 0xF);
+                    if (full_day < 1) {
+                        rtc->day_of_month = (0 << 4) | 1;
+                    }
+                    if (full_day > 31) {
+                        rtc->day_of_month = (3 << 4) | 1;
+                    }
+                }
+                {
+                    uint8_t full_month = ((rtc->month >> 4) & 0xF) * 10 + (rtc->month & 0xF);
+                    if (full_month < 1) {
+                        rtc->month = (0 << 4) | 1;
+                    }
+                    if (full_month > 12) {
+                        rtc->month = (1 << 4) | 2;
+                    }
+                }
+                {
+                    uint8_t full_year = ((rtc->year >> 4) & 0xF) * 10 + (rtc->year & 0xF);
+                    if (full_year > 99) {
+                        rtc->year = (9 << 4) | 9;
+                    }
+                }
                 selected_digit = -1;
                 display_rtc_date();  // Refresh without blinking
                 refresh_display();
@@ -643,34 +692,64 @@ int main(void) {
             if (buttons) {
                 switch (selected_digit) {
                     case 7:  // Hours tens place
-                        rtc->hours = ((rtc->hours / 10 + 1) % 3) * 10 + (rtc->hours % 10);
-                        if (rtc->hours > 23)
-                            rtc->hours -= 20;
+                        {
+                            uint8_t tens = (rtc->hours >> 4) & 0xF;
+                            uint8_t ones = rtc->hours & 0xF;
+                            uint8_t new_tens = (tens + 1) % 3;
+                            rtc->hours = (new_tens << 4) | ones;
+                        }
                         break;
                     case 6:  // Hours ones place
-                        rtc->hours = (rtc->hours / 10) * 10 + ((rtc->hours % 10 + 1) % 10);
-                        if (rtc->hours > 23)
-                            rtc->hours = (rtc->hours / 10) * 10;
+                        {
+                            uint8_t tens = (rtc->hours >> 4) & 0xF;
+                            uint8_t ones = rtc->hours & 0xF;
+                            uint8_t new_ones = (ones + 1) % 10;
+                            rtc->hours = (tens << 4) | new_ones;
+                            uint8_t full = tens * 10 + new_ones;
+                            if (full > 23) {
+                                rtc->hours = (tens << 4) | 0;
+                            }
+                        }
                         break;
                     case 4:  // Minutes tens place
-                        rtc->minutes = ((rtc->minutes / 10 + 1) % 6) * 10 + (rtc->minutes % 10);
-                        if (rtc->minutes > 59)
-                            rtc->minutes = 00;
+                        {
+                            uint8_t tens = (rtc->minutes >> 4) & 0xF;
+                            uint8_t ones = rtc->minutes & 0xF;
+                            uint8_t new_tens = (tens + 1) % 6;
+                            rtc->minutes = (new_tens << 4) | ones;
+                        }
                         break;
                     case 3:  // Minutes ones place
-                        rtc->minutes = (rtc->minutes / 10) * 10 + ((rtc->minutes % 10 + 1) % 10);
-                        if (rtc->minutes > 59)
-                            rtc->minutes = (rtc->minutes / 10) * 10;
+                        {
+                            uint8_t tens = (rtc->minutes >> 4) & 0xF;
+                            uint8_t ones = rtc->minutes & 0xF;
+                            uint8_t new_ones = (ones + 1) % 10;
+                            rtc->minutes = (tens << 4) | new_ones;
+                            uint8_t full = tens * 10 + new_ones;
+                            if (full > 59) {
+                                rtc->minutes = (tens << 4) | 0;
+                            }
+                        }
                         break;
                     case 1:  // Seconds tens place
-                        rtc->seconds = ((rtc->seconds / 10 + 1) % 6) * 10 + (rtc->seconds % 10);
-                        if (rtc->seconds > 59)
-                            rtc->seconds = 00;
+                        {
+                            uint8_t tens = (rtc->seconds >> 4) & 0xF;
+                            uint8_t ones = rtc->seconds & 0xF;
+                            uint8_t new_tens = (tens + 1) % 6;
+                            rtc->seconds = (new_tens << 4) | ones;
+                        }
                         break;
                     case 0:  // Seconds ones place
-                        rtc->seconds = (rtc->seconds / 10) * 10 + ((rtc->seconds % 10 + 1) % 10);
-                        if (rtc->seconds > 59)
-                            rtc->seconds = (rtc->seconds / 10) * 10;
+                        {
+                            uint8_t tens = (rtc->seconds >> 4) & 0xF;
+                            uint8_t ones = rtc->seconds & 0xF;
+                            uint8_t new_ones = (ones + 1) % 10;
+                            rtc->seconds = (tens << 4) | new_ones;
+                            uint8_t full = tens * 10 + new_ones;
+                            if (full > 59) {
+                                rtc->seconds = (tens << 4) | 0;
+                            }
+                        }
                         break;
                 }
                 display_rtc_time();
@@ -682,9 +761,24 @@ int main(void) {
             if (buttonret) {
                 time_edit_mode = false;
                 // Clamp time values to valid ranges
-                if (rtc->hours > 23) rtc->hours = 23;
-                if (rtc->minutes > 59) rtc->minutes = 59;
-                if (rtc->seconds > 59) rtc->seconds = 59;
+                {
+                    uint8_t full_hours = ((rtc->hours >> 4) & 0xF) * 10 + (rtc->hours & 0xF);
+                    if (full_hours > 23) {
+                        rtc->hours = (2 << 4) | 3;
+                    }
+                }
+                {
+                    uint8_t full_min = ((rtc->minutes >> 4) & 0xF) * 10 + (rtc->minutes & 0xF);
+                    if (full_min > 59) {
+                        rtc->minutes = (5 << 4) | 9;
+                    }
+                }
+                {
+                    uint8_t full_sec = ((rtc->seconds >> 4) & 0xF) * 10 + (rtc->seconds & 0xF);
+                    if (full_sec > 59) {
+                        rtc->seconds = (5 << 4) | 9;
+                    }
+                }
                 selected_digit = -1;
                 display_rtc_time();  // Refresh without blinking
                 refresh_display();
