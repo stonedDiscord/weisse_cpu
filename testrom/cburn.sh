@@ -7,13 +7,13 @@ if [ ! -f a.rom ]; then
 fi
 
 current_size=$(stat -c%s a.rom)
-if [ $current_size -lt 4096 ]; then
-    echo "Padding a.rom from $current_size to 4096 bytes"
-    dd if=/dev/zero bs=1 count=$((4096 - current_size)) >> a.rom
+if [ $current_size -lt 8192 ]; then
+    echo "Padding a.rom from $current_size to 8192 bytes"
+    dd if=/dev/zero bs=1 count=$((8192 - current_size)) >> a.rom
 fi
 
 cat a.rom a.rom > c_8.bin
-cat c_8.bin c_8.bin c_8.bin c_8.bin > c_64.bin
+cat c_8.bin c_8.bin > c_64.bin
 rm c_8.bin
 cat c_64.bin c_64.bin > c_128.bin
 rm c_64.bin
