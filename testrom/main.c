@@ -75,6 +75,8 @@ void display_rtc_date();
 void display_rtc_time();
 
 volatile struct rtc_state *rtc;
+volatile uint8_t *rtc_a;
+volatile uint8_t *rtc_b;
 
 #define COINS       0x70
 #define COUNTERS    0x71
@@ -506,13 +508,17 @@ void display_rtc_time()
  * and then displays the state of the inputs on the lamp matrix
  * and echoes back any serial input
  */
-void main(void) {
-    int8_t i;
+int main(void) {
+    int8_t menu_item=0;
 
     init_kdc();
     init_muart();
 
     rtc = (struct rtc_state *)0x9000;
+    rtc_a = (uint8_t *)0x900a;
+    rtc_b = (uint8_t *)0x900b;
+
+    rtc_b = 0x03;
 
     _8085_int7();
     enable_interrupts();
@@ -592,6 +598,7 @@ void main(void) {
             // Exit edit mode
             if (buttonret) {
                 date_edit_mode = false;
+                rtc_a = 0x21;
                 selected_digit = -1;
                 display_rtc_date();  // Refresh without blinking
                 refresh_display();
@@ -660,13 +667,14 @@ void main(void) {
             // Exit edit mode
             if (buttonret) {
                 time_edit_mode = false;
+                rtc_a = 0x21;
                 selected_digit = -1;
                 display_rtc_time();  // Refresh without blinking
                 refresh_display();
             }
         } else {
-            write_serie(sensor_ram[i]);
-            write_both(0, i);
+            write_serie(sensor_ram[menu_item]);
+            write_both(0, menu_item);
             write_both(1, 0xff);
             write_both(2, 0xff);
             write_both(3, 0xff);
@@ -674,29 +682,31 @@ void main(void) {
 
             // Normal mode operations
             if (buttonl) {
-                i--;
+                menu_item--;
                 dumb_delay(200);
             } else if (buttonr) {
-                i++;
+                menu_item++;
                 dumb_delay(200);
             }
 
             if (buttonret) {
-                i = 0;
+                menu_item = 0;
                 dumb_delay(200);
             }
 
             if (buttons) {
-                switch (i) {
+                switch (menu_item) {
                     case 2:
                         date_edit_mode = true;
-                        selected_digit = 7;  // Start with first digit (day tens place)
+                        rtc_a = 0x70;
+                        selected_digit = 7;
                         display_rtc_date();
                         refresh_display();
                         break;
                     case 3:
                         time_edit_mode = true;
-                        selected_digit = 7;  // Start with first digit (hours tens place)
+                        rtc_a = 0x70;
+                        selected_digit = 7;
                         display_rtc_time();
                         refresh_display();
                         break;
@@ -718,12 +728,12 @@ void main(void) {
             }
         }
 
-        if (i < 0) {
-            i = 7;
+        if (menu_item < 0) {
+            menu_item = 7;
         }
 
-        if (i >= 8) {
-            i = 0;
+        if (menu_item >= 8) {
+            menu_item = 0;
         }
 
         if(read_status() & I8256_STATUS_RBF) {
