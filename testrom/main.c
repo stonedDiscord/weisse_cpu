@@ -538,6 +538,9 @@ int main(void) {
     bool buttonr = false;
     bool buttonret = false;
 
+    write_lamps(0, 0x16); //light up pressable buttons
+    write_lamps(3, 0xc0); // return
+
     // Infinite loop to scan the keyboard
     while (1) {
         read_sensor_matrix();
