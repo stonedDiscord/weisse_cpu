@@ -517,9 +517,9 @@ int main(void) {
     rtc = (struct rtc_state *)0x9000;
     rtc_a = (uint8_t *)0x900a;
     rtc_b = (uint8_t *)0x900b;
-
-    rtc_b = 0x03;
-
+    
+    *rtc_b = 0x03;
+    
     _8085_int7();
     enable_interrupts();
 
@@ -598,7 +598,13 @@ int main(void) {
             // Exit edit mode
             if (buttonret) {
                 date_edit_mode = false;
-                rtc_a = 0x21;
+                // Clamp date values to valid ranges
+                if (rtc->day_of_month < 1) rtc->day_of_month = 1;
+                if (rtc->day_of_month > 31) rtc->day_of_month = 31;
+                if (rtc->month < 1) rtc->month = 1;
+                if (rtc->month > 12) rtc->month = 12;
+                if (rtc->year > 99) rtc->year = 99;
+                *rtc_a = 0x21;
                 selected_digit = -1;
                 display_rtc_date();  // Refresh without blinking
                 refresh_display();
@@ -667,7 +673,11 @@ int main(void) {
             // Exit edit mode
             if (buttonret) {
                 time_edit_mode = false;
-                rtc_a = 0x21;
+                // Clamp time values to valid ranges
+                if (rtc->hours > 23) rtc->hours = 23;
+                if (rtc->minutes > 59) rtc->minutes = 59;
+                if (rtc->seconds > 59) rtc->seconds = 59;
+                *rtc_a = 0x21;
                 selected_digit = -1;
                 display_rtc_time();  // Refresh without blinking
                 refresh_display();
@@ -698,14 +708,14 @@ int main(void) {
                 switch (menu_item) {
                     case 2:
                         date_edit_mode = true;
-                        rtc_a = 0x70;
+                        //*rtc_a = 0x70; //stop clock
                         selected_digit = 7;
                         display_rtc_date();
                         refresh_display();
                         break;
                     case 3:
                         time_edit_mode = true;
-                        rtc_a = 0x70;
+                        //*rtc_a = 0x70;
                         selected_digit = 7;
                         display_rtc_time();
                         refresh_display();
