@@ -4,17 +4,25 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-struct rtc_state_t {
-    uint8_t seconds;
-    uint8_t sec_alarm;
-    uint8_t minutes;
-    uint8_t min_alarm;
-    uint8_t hours;
-    uint8_t hour_alarm;
-    uint8_t day_of_week;
-    uint8_t day_of_month;
-    uint8_t month;
-    uint8_t year;
+struct rtc_bcd_t
+{
+    uint8_t ones: 4;
+    uint8_t tens: 4;
+};
+
+
+struct rtc_state_t
+{
+    struct rtc_bcd_t seconds;
+    struct rtc_bcd_t sec_alarm;
+    struct rtc_bcd_t minutes;
+    struct rtc_bcd_t min_alarm;
+    struct rtc_bcd_t hours;
+    struct rtc_bcd_t hour_alarm;
+    struct rtc_bcd_t day_of_week;
+    struct rtc_bcd_t day_of_month;
+    struct rtc_bcd_t month;
+    struct rtc_bcd_t year;
 };
 
 struct rtc_a_t
