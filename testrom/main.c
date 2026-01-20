@@ -135,7 +135,7 @@ void _8085_int7() {
  * Currently a placeholder function.
  */
 void _8085_int65() {
-    read_sensor_matrix();
+    //read_sensor_matrix();
     enable_interrupts();
 }
 
@@ -151,7 +151,7 @@ void read_sensor_matrix() {
  * Currently a placeholder function.
  */
 void _8085_int75() {
-    refresh_display();
+    //refresh_display();
     enable_interrupts();
 }
 
@@ -835,6 +835,18 @@ int main(void) {
                         break;
                     case 5:
                         play_track();
+                        break;
+                    case 6:
+                        for (uint8_t j = 0; j < 16; j++)
+                        {
+                            for (uint8_t k = 0; k < 8; k++)
+                            {
+                                uint8_t l = 1 << k;
+                                write_lamps(j,l);
+                                dumb_delay(200);
+                            }
+                        }
+                        
                         break;
                     case 7:
                         write_lamps(0,0xff);
