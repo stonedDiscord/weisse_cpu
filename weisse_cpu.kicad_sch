@@ -5,8 +5,9 @@
 	(uuid "e63e39d7-6ac0-4ffd-8aa3-1841a4541b55")
 	(paper "A0")
 	(title_block
-		(title "Weisse CPU")
+		(title "Weiße CPU")
 		(company "stonedDiscord")
+		(comment 1 "https://github.com/stonedDiscord/weisse_cpu")
 	)
 	(lib_symbols
 		(symbol "4xxx:40106"
@@ -29841,7 +29842,7 @@
 		)
 		(uuid "224ecb84-0394-4409-8a81-8503fd86e252")
 	)
-	(text_box "IO High=\nIO = B\nIO Low=\nMemory = A"
+	(text_box "Addressierung\nIO High=\nIO = B\nIO Low=\nMemory = A"
 		(exclude_from_sim no)
 		(at 607.06 17.78 0)
 		(size 82.55 76.2)
@@ -29861,7 +29862,7 @@
 		)
 		(uuid "2d922ca7-ecc1-4848-b863-c1f5b43bd1d9")
 	)
-	(text_box "EINGANG ZUSATZTASTEN"
+	(text_box "Eingang Zusatztasten"
 		(exclude_from_sim no)
 		(at 490.22 17.78 0)
 		(size 111.76 76.2)
@@ -29941,7 +29942,7 @@
 		)
 		(uuid "36ecab2e-e901-4921-a2a9-83ff5ec74dec")
 	)
-	(text_box "COINS"
+	(text_box "Münzeinheit"
 		(exclude_from_sim no)
 		(at 815.34 17.78 0)
 		(size 114.3 76.2)
@@ -29981,7 +29982,7 @@
 		)
 		(uuid "3c227b16-6840-431b-a43f-cfd3b6d99cf9")
 	)
-	(text_box "SPALTEN"
+	(text_box "Spalten"
 		(exclude_from_sim no)
 		(at 111.76 99.06 0)
 		(size 200.66 91.44)
@@ -30101,7 +30102,7 @@
 		)
 		(uuid "4861076a-77c5-4ca7-a69f-c099e7bdae04")
 	)
-	(text_box "Strom"
+	(text_box "Stromversorgung"
 		(exclude_from_sim no)
 		(at 919.48 406.4 0)
 		(size 246.38 182.88)
@@ -30181,7 +30182,7 @@
 		)
 		(uuid "625f67a9-6db2-456a-bd5a-ed3793af933e")
 	)
-	(text_box "WALZEN IO"
+	(text_box "Walzen I/O"
 		(exclude_from_sim no)
 		(at 949.96 254 0)
 		(size 175.26 147.32)
@@ -30221,7 +30222,7 @@
 		)
 		(uuid "676a0fd3-f0f3-40f5-bf59-f5ecb1aea17d")
 	)
-	(text_box "Unused"
+	(text_box "Unbenutzt"
 		(exclude_from_sim no)
 		(at 1064.26 17.78 0)
 		(size 106.68 88.9)
@@ -30241,7 +30242,7 @@
 		)
 		(uuid "6d0d3948-16c3-46ba-a5fe-b7b6c0031d67")
 	)
-	(text_box "DISPLAY&KEYBOARD"
+	(text_box "Anzeige und Tasten"
 		(exclude_from_sim no)
 		(at 502.92 99.06 0)
 		(size 129.54 91.44)
@@ -30301,7 +30302,7 @@
 		)
 		(uuid "8aff24fb-bc41-4370-8234-65b4483a4e86")
 	)
-	(text_box "I/O ADDRESS DECODING"
+	(text_box "I/O Addressen"
 		(exclude_from_sim no)
 		(at 754.38 210.82 0)
 		(size 109.22 116.84)
@@ -30321,7 +30322,7 @@
 		)
 		(uuid "8e0fd42a-06dd-4555-822e-8bcc13a781a3")
 	)
-	(text_box "Spannungen?"
+	(text_box "Spannungen"
 		(exclude_from_sim no)
 		(at 17.78 17.78 0)
 		(size 127 76.2)
@@ -30341,7 +30342,7 @@
 		)
 		(uuid "8e7d8994-f4ad-4bc1-a24b-d64d4d204f7d")
 	)
-	(text_box "TAKTTEILER"
+	(text_box "Taktteiler"
 		(exclude_from_sim no)
 		(at 933.45 17.78 0)
 		(size 82.55 76.2)
@@ -30361,7 +30362,7 @@
 		)
 		(uuid "8fa8bd24-3f18-4edb-b2a4-96ee55026737")
 	)
-	(text_box "UHR"
+	(text_box "Uhr"
 		(exclude_from_sim no)
 		(at 317.5 99.06 0)
 		(size 180.34 91.44)
@@ -30421,7 +30422,7 @@
 		)
 		(uuid "cd77f7aa-0fd0-4f30-83d6-a19260dfb154")
 	)
-	(text_box "MOTORSTEUERUNG"
+	(text_box "Motorsteuerung"
 		(exclude_from_sim no)
 		(at 645.16 195.58 0)
 		(size 104.14 132.08)
@@ -30461,7 +30462,7 @@
 		)
 		(uuid "e15a824f-681a-4896-98a0-59f6b9cccdd3")
 	)
-	(text_box "TASTEN EINGAENGE"
+	(text_box "Eingang Tasten"
 		(exclude_from_sim no)
 		(at 693.42 17.78 0)
 		(size 116.84 76.2)
@@ -30521,7 +30522,7 @@
 		)
 		(uuid "e56e129c-e8df-4db9-be98-3bdc87173120")
 	)
-	(text_box "BATTERIE"
+	(text_box "Batterie"
 		(exclude_from_sim no)
 		(at 17.78 99.06 0)
 		(size 88.9 91.44)
@@ -65886,6 +65887,7 @@
 				(font
 					(size 1.27 1.27)
 				)
+				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
