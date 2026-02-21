@@ -509,6 +509,246 @@ void display_rtc_time()
 }
 
 /**
+ * @brief Navigate to next valid digit (skip separator positions 2 and 5)
+ */
+void navigate_digit_next() {
+    do {
+        selected_digit++;
+        if (selected_digit > 7)
+            selected_digit = 7;
+    } while (selected_digit == 5 || selected_digit == 2);
+}
+
+/**
+ * @brief Navigate to previous valid digit (skip separator positions 2 and 5)
+ */
+void navigate_digit_prev() {
+    do {
+        selected_digit--;
+        if (selected_digit < 0)
+            selected_digit = 0;
+    } while (selected_digit == 5 || selected_digit == 2);
+}
+
+/**
+ * @brief Increment a BCD digit at given position
+ * @param value Pointer to the BCD value
+ * @param pos Position (0=ones, 1=tens)
+ * @param max Maximum value for this position
+ */
+void increment_bcd_digit(uint8_t *value, uint8_t pos, uint8_t max) {
+    uint8_t tens = (*value >> 4) & 0xF;
+    uint8_t ones = *value & 0xF;
+    
+    if (pos == 0) {
+        ones = (ones + 1) % 10;
+        uint8_t full = tens * 10 + ones;
+        if (full > max) {
+            ones = 0;
+        }
+        *value = (tens << 4) | ones;
+    } else {
+        tens = (tens + 1) % ((max / 10) + 1);
+        *value = (tens << 4) | ones;
+    }
+}
+
+/**
+ * @brief Handle date edit mode
+ */
+void handle_date_edit_mode(bool buttonl, bool buttons, bool buttonr, bool buttonret) {
+    if (buttonl) {
+        navigate_digit_next();
+        display_rtc_date();
+        refresh_display();
+        dumb_delay(200);
+    } else if (buttonr) {
+        navigate_digit_prev();
+        display_rtc_date();
+        refresh_display();
+        dumb_delay(200);
+    }
+
+    if (buttons) {
+        switch (selected_digit) {
+            case 7: increment_bcd_digit(&rtc->day_of_month, 1, 39); break;
+            case 6: increment_bcd_digit(&rtc->day_of_month, 0, 31); break;
+            case 4: increment_bcd_digit(&rtc->month, 1, 19); break;
+            case 3: increment_bcd_digit(&rtc->month, 0, 12); break;
+            case 1: increment_bcd_digit(&rtc->year, 1, 99); break;
+            case 0: increment_bcd_digit(&rtc->year, 0, 99); break;
+        }
+        display_rtc_date();
+        refresh_display();
+        dumb_delay(200);
+    }
+
+    if (buttonret) {
+        date_edit_mode = false;
+        // Clamp date values
+        uint8_t full_day = ((rtc->day_of_month >> 4) & 0xF) * 10 + (rtc->day_of_month & 0xF);
+        if (full_day < 1) rtc->day_of_month = (0 << 4) | 1;
+        if (full_day > 31) rtc->day_of_month = (3 << 4) | 1;
+        
+        uint8_t full_month = ((rtc->month >> 4) & 0xF) * 10 + (rtc->month & 0xF);
+        if (full_month < 1) rtc->month = (0 << 4) | 1;
+        if (full_month > 12) rtc->month = (1 << 4) | 2;
+        
+        selected_digit = -1;
+        display_rtc_date();
+        refresh_display();
+    }
+}
+
+/**
+ * @brief Handle time edit mode
+ */
+void handle_time_edit_mode(bool buttonl, bool buttons, bool buttonr, bool buttonret) {
+    if (buttonl) {
+        navigate_digit_next();
+        display_rtc_time();
+        refresh_display();
+        dumb_delay(200);
+    } else if (buttonr) {
+        navigate_digit_prev();
+        display_rtc_time();
+        refresh_display();
+        dumb_delay(200);
+    }
+
+    if (buttons) {
+        switch (selected_digit) {
+            case 7: increment_bcd_digit(&rtc->hours, 1, 23); break;
+            case 6: increment_bcd_digit(&rtc->hours, 0, 23); break;
+            case 4: increment_bcd_digit(&rtc->minutes, 1, 59); break;
+            case 3: increment_bcd_digit(&rtc->minutes, 0, 59); break;
+            case 1: increment_bcd_digit(&rtc->seconds, 1, 59); break;
+            case 0: increment_bcd_digit(&rtc->seconds, 0, 59); break;
+        }
+        display_rtc_time();
+        refresh_display();
+        dumb_delay(200);
+    }
+
+    if (buttonret) {
+        time_edit_mode = false;
+        // Clamp time values
+        uint8_t full_hours = ((rtc->hours >> 4) & 0xF) * 10 + (rtc->hours & 0xF);
+        if (full_hours > 23) rtc->hours = (2 << 4) | 3;
+        
+        uint8_t full_min = ((rtc->minutes >> 4) & 0xF) * 10 + (rtc->minutes & 0xF);
+        if (full_min > 59) rtc->minutes = (5 << 4) | 9;
+        
+        uint8_t full_sec = ((rtc->seconds >> 4) & 0xF) * 10 + (rtc->seconds & 0xF);
+        if (full_sec > 59) rtc->seconds = (5 << 4) | 9;
+        
+        selected_digit = -1;
+        display_rtc_time();
+        refresh_display();
+    }
+}
+
+/**
+ * @brief Menu option: Clear all lamps
+ */
+void menu_clear_lamps() {
+    for (uint8_t i = 0; i < 8; i++) {
+        write_lamps(i, 0x00);
+    }
+}
+
+/**
+ * @brief Menu option: Enter date edit mode
+ */
+void menu_edit_date() {
+    date_edit_mode = true;
+    selected_digit = 7;
+    display_rtc_date();
+    refresh_display();
+}
+
+/**
+ * @brief Menu option: Enter time edit mode
+ */
+void menu_edit_time() {
+    time_edit_mode = true;
+    selected_digit = 7;
+    display_rtc_time();
+    refresh_display();
+}
+
+/**
+ * @brief Menu option: Play music track
+ */
+void menu_play_music() {
+    play_track();
+}
+
+/**
+ * @brief Menu option: Lamp test pattern
+ */
+void menu_lamp_test() {
+    for (uint8_t j = 0; j < 16; j++) {
+        for (uint8_t k = 0; k < 8; k++) {
+            write_lamps(j, 1 << k);
+            dumb_delay(200);
+        }
+    }
+}
+
+/**
+ * @brief Menu option: All lamps on
+ */
+void menu_all_lamps_on() {
+    for (uint8_t i = 0; i < 8; i++) {
+        write_lamps(i, 0xff);
+    }
+}
+
+/**
+ * @brief Handle normal mode menu selection
+ */
+void handle_normal_mode(int8_t *menu_item, bool buttonl, bool buttons, bool buttonr, bool buttonret) {
+    write_serie(sensor_ram[*menu_item]);
+    write_both(0, *menu_item);
+    write_both(1, 0xff);
+    write_both(2, 0xff);
+    write_both(3, 0xff);
+    write_both(4, 0xff);
+
+    if (buttonl) {
+        (*menu_item)--;
+        dumb_delay(200);
+    } else if (buttonr) {
+        (*menu_item)++;
+        dumb_delay(200);
+    }
+
+    if (buttonret) {
+        *menu_item = 0;
+        dumb_delay(200);
+    }
+
+    if (buttons) {
+        switch (*menu_item) {
+            case 0: menu_reset(); break;
+            case 1: menu_all_lamps_on(); break;
+            case 2: menu_edit_date(); break;
+            case 3: menu_play_music(); break;
+            case 4: menu_edit_time(); break;
+            case 5: menu_clear_lamps(); break;
+            case 6: menu_lamp_test(); break;
+            case 7: menu_all_lamps_on(); break;
+        }
+        dumb_delay(200);
+    }
+
+    // Wrap menu item
+    if (*menu_item < 0) *menu_item = 7;
+    if (*menu_item >= 8) *menu_item = 0;
+}
+
+/**
  * @brief Main program entry point
  *
  * Initializes the controllers, plays the track
@@ -516,29 +756,22 @@ void display_rtc_time()
  * and echoes back any serial input
  */
 int main(void) {
-    int8_t menu_item=0;
+    int8_t menu_item = 0;
 
     init_kdc();
     init_muart();
 
     rtc = (struct rtc_state_t *)RTC_ADD;
-
     rtc_a = (uint8_t *)RTC_A_ADD;
     rtc_b = (uint8_t *)RTC_B_ADD;
     
     *rtc_a = 0x21; // 32kHz
-    
     *rtc_b = RTC_B_DS | RTC_B_24;
 
     _8085_int7();
     enable_interrupts();
 
-    bool buttonl = false;
-    bool buttons = false;
-    bool buttonr = false;
-    bool buttonret = false;
-
-    write_lamps(0, 0x16); //light up pressable buttons
+    write_lamps(0, 0x16); // light up pressable buttons
     write_lamps(3, 0xc0); // return
 
     // Infinite loop to scan the keyboard
@@ -550,328 +783,16 @@ int main(void) {
         bool buttonr = check_button(RISK_RIGHT);
         bool buttonret = check_button(RETURN);
 
-        // Date edit mode handling
         if (date_edit_mode) {
-            // Navigate between date digits (only valid digits: 7,6,4,3,1,0)
-            if (buttonl) {
-                do {
-                    selected_digit++;
-                    if (selected_digit > 7)
-                        selected_digit = 7;
-                } while (selected_digit == 5 || selected_digit == 2);  // Skip separator positions
-                display_rtc_date();
-                refresh_display();
-                dumb_delay(200);
-            } else if (buttonr) {
-                do {
-                    selected_digit--;
-                    if (selected_digit < 0)
-                        selected_digit = 0;
-                } while (selected_digit == 5 || selected_digit == 2);  // Skip separator positions
-                display_rtc_date();
-                refresh_display();
-                dumb_delay(200);
-            }
-
-            // Change selected digit value
-            if (buttons) {
-                switch (selected_digit) {
-                    case 7:  // Day tens place
-                        {
-                            uint8_t tens = (rtc->day_of_month >> 4) & 0xF;
-                            uint8_t ones = rtc->day_of_month & 0xF;
-                            uint8_t new_tens = (tens + 1) % 4;
-                            rtc->day_of_month = (new_tens << 4) | ones;
-                        }
-                        break;
-                    case 6:  // Day ones place
-                        {
-                            uint8_t tens = (rtc->day_of_month >> 4) & 0xF;
-                            uint8_t ones = rtc->day_of_month & 0xF;
-                            uint8_t new_ones = (ones + 1) % 10;
-                            rtc->day_of_month = (tens << 4) | new_ones;
-                            uint8_t full = tens * 10 + new_ones;
-                            if (full > 31) {
-                                rtc->day_of_month = (tens << 4) | 0;
-                            }
-                        }
-                        break;
-                    case 4:  // Month tens place
-                        {
-                            uint8_t tens = (rtc->month >> 4) & 0xF;
-                            uint8_t ones = rtc->month & 0xF;
-                            uint8_t new_tens = (tens + 1) % 2;
-                            rtc->month = (new_tens << 4) | ones;
-                        }
-                        break;
-                    case 3:  // Month ones place
-                        {
-                            uint8_t tens = (rtc->month >> 4) & 0xF;
-                            uint8_t ones = rtc->month & 0xF;
-                            uint8_t new_ones = (ones + 1) % 10;
-                            rtc->month = (tens << 4) | new_ones;
-                            uint8_t full = tens * 10 + new_ones;
-                            if (full > 12) {
-                                rtc->month = (tens << 4) | 0;
-                            }
-                        }
-                        break;
-                    case 1:  // Year tens place
-                        {
-                            uint8_t tens = (rtc->year >> 4) & 0xF;
-                            uint8_t ones = rtc->year & 0xF;
-                            uint8_t new_tens = (tens + 1) % 10;
-                            rtc->year = (new_tens << 4) | ones;
-                        }
-                        break;
-                    case 0:  // Year ones place
-                        {
-                            uint8_t tens = (rtc->year >> 4) & 0xF;
-                            uint8_t ones = rtc->year & 0xF;
-                            uint8_t new_ones = (ones + 1) % 10;
-                            rtc->year = (tens << 4) | new_ones;
-                        }
-                        break;
-                }
-                display_rtc_date();
-                refresh_display();
-                dumb_delay(200);
-            }
-
-            // Exit edit mode
-            if (buttonret) {
-                date_edit_mode = false;
-                // Clamp date values to valid ranges
-                {
-                    uint8_t full_day = ((rtc->day_of_month >> 4) & 0xF) * 10 + (rtc->day_of_month & 0xF);
-                    if (full_day < 1) {
-                        rtc->day_of_month = (0 << 4) | 1;
-                    }
-                    if (full_day > 31) {
-                        rtc->day_of_month = (3 << 4) | 1;
-                    }
-                }
-                {
-                    uint8_t full_month = ((rtc->month >> 4) & 0xF) * 10 + (rtc->month & 0xF);
-                    if (full_month < 1) {
-                        rtc->month = (0 << 4) | 1;
-                    }
-                    if (full_month > 12) {
-                        rtc->month = (1 << 4) | 2;
-                    }
-                }
-                {
-                    uint8_t full_year = ((rtc->year >> 4) & 0xF) * 10 + (rtc->year & 0xF);
-                    if (full_year > 99) {
-                        rtc->year = (9 << 4) | 9;
-                    }
-                }
-                selected_digit = -1;
-                display_rtc_date();  // Refresh without blinking
-                refresh_display();
-            }
+            handle_date_edit_mode(buttonl, buttons, buttonr, buttonret);
         } else if (time_edit_mode) {
-            // Navigate between time digits (only valid digits: 7,6,4,3,1,0)
-            if (buttonl) {
-                do {
-                    selected_digit++;
-                    if (selected_digit > 7)
-                        selected_digit = 7;
-                } while (selected_digit == 5 || selected_digit == 2);  // Skip separator positions
-                display_rtc_time();
-                refresh_display();
-                dumb_delay(200);
-            } else if (buttonr) {
-                do {
-                    selected_digit--;
-                    if (selected_digit < 0)
-                        selected_digit = 0;
-                } while (selected_digit == 5 || selected_digit == 2);  // Skip separator positions
-                display_rtc_time();
-                refresh_display();
-                dumb_delay(200);
-            }
-
-            // Change selected digit value
-            if (buttons) {
-                switch (selected_digit) {
-                    case 7:  // Hours tens place
-                        {
-                            uint8_t tens = (rtc->hours >> 4) & 0xF;
-                            uint8_t ones = rtc->hours & 0xF;
-                            uint8_t new_tens = (tens + 1) % 3;
-                            rtc->hours = (new_tens << 4) | ones;
-                        }
-                        break;
-                    case 6:  // Hours ones place
-                        {
-                            uint8_t tens = (rtc->hours >> 4) & 0xF;
-                            uint8_t ones = rtc->hours & 0xF;
-                            uint8_t new_ones = (ones + 1) % 10;
-                            rtc->hours = (tens << 4) | new_ones;
-                            uint8_t full = tens * 10 + new_ones;
-                            if (full > 23) {
-                                rtc->hours = (tens << 4) | 0;
-                            }
-                        }
-                        break;
-                    case 4:  // Minutes tens place
-                        {
-                            uint8_t tens = (rtc->minutes >> 4) & 0xF;
-                            uint8_t ones = rtc->minutes & 0xF;
-                            uint8_t new_tens = (tens + 1) % 6;
-                            rtc->minutes = (new_tens << 4) | ones;
-                        }
-                        break;
-                    case 3:  // Minutes ones place
-                        {
-                            uint8_t tens = (rtc->minutes >> 4) & 0xF;
-                            uint8_t ones = rtc->minutes & 0xF;
-                            uint8_t new_ones = (ones + 1) % 10;
-                            rtc->minutes = (tens << 4) | new_ones;
-                            uint8_t full = tens * 10 + new_ones;
-                            if (full > 59) {
-                                rtc->minutes = (tens << 4) | 0;
-                            }
-                        }
-                        break;
-                    case 1:  // Seconds tens place
-                        {
-                            uint8_t tens = (rtc->seconds >> 4) & 0xF;
-                            uint8_t ones = rtc->seconds & 0xF;
-                            uint8_t new_tens = (tens + 1) % 6;
-                            rtc->seconds = (new_tens << 4) | ones;
-                        }
-                        break;
-                    case 0:  // Seconds ones place
-                        {
-                            uint8_t tens = (rtc->seconds >> 4) & 0xF;
-                            uint8_t ones = rtc->seconds & 0xF;
-                            uint8_t new_ones = (ones + 1) % 10;
-                            rtc->seconds = (tens << 4) | new_ones;
-                            uint8_t full = tens * 10 + new_ones;
-                            if (full > 59) {
-                                rtc->seconds = (tens << 4) | 0;
-                            }
-                        }
-                        break;
-                }
-                display_rtc_time();
-                refresh_display();
-                dumb_delay(200);
-            }
-
-            // Exit edit mode
-            if (buttonret) {
-                time_edit_mode = false;
-                // Clamp time values to valid ranges
-                {
-                    uint8_t full_hours = ((rtc->hours >> 4) & 0xF) * 10 + (rtc->hours & 0xF);
-                    if (full_hours > 23) {
-                        rtc->hours = (2 << 4) | 3;
-                    }
-                }
-                {
-                    uint8_t full_min = ((rtc->minutes >> 4) & 0xF) * 10 + (rtc->minutes & 0xF);
-                    if (full_min > 59) {
-                        rtc->minutes = (5 << 4) | 9;
-                    }
-                }
-                {
-                    uint8_t full_sec = ((rtc->seconds >> 4) & 0xF) * 10 + (rtc->seconds & 0xF);
-                    if (full_sec > 59) {
-                        rtc->seconds = (5 << 4) | 9;
-                    }
-                }
-                selected_digit = -1;
-                display_rtc_time();  // Refresh without blinking
-                refresh_display();
-            }
+            handle_time_edit_mode(buttonl, buttons, buttonr, buttonret);
         } else {
-            write_serie(sensor_ram[menu_item]);
-            write_both(0, menu_item);
-            write_both(1, 0xff);
-            write_both(2, 0xff);
-            write_both(3, 0xff);
-            write_both(4, 0xff);
-
-            // Normal mode operations
-            if (buttonl) {
-                menu_item--;
-                dumb_delay(200);
-            } else if (buttonr) {
-                menu_item++;
-                dumb_delay(200);
-            }
-
-            if (buttonret) {
-                menu_item = 0;
-                dumb_delay(200);
-            }
-
-            if (buttons) {
-                switch (menu_item) {
-                    case 0:
-                        write_lamps(0,0x00);
-                        write_lamps(1,0x00);
-                        write_lamps(2,0x00);
-                        write_lamps(3,0x00);
-                        write_lamps(4,0x00);
-                        write_lamps(5,0x00);
-                        write_lamps(6,0x00);
-                        write_lamps(7,0x00);
-                        break;
-                    case 2:
-                        date_edit_mode = true;
-                        selected_digit = 7;
-                        display_rtc_date();
-                        refresh_display();
-                        break;
-                    case 3:
-                        time_edit_mode = true;
-                        selected_digit = 7;
-                        display_rtc_time();
-                        refresh_display();
-                        break;
-                    case 5:
-                        play_track();
-                        break;
-                    case 6:
-                        for (uint8_t j = 0; j < 16; j++)
-                        {
-                            for (uint8_t k = 0; k < 8; k++)
-                            {
-                                uint8_t l = 1 << k;
-                                write_lamps(j,l);
-                                dumb_delay(200);
-                            }
-                        }
-                        
-                        break;
-                    case 7:
-                        write_lamps(0,0xff);
-                        write_lamps(1,0xff);
-                        write_lamps(2,0xff);
-                        write_lamps(3,0xff);
-                        write_lamps(4,0xff);
-                        write_lamps(5,0xff);
-                        write_lamps(6,0xff);
-                        write_lamps(7,0xff);
-                        break;
-                }
-                dumb_delay(200);
-            }
+            handle_normal_mode(&menu_item, buttonl, buttons, buttonr, buttonret);
         }
 
-        if (menu_item < 0) {
-            menu_item = 7;
-        }
-
-        if (menu_item >= 8) {
-            menu_item = 0;
-        }
-
-        if(read_status() & I8256_STATUS_RBF) {
+        // Echo serial input
+        if (read_status() & I8256_STATUS_RBF) {
             uint8_t rcv = read_serial_char();
             print_serial_char(rcv);
         }
