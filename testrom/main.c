@@ -23,9 +23,12 @@
 #ifdef BOARD4040
 #define I8279_IO    0x80
 #define I8256_IO    0x90
+#include "rtc62421.c"
 #else
 #define I8279_IO    0x50
 #define I8256_IO    0x60
+#define RTC_ADD     0x9000
+#include "hd146818.c"
 #endif
 
 #include "8279.c"
@@ -43,9 +46,6 @@ enum COUNTER_VALS {
 };
 
 #include "track.c"
-
-#define RTC_ADD     0x9000
-#include "hd146818.c"
 
 // Function prototypes
 void enable_interrupts();
@@ -81,8 +81,6 @@ void display_rtc_date();
 void display_rtc_time();
 
 volatile struct rtc_state_t *rtc;
-volatile uint8_t *rtc_a;
-volatile uint8_t *rtc_b;
 
 #define COINS       0x70
 #define COUNTERS    0x71
@@ -482,35 +480,43 @@ bool check_button(uint8_t button) {
 
 void display_rtc_date()
 {
-    write_both(7, (rtc->day_of_month >> 4) & 0xF);
-    write_both(6, rtc->day_of_month & 0xF);
+    uint8_t day = rtc_get_day();
+    uint8_t month = rtc_get_month();
+    uint8_t year = rtc_get_year();
+    
+    write_both(7, (day >> 4) & 0xF);
+    write_both(6, day & 0xF);
 
     write_both(5, 0xff);
 
-    write_both(4, (rtc->month >> 4) & 0xF);
-    write_both(3, rtc->month & 0xF);
+    write_both(4, (month >> 4) & 0xF);
+    write_both(3, month & 0xF);
 
     write_both(2, 0xff);
 
-    write_both(1, (rtc->year >> 4) & 0xF);
-    write_both(0, rtc->year & 0xF);
+    write_both(1, (year >> 4) & 0xF);
+    write_both(0, year & 0xF);
 }
 
-// Function to display the date from the RTC
+// Function to display the time from the RTC
 void display_rtc_time()
 {
-    write_both(7, (rtc->hours >> 4) & 0xF);
-    write_both(6, rtc->hours & 0xF);
+    uint8_t hours = rtc_get_hours();
+    uint8_t minutes = rtc_get_minutes();
+    uint8_t seconds = rtc_get_seconds();
+    
+    write_both(7, (hours >> 4) & 0xF);
+    write_both(6, hours & 0xF);
 
     write_both(5, 0xff);
 
-    write_both(4, (rtc->minutes >> 4) & 0xF);
-    write_both(3, rtc->minutes & 0xF);
+    write_both(4, (minutes >> 4) & 0xF);
+    write_both(3, minutes & 0xF);
 
     write_both(2, 0xff);
 
-    write_both(1, (rtc->seconds >> 4) & 0xF);
-    write_both(0, rtc->seconds & 0xF);
+    write_both(1, (seconds >> 4) & 0xF);
+    write_both(0, seconds & 0xF);
 }
 
 /**
@@ -536,29 +542,6 @@ void navigate_digit_prev() {
 }
 
 /**
- * @brief Increment a BCD digit at given position
- * @param value Pointer to the BCD value
- * @param pos Position (0=ones, 1=tens)
- * @param max Maximum value for this position
- */
-void increment_bcd_digit(uint8_t *value, uint8_t pos, uint8_t max) {
-    uint8_t tens = (*value >> 4) & 0xF;
-    uint8_t ones = *value & 0xF;
-    
-    if (pos == 0) {
-        ones = (ones + 1) % 10;
-        uint8_t full = tens * 10 + ones;
-        if (full > max) {
-            ones = 0;
-        }
-        *value = (tens << 4) | ones;
-    } else {
-        tens = (tens + 1) % ((max / 10) + 1);
-        *value = (tens << 4) | ones;
-    }
-}
-
-/**
  * @brief Handle date edit mode
  */
 void handle_date_edit_mode(bool buttonl, bool buttons, bool buttonr, bool buttonret) {
@@ -576,12 +559,12 @@ void handle_date_edit_mode(bool buttonl, bool buttons, bool buttonr, bool button
 
     if (buttons) {
         switch (selected_digit) {
-            case 7: increment_bcd_digit(&rtc->day_of_month, 1, 39); break;
-            case 6: increment_bcd_digit(&rtc->day_of_month, 0, 31); break;
-            case 4: increment_bcd_digit(&rtc->month, 1, 19); break;
-            case 3: increment_bcd_digit(&rtc->month, 0, 12); break;
-            case 1: increment_bcd_digit(&rtc->year, 1, 99); break;
-            case 0: increment_bcd_digit(&rtc->year, 0, 99); break;
+            case 7: rtc_increment_day_tens(); break;
+            case 6: rtc_increment_day_ones(); break;
+            case 4: rtc_increment_month_tens(); break;
+            case 3: rtc_increment_month_ones(); break;
+            case 1: rtc_increment_year_tens(); break;
+            case 0: rtc_increment_year_ones(); break;
         }
         display_rtc_date();
         refresh_display();
@@ -591,13 +574,15 @@ void handle_date_edit_mode(bool buttonl, bool buttons, bool buttonr, bool button
     if (buttonret) {
         date_edit_mode = false;
         // Clamp date values
-        uint8_t full_day = ((rtc->day_of_month >> 4) & 0xF) * 10 + (rtc->day_of_month & 0xF);
-        if (full_day < 1) rtc->day_of_month = (0 << 4) | 1;
-        if (full_day > 31) rtc->day_of_month = (3 << 4) | 1;
+        uint8_t day = rtc_get_day();
+        uint8_t full_day = ((day >> 4) & 0xF) * 10 + (day & 0xF);
+        if (full_day < 1) rtc_set_day(0x01);
+        if (full_day > 31) rtc_set_day(0x31);
         
-        uint8_t full_month = ((rtc->month >> 4) & 0xF) * 10 + (rtc->month & 0xF);
-        if (full_month < 1) rtc->month = (0 << 4) | 1;
-        if (full_month > 12) rtc->month = (1 << 4) | 2;
+        uint8_t month = rtc_get_month();
+        uint8_t full_month = ((month >> 4) & 0xF) * 10 + (month & 0xF);
+        if (full_month < 1) rtc_set_month(0x01);
+        if (full_month > 12) rtc_set_month(0x12);
         
         selected_digit = -1;
         display_rtc_date();
@@ -623,12 +608,12 @@ void handle_time_edit_mode(bool buttonl, bool buttons, bool buttonr, bool button
 
     if (buttons) {
         switch (selected_digit) {
-            case 7: increment_bcd_digit(&rtc->hours, 1, 23); break;
-            case 6: increment_bcd_digit(&rtc->hours, 0, 23); break;
-            case 4: increment_bcd_digit(&rtc->minutes, 1, 59); break;
-            case 3: increment_bcd_digit(&rtc->minutes, 0, 59); break;
-            case 1: increment_bcd_digit(&rtc->seconds, 1, 59); break;
-            case 0: increment_bcd_digit(&rtc->seconds, 0, 59); break;
+            case 7: rtc_increment_hours_tens(); break;
+            case 6: rtc_increment_hours_ones(); break;
+            case 4: rtc_increment_minutes_tens(); break;
+            case 3: rtc_increment_minutes_ones(); break;
+            case 1: rtc_increment_seconds_tens(); break;
+            case 0: rtc_increment_seconds_ones(); break;
         }
         display_rtc_time();
         refresh_display();
@@ -638,14 +623,17 @@ void handle_time_edit_mode(bool buttonl, bool buttons, bool buttonr, bool button
     if (buttonret) {
         time_edit_mode = false;
         // Clamp time values
-        uint8_t full_hours = ((rtc->hours >> 4) & 0xF) * 10 + (rtc->hours & 0xF);
-        if (full_hours > 23) rtc->hours = (2 << 4) | 3;
+        uint8_t hours = rtc_get_hours();
+        uint8_t full_hours = ((hours >> 4) & 0xF) * 10 + (hours & 0xF);
+        if (full_hours > 23) rtc_set_hours(0x23);
         
-        uint8_t full_min = ((rtc->minutes >> 4) & 0xF) * 10 + (rtc->minutes & 0xF);
-        if (full_min > 59) rtc->minutes = (5 << 4) | 9;
+        uint8_t minutes = rtc_get_minutes();
+        uint8_t full_min = ((minutes >> 4) & 0xF) * 10 + (minutes & 0xF);
+        if (full_min > 59) rtc_set_minutes(0x59);
         
-        uint8_t full_sec = ((rtc->seconds >> 4) & 0xF) * 10 + (rtc->seconds & 0xF);
-        if (full_sec > 59) rtc->seconds = (5 << 4) | 9;
+        uint8_t seconds = rtc_get_seconds();
+        uint8_t full_sec = ((seconds >> 4) & 0xF) * 10 + (seconds & 0xF);
+        if (full_sec > 59) rtc_set_seconds(0x59);
         
         selected_digit = -1;
         display_rtc_time();
@@ -767,11 +755,7 @@ int main(void) {
     init_muart();
 
     rtc = (struct rtc_state_t *)RTC_ADD;
-    rtc_a = (uint8_t *)RTC_A_ADD;
-    rtc_b = (uint8_t *)RTC_B_ADD;
-    
-    *rtc_a = 0x21; // 32kHz
-    *rtc_b = RTC_B_DS | RTC_B_24;
+    rtc_init();  // Initialize RTC (24-hour format, start counting)
 
     _8085_int7();
     enable_interrupts();
