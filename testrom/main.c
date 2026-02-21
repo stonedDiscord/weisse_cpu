@@ -642,6 +642,15 @@ void handle_time_edit_mode(bool buttonl, bool buttons, bool buttonr, bool button
 }
 
 /**
+ * @brief Menu option: Reset
+ */
+void menu_reset() {
+    __asm
+        RST 0
+    __endasm
+}
+
+/**
  * @brief Menu option: Clear all lamps
  */
 void menu_clear_lamps() {
