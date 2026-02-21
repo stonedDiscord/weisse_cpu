@@ -4,8 +4,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#ifndef RTC_ADD
-#error "Please set the RTC_ADD base address before including this file."
+#ifndef RTC_IO_ADD
+#error "Please set the RTC_IO_ADD base address before including this file."
 #endif
 
 /**
@@ -50,20 +50,6 @@ struct rtc_regs_t {
     uint8_t ctrl_d;        // 0x0D: Control register D
     uint8_t ctrl_e;        // 0x0E: Control register E
     uint8_t ctrl_f;        // 0x0F: Control register F
-};
-
-// Software state structure (BCD format compatible with existing code)
-struct rtc_state_t {
-    uint8_t seconds;       // BCD: 0x00-0x59
-    uint8_t sec_alarm;     // Not used by RTC62421
-    uint8_t minutes;       // BCD: 0x00-0x59
-    uint8_t min_alarm;     // Not used by RTC62421
-    uint8_t hours;         // BCD: 0x00-0x23
-    uint8_t hour_alarm;    // Not used by RTC62421
-    uint8_t day_of_week;   // 0-6
-    uint8_t day_of_month;  // BCD: 0x01-0x31
-    uint8_t month;         // BCD: 0x01-0x12
-    uint8_t year;          // BCD: 0x00-0x99
 };
 
 /**

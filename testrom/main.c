@@ -23,6 +23,12 @@
 #ifdef BOARD4040
 #define I8279_IO    0x80
 #define I8256_IO    0x90
+#define RTC_ADD     0x6000
+#include "hd146818.c"
+#elifdef BOARD4109
+#define I8279_IO    0x50
+#define I8256_IO    0x60
+#define RTC_ADD     0x00
 #include "rtc62421.c"
 #else
 #define I8279_IO    0x50
