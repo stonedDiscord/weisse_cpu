@@ -4,6 +4,10 @@
 	(generator_version "9.0")
 	(uuid "c758d11b-85df-45f2-b623-a0eb46e04509")
 	(paper "A4")
+	(title_block
+		(title "Matrixtester")
+		(company "stonedDiscord")
+	)
 	(lib_symbols
 		(symbol "Connector:Conn_01x16_Pin"
 			(pin_names
