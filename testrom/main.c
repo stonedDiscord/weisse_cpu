@@ -20,10 +20,15 @@
 #include <stdint.h>
 #include <stddef.h>
 
+#ifdef BOARD4040
+#define I8279_IO    0x80
+#define I8256_IO    0x90
+#else
 #define I8279_IO    0x50
-#include "8279.c"
-
 #define I8256_IO    0x60
+#endif
+
+#include "8279.c"
 #include "8256.c"
 
 enum COUNTER_VALS {
