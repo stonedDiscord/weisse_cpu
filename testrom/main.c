@@ -757,7 +757,7 @@ void handle_normal_mode(int8_t *menu_item, bool buttonl, bool buttons, bool butt
 
     if (buttons) {
         switch (*menu_item) {
-            case 0: menu_reset(); break;
+            //case 0: menu_reset(); break;
             case 1: menu_all_lamps_on(); break;
             case 2: menu_edit_date(); break;
             case 3: menu_play_music(); break;
