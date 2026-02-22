@@ -24,16 +24,22 @@
 #define I8279_IO    0x80
 #define I8256_IO    0x90
 #define RTC_ADD     0x6000
+#pragma output REGISTER_SP = 0x53fc
+#pragma output CRT_ORG_BSS = 0x5000
 #include "hd146818.c"
 #elif defined(BOARD4109)
 #define I8279_IO    0x50
 #define I8256_IO    0x60
 #define RTC_IO      0x00
+#pragma output REGISTER_SP = 0x9ff0
+#pragma output CRT_ORG_BSS = 0x9000
 #include "rtc62421.c"
 #else
 #define I8279_IO    0x50
 #define I8256_IO    0x60
 #define RTC_ADD     0x9000
+#pragma output REGISTER_SP = 0xc7f0
+#pragma output CRT_ORG_BSS = 0xc000
 #include "hd146818.c"
 #endif
 

@@ -25,10 +25,10 @@
         PUBLIC    l_dcal          ;jp(hl)
         
 ;-------------------------------------------------------------------------
-        defc    REGISTER_SP  = 0xc7f0
+        ;defc    REGISTER_SP  = 0xc7f0
         defc    CRT_ORG_CODE = 0x0000
         defc    CRT_ORG_DATA = 0x8000
-        defc    CRT_ORG_BSS  = 0xc000
+        ;defc    CRT_ORG_BSS  = 0xc000
 
 
         INCLUDE "crt/classic/crt_rules.inc"

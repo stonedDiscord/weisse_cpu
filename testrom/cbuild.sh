@@ -23,3 +23,11 @@ rm excellnt.zip
 7z a excellnt.zip excellent.ice5 excellent.ice6 excellent.icd5 excellent.icd6 excellent.icc5
 
 cp excellnt.zip /run/media/stoned/schrott/Roms/mame/roms/excellnt.zip
+
+docker run  -v .:/src/ z88dk/z88dk sh ./build.sh -DBOARD4109
+cp a.rom merkur_astro_pr1.ice6
+cp a.rom merkur_astro_pr2.icd6
+rm mastro.zip
+7z a mastro.zip merkur_astro_pr1.ice6 merkur_astro_pr2.icd6
+
+cp mastro.zip /run/media/stoned/schrott/Roms/mame/roms/mastro.zip
