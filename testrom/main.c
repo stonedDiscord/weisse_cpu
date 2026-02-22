@@ -482,6 +482,26 @@ void play_track()
 #define STOP_MID   BUTTON(3, 3, 1)
 #define RISK_RIGHT BUTTON(3, 0, 1)
 #define RETURN     BUTTON(0, 3, 1)
+
+// Servicetastatur
+#define RESET      BUTTON(6, 7, 0)
+#define DAUERLAUF  BUTTON(6, 6, 0)
+#define SPIELZ     BUTTON(6, 5, 0)
+#define SPEICHER   BUTTON(6, 4, 0)
+#define HW_TEST    BUTTON(6, 3, 0)
+#define AZQ        BUTTON(6, 2, 0)
+#define FOUL       BUTTON(6, 1, 0)
+#define GEWINN     BUTTON(6, 0, 0)
+
+#define HOCH1      BUTTON(7, 7, 0)
+#define RUNTER1    BUTTON(7, 6, 0)
+#define HOCHS      BUTTON(7, 5, 0)
+#define RUNTERS    BUTTON(7, 4, 0)
+#define HOCH01     BUTTON(7, 3, 0)
+#define RUNTER01   BUTTON(7, 2, 0)
+#define MUENZ      BUTTON(7, 1, 0)
+#define INIT       BUTTON(7, 0, 0)
+
 /**
  * @brief Check the state of a button
  *
@@ -805,10 +825,20 @@ int main(void) {
     while (1) {
         read_sensor_matrix();
 
-        bool buttonl = check_button(RISK_LEFT);
-        bool buttons = check_button(STOP_MID);
-        bool buttonr = check_button(RISK_RIGHT);
-        bool buttonret = check_button(RETURN);
+        bool buttonl = check_button(RISK_LEFT) | check_button(RUNTER01);
+        bool buttons = check_button(STOP_MID) | check_button(GEWINN);
+        bool buttonr = check_button(RISK_RIGHT) | check_button(HOCH01);
+        bool buttonret = check_button(RETURN) | check_button(INIT);
+
+        if (check_button(HW_TEST)) {
+            menu_play_music();
+        }
+        if (check_button(DAUERLAUF)) {
+            menu_edit_date();
+        }
+        if (check_button(FOUL)) {
+            menu_edit_time();
+        }
 
         if (date_edit_mode) {
             handle_date_edit_mode(buttonl, buttons, buttonr, buttonret);
