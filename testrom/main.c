@@ -20,15 +20,15 @@
 #include <stdint.h>
 #include <stddef.h>
 
-#ifdef BOARD4040
+#if defined(BOARD4040)
 #define I8279_IO    0x80
 #define I8256_IO    0x90
 #define RTC_ADD     0x6000
 #include "hd146818.c"
-#elifdef BOARD4109
+#elif defined(BOARD4109)
 #define I8279_IO    0x50
 #define I8256_IO    0x60
-#define RTC_ADD     0x00
+#define RTC_IO      0x00
 #include "rtc62421.c"
 #else
 #define I8279_IO    0x50
@@ -74,6 +74,7 @@ void refresh_display();
 void write_serie(uint8_t number);
 void init_kdc();
 void init_muart();
+void init_ppi();
 void delay(uint16_t ms);
 void dumb_delay(uint16_t ms);
 void wait_tx_ready();
@@ -345,6 +346,17 @@ void init_muart() {
         OUT I8256_INTEN
         MVI A, 0xBA
         OUT I8256_INTAD
+    __endasm;
+}
+
+/**
+ * @brief Initialize the 8255 PPI
+ * 
+ */
+void init_ppi() {
+    __asm
+        MVI A, 0x80
+        OUT 0x73
     __endasm;
 }
 
@@ -768,8 +780,13 @@ int main(void) {
 
     init_kdc();
     init_muart();
+    init_ppi();
 
+#ifdef BOARD4109
+    // RTC62421 is I/O mapped, not memory mapped - no pointer needed
+#else
     rtc = (struct rtc_state_t *)RTC_ADD;
+#endif
     rtc_init();  // Initialize RTC (24-hour format, start counting)
 
     _8085_int7();
