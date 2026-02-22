@@ -32,20 +32,6 @@ struct rtc_regs_t {
     uint8_t reg_d;         // 0x0D: Register D
 };
 
-// Software state structure (same layout as hardware for HD146818)
-struct rtc_state_t {
-    uint8_t seconds;       // BCD: 0x00-0x59
-    uint8_t sec_alarm;     // Alarm seconds
-    uint8_t minutes;       // BCD: 0x00-0x59
-    uint8_t min_alarm;     // Alarm minutes
-    uint8_t hours;         // BCD: 0x00-0x23
-    uint8_t hour_alarm;    // Alarm hours
-    uint8_t day_of_week;   // 1-7
-    uint8_t day_of_month;  // BCD: 0x01-0x31
-    uint8_t month;         // BCD: 0x01-0x12
-    uint8_t year;          // BCD: 0x00-0x99
-};
-
 // Register A bits
 #define RTC_A_UIP 0x80  // Update in progress
 
@@ -64,18 +50,6 @@ struct rtc_state_t {
 #define RTC_REG_B_ADD (RTC_ADD + 0x0B)
 #define RTC_REG_C_ADD (RTC_ADD + 0x0C)
 #define RTC_REG_D_ADD (RTC_ADD + 0x0D)
-
-// Compatibility defines
-#define RTC_CTRL_D_ADD RTC_REG_A_ADD
-#define RTC_CTRL_E_ADD RTC_REG_B_ADD
-#define RTC_CTRL_F_ADD RTC_REG_C_ADD
-
-#define RTC_CTRL_F_24H  RTC_B_24
-#define RTC_CTRL_F_STOP RTC_B_SET
-
-// For compatibility with existing code using rtc_a and rtc_b pointers
-#define RTC_A_ADD RTC_REG_A_ADD
-#define RTC_B_ADD RTC_REG_B_ADD
 
 // Global RTC register pointer
 volatile struct rtc_regs_t *rtc_regs = (struct rtc_regs_t *)RTC_ADD;

@@ -4,8 +4,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#ifndef RTC_IO_ADD
-#error "Please set the RTC_IO_ADD base address before including this file."
+#ifndef RTC_IO
+#error "Please set the RTC_IO base address before including this file."
 #endif
 
 /**
@@ -31,26 +31,6 @@
  *
  * Note: This RTC only has 4 data lines, so the upper nibble is ignored.
  */
-
-// Direct register access structure (maps to hardware registers)
-struct rtc_regs_t {
-    uint8_t sec_ones;      // 0x00: Seconds ones
-    uint8_t sec_tens;      // 0x01: Seconds tens
-    uint8_t min_ones;      // 0x02: Minutes ones
-    uint8_t min_tens;      // 0x03: Minutes tens
-    uint8_t hour_ones;     // 0x04: Hours ones
-    uint8_t hour_tens;     // 0x05: Hours tens
-    uint8_t day_ones;      // 0x06: Days ones
-    uint8_t day_tens;      // 0x07: Days tens
-    uint8_t month_ones;    // 0x08: Months ones
-    uint8_t month_tens;    // 0x09: Months tens
-    uint8_t year_ones;     // 0x0A: Years ones
-    uint8_t year_tens;     // 0x0B: Years tens
-    uint8_t day_of_week;   // 0x0C: Day of week
-    uint8_t ctrl_d;        // 0x0D: Control register D
-    uint8_t ctrl_e;        // 0x0E: Control register E
-    uint8_t ctrl_f;        // 0x0F: Control register F
-};
 
 /**
  * Control register D bits (d3, d2, d1, d0)
@@ -91,10 +71,23 @@ struct rtc_regs_t {
 #define RTC_CTRL_F_24H    0x04  // d2: 24-hour format
 #define RTC_CTRL_F_TEST   0x08  // d3: Test mode
 
-// Register addresses
-#define RTC_CTRL_D_ADD (RTC_ADD + 0x0D)
-#define RTC_CTRL_E_ADD (RTC_ADD + 0x0E)
-#define RTC_CTRL_F_ADD (RTC_ADD + 0x0F)
+// Register addresses (I/O port offsets) - calculated at compile time
+#define RTC_REG_SEC_ONES     (RTC_IO + 0x00)
+#define RTC_REG_SEC_TENS     (RTC_IO + 0x01)
+#define RTC_REG_MIN_ONES     (RTC_IO + 0x02)
+#define RTC_REG_MIN_TENS     (RTC_IO + 0x03)
+#define RTC_REG_HOUR_ONES    (RTC_IO + 0x04)
+#define RTC_REG_HOUR_TENS    (RTC_IO + 0x05)
+#define RTC_REG_DAY_ONES     (RTC_IO + 0x06)
+#define RTC_REG_DAY_TENS     (RTC_IO + 0x07)
+#define RTC_REG_MONTH_ONES   (RTC_IO + 0x08)
+#define RTC_REG_MONTH_TENS   (RTC_IO + 0x09)
+#define RTC_REG_YEAR_ONES    (RTC_IO + 0x0A)
+#define RTC_REG_YEAR_TENS    (RTC_IO + 0x0B)
+#define RTC_REG_DAY_OF_WEEK  (RTC_IO + 0x0C)
+#define RTC_REG_CTRL_D       (RTC_IO + 0x0D)
+#define RTC_REG_CTRL_E       (RTC_IO + 0x0E)
+#define RTC_REG_CTRL_F       (RTC_IO + 0x0F)
 
 // Compatibility defines for existing code that expects HD146818-like interface
 #define RTC_A_UIP    RTC_CTRL_D_BUSY  // Map to BUSY flag
@@ -110,31 +103,302 @@ struct rtc_regs_t {
 #define RTC_B_SET    RTC_CTRL_F_STOP  // Map SET to STOP
 
 // For compatibility with existing code using rtc_a and rtc_b pointers
-#define RTC_A_ADD RTC_CTRL_D_ADD
-#define RTC_B_ADD RTC_CTRL_F_ADD
+#define RTC_A_ADD RTC_REG_CTRL_D
+#define RTC_B_ADD RTC_REG_CTRL_F
 
-// Global RTC register pointer
-volatile struct rtc_regs_t *rtc_regs = (struct rtc_regs_t *)RTC_ADD;
+// ============================================================================
+// Low-level I/O functions using inline assembly
+// The port address is encoded directly in the IN/OUT instruction
+// ============================================================================
 
-/**
- * @brief Read BCD value from RTC62421 ones/tens register pair
- * @param ones_ptr Pointer to the ones register
- * @return Combined BCD value
- */
-static uint8_t rtc_read_bcd(volatile uint8_t *ones_ptr) {
-    uint8_t tens = *(ones_ptr + 1) & 0x0F;  // Tens register is next
-    uint8_t ones = *ones_ptr & 0x0F;
-    return (tens << 4) | ones;
+// Control register D access
+static uint8_t rtc_read_ctrl_d(void) {
+    uint8_t out;
+    __asm
+        POP HL
+        IN RTC_REG_CTRL_D
+        MOV L, A
+        PUSH HL
+    __endasm;
+    return out;
 }
 
+static void rtc_write_ctrl_d(uint8_t value) {
+    value;
+    __asm
+        OUT RTC_REG_CTRL_D
+    __endasm;
+}
+
+// Control register F access
+static uint8_t rtc_read_ctrl_f(void) {
+    uint8_t out;
+    __asm
+        POP HL
+        IN RTC_REG_CTRL_F
+        MOV L, A
+        PUSH HL
+    __endasm;
+    return out;
+}
+
+static void rtc_write_ctrl_f(uint8_t value) {
+    value;
+    __asm
+        OUT RTC_REG_CTRL_F
+    __endasm;
+}
+
+// Seconds register functions
+static uint8_t rtc_read_sec_ones(void) {
+    uint8_t out;
+    __asm
+        POP HL
+        IN RTC_REG_SEC_ONES
+        MOV L, A
+        PUSH HL
+    __endasm;
+    return out;
+}
+
+static void rtc_write_sec_ones(uint8_t value) {
+    value;
+    __asm
+        OUT RTC_REG_SEC_ONES
+    __endasm;
+}
+
+static uint8_t rtc_read_sec_tens(void) {
+    uint8_t out;
+    __asm
+        POP HL
+        IN RTC_REG_SEC_TENS
+        MOV L, A
+        PUSH HL
+    __endasm;
+    return out;
+}
+
+static void rtc_write_sec_tens(uint8_t value) {
+    value;
+    __asm
+        OUT RTC_REG_SEC_TENS
+    __endasm;
+}
+
+// Minutes register functions
+static uint8_t rtc_read_min_ones(void) {
+    uint8_t out;
+    __asm
+        POP HL
+        IN RTC_REG_MIN_ONES
+        MOV L, A
+        PUSH HL
+    __endasm;
+    return out;
+}
+
+static void rtc_write_min_ones(uint8_t value) {
+    value;
+    __asm
+        OUT RTC_REG_MIN_ONES
+    __endasm;
+}
+
+static uint8_t rtc_read_min_tens(void) {
+    uint8_t out;
+    __asm
+        POP HL
+        IN RTC_REG_MIN_TENS
+        MOV L, A
+        PUSH HL
+    __endasm;
+    return out;
+}
+
+static void rtc_write_min_tens(uint8_t value) {
+    value;
+    __asm
+        OUT RTC_REG_MIN_TENS
+    __endasm;
+}
+
+// Hours register functions
+static uint8_t rtc_read_hour_ones(void) {
+    uint8_t out;
+    __asm
+        POP HL
+        IN RTC_REG_HOUR_ONES
+        MOV L, A
+        PUSH HL
+    __endasm;
+    return out;
+}
+
+static void rtc_write_hour_ones(uint8_t value) {
+    value;
+    __asm
+        OUT RTC_REG_HOUR_ONES
+    __endasm;
+}
+
+static uint8_t rtc_read_hour_tens(void) {
+    uint8_t out;
+    __asm
+        POP HL
+        IN RTC_REG_HOUR_TENS
+        MOV L, A
+        PUSH HL
+    __endasm;
+    return out;
+}
+
+static void rtc_write_hour_tens(uint8_t value) {
+    value;
+    __asm
+        OUT RTC_REG_HOUR_TENS
+    __endasm;
+}
+
+// Day register functions
+static uint8_t rtc_read_day_ones(void) {
+    uint8_t out;
+    __asm
+        POP HL
+        IN RTC_REG_DAY_ONES
+        MOV L, A
+        PUSH HL
+    __endasm;
+    return out;
+}
+
+static void rtc_write_day_ones(uint8_t value) {
+    value;
+    __asm
+        OUT RTC_REG_DAY_ONES
+    __endasm;
+}
+
+static uint8_t rtc_read_day_tens(void) {
+    uint8_t out;
+    __asm
+        POP HL
+        IN RTC_REG_DAY_TENS
+        MOV L, A
+        PUSH HL
+    __endasm;
+    return out;
+}
+
+static void rtc_write_day_tens(uint8_t value) {
+    value;
+    __asm
+        OUT RTC_REG_DAY_TENS
+    __endasm;
+}
+
+// Month register functions
+static uint8_t rtc_read_month_ones(void) {
+    uint8_t out;
+    __asm
+        POP HL
+        IN RTC_REG_MONTH_ONES
+        MOV L, A
+        PUSH HL
+    __endasm;
+    return out;
+}
+
+static void rtc_write_month_ones(uint8_t value) {
+    value;
+    __asm
+        OUT RTC_REG_MONTH_ONES
+    __endasm;
+}
+
+static uint8_t rtc_read_month_tens(void) {
+    uint8_t out;
+    __asm
+        POP HL
+        IN RTC_REG_MONTH_TENS
+        MOV L, A
+        PUSH HL
+    __endasm;
+    return out;
+}
+
+static void rtc_write_month_tens(uint8_t value) {
+    value;
+    __asm
+        OUT RTC_REG_MONTH_TENS
+    __endasm;
+}
+
+// Year register functions
+static uint8_t rtc_read_year_ones(void) {
+    uint8_t out;
+    __asm
+        POP HL
+        IN RTC_REG_YEAR_ONES
+        MOV L, A
+        PUSH HL
+    __endasm;
+    return out;
+}
+
+static void rtc_write_year_ones(uint8_t value) {
+    value;
+    __asm
+        OUT RTC_REG_YEAR_ONES
+    __endasm;
+}
+
+static uint8_t rtc_read_year_tens(void) {
+    uint8_t out;
+    __asm
+        POP HL
+        IN RTC_REG_YEAR_TENS
+        MOV L, A
+        PUSH HL
+    __endasm;
+    return out;
+}
+
+static void rtc_write_year_tens(uint8_t value) {
+    value;
+    __asm
+        OUT RTC_REG_YEAR_TENS
+    __endasm;
+}
+
+// Day of week register functions
+static uint8_t rtc_read_day_of_week_reg(void) {
+    uint8_t out;
+    __asm
+        POP HL
+        IN RTC_REG_DAY_OF_WEEK
+        MOV L, A
+        PUSH HL
+    __endasm;
+    return out;
+}
+
+static void rtc_write_day_of_week_reg(uint8_t value) {
+    value;
+    __asm
+        OUT RTC_REG_DAY_OF_WEEK
+    __endasm;
+}
+
+// ============================================================================
+// High-level BCD read/write functions
+// ============================================================================
+
 /**
- * @brief Write BCD value to RTC62421 ones/tens register pair
- * @param ones_ptr Pointer to the ones register
- * @param value BCD value to write
+ * @brief Read BCD value from ones/tens pair
  */
-static void rtc_write_bcd(volatile uint8_t *ones_ptr, uint8_t value) {
-    *ones_ptr = value & 0x0F;           // Write ones
-    *(ones_ptr + 1) = (value >> 4) & 0x0F;  // Write tens
+static uint8_t rtc_read_bcd_pair(uint8_t ones, uint8_t tens) {
+    return ((tens & 0x0F) << 4) | (ones & 0x0F);
 }
 
 // ============================================================================
@@ -145,7 +409,7 @@ static void rtc_write_bcd(volatile uint8_t *ones_ptr, uint8_t value) {
  * @brief Get seconds from RTC (BCD format 0x00-0x59)
  */
 static uint8_t rtc_get_seconds(void) {
-    return rtc_read_bcd(&rtc_regs->sec_ones);
+    return rtc_read_bcd_pair(rtc_read_sec_ones(), rtc_read_sec_tens());
 }
 
 /**
@@ -153,14 +417,15 @@ static uint8_t rtc_get_seconds(void) {
  * @param value BCD seconds value
  */
 static void rtc_set_seconds(uint8_t value) {
-    rtc_write_bcd(&rtc_regs->sec_ones, value);
+    rtc_write_sec_ones(value & 0x0F);
+    rtc_write_sec_tens((value >> 4) & 0x0F);
 }
 
 /**
  * @brief Get minutes from RTC (BCD format 0x00-0x59)
  */
 static uint8_t rtc_get_minutes(void) {
-    return rtc_read_bcd(&rtc_regs->min_ones);
+    return rtc_read_bcd_pair(rtc_read_min_ones(), rtc_read_min_tens());
 }
 
 /**
@@ -168,14 +433,15 @@ static uint8_t rtc_get_minutes(void) {
  * @param value BCD minutes value
  */
 static void rtc_set_minutes(uint8_t value) {
-    rtc_write_bcd(&rtc_regs->min_ones, value);
+    rtc_write_min_ones(value & 0x0F);
+    rtc_write_min_tens((value >> 4) & 0x0F);
 }
 
 /**
  * @brief Get hours from RTC (BCD format 0x00-0x23)
  */
 static uint8_t rtc_get_hours(void) {
-    return rtc_read_bcd(&rtc_regs->hour_ones);
+    return rtc_read_bcd_pair(rtc_read_hour_ones(), rtc_read_hour_tens());
 }
 
 /**
@@ -183,14 +449,15 @@ static uint8_t rtc_get_hours(void) {
  * @param value BCD hours value
  */
 static void rtc_set_hours(uint8_t value) {
-    rtc_write_bcd(&rtc_regs->hour_ones, value);
+    rtc_write_hour_ones(value & 0x0F);
+    rtc_write_hour_tens((value >> 4) & 0x0F);
 }
 
 /**
  * @brief Get day of month from RTC (BCD format 0x01-0x31)
  */
 static uint8_t rtc_get_day(void) {
-    return rtc_read_bcd(&rtc_regs->day_ones);
+    return rtc_read_bcd_pair(rtc_read_day_ones(), rtc_read_day_tens());
 }
 
 /**
@@ -198,14 +465,15 @@ static uint8_t rtc_get_day(void) {
  * @param value BCD day value
  */
 static void rtc_set_day(uint8_t value) {
-    rtc_write_bcd(&rtc_regs->day_ones, value);
+    rtc_write_day_ones(value & 0x0F);
+    rtc_write_day_tens((value >> 4) & 0x0F);
 }
 
 /**
  * @brief Get month from RTC (BCD format 0x01-0x12)
  */
 static uint8_t rtc_get_month(void) {
-    return rtc_read_bcd(&rtc_regs->month_ones);
+    return rtc_read_bcd_pair(rtc_read_month_ones(), rtc_read_month_tens());
 }
 
 /**
@@ -213,14 +481,15 @@ static uint8_t rtc_get_month(void) {
  * @param value BCD month value
  */
 static void rtc_set_month(uint8_t value) {
-    rtc_write_bcd(&rtc_regs->month_ones, value);
+    rtc_write_month_ones(value & 0x0F);
+    rtc_write_month_tens((value >> 4) & 0x0F);
 }
 
 /**
  * @brief Get year from RTC (BCD format 0x00-0x99)
  */
 static uint8_t rtc_get_year(void) {
-    return rtc_read_bcd(&rtc_regs->year_ones);
+    return rtc_read_bcd_pair(rtc_read_year_ones(), rtc_read_year_tens());
 }
 
 /**
@@ -228,14 +497,15 @@ static uint8_t rtc_get_year(void) {
  * @param value BCD year value
  */
 static void rtc_set_year(uint8_t value) {
-    rtc_write_bcd(&rtc_regs->year_ones, value);
+    rtc_write_year_ones(value & 0x0F);
+    rtc_write_year_tens((value >> 4) & 0x0F);
 }
 
 /**
  * @brief Get day of week from RTC (0-6)
  */
 static uint8_t rtc_get_day_of_week(void) {
-    return rtc_regs->day_of_week & 0x0F;
+    return rtc_read_day_of_week_reg() & 0x0F;
 }
 
 /**
@@ -243,19 +513,23 @@ static uint8_t rtc_get_day_of_week(void) {
  * @param value Day of week value
  */
 static void rtc_set_day_of_week(uint8_t value) {
-    rtc_regs->day_of_week = value & 0x0F;
+    rtc_write_day_of_week_reg(value & 0x0F);
 }
 
+// ============================================================================
+// Increment functions for individual time components
+// ============================================================================
+
 /**
- * @brief Increment a BCD digit at given position in RTC register
- * @param ones_ptr Pointer to the ones register (tens is at ones_ptr+1)
+ * @brief Increment a BCD digit at given position
+ * @param current_bcd Current BCD value
  * @param pos Position (0=ones, 1=tens)
- * @param max Maximum value for this position
+ * @param max Maximum value for this field
+ * @return New BCD value
  */
-static void rtc_increment_bcd_digit(volatile uint8_t *ones_ptr, uint8_t pos, uint8_t max) {
-    uint8_t value = rtc_read_bcd(ones_ptr);
-    uint8_t tens = (value >> 4) & 0xF;
-    uint8_t ones = value & 0xF;
+static uint8_t rtc_increment_bcd_digit_value(uint8_t current_bcd, uint8_t pos, uint8_t max) {
+    uint8_t tens = (current_bcd >> 4) & 0xF;
+    uint8_t ones = current_bcd & 0xF;
     
     if (pos == 0) {
         ones = (ones + 1) % 10;
@@ -266,95 +540,115 @@ static void rtc_increment_bcd_digit(volatile uint8_t *ones_ptr, uint8_t pos, uin
     } else {
         tens = (tens + 1) % ((max / 10) + 1);
     }
-    rtc_write_bcd(ones_ptr, (tens << 4) | ones);
+    return (tens << 4) | ones;
 }
-
-// ============================================================================
-// Increment functions for individual time components
-// ============================================================================
 
 /**
  * @brief Increment seconds ones digit (0-9)
  */
 static void rtc_increment_seconds_ones(void) {
-    rtc_increment_bcd_digit(&rtc_regs->sec_ones, 0, 59);
+    uint8_t val = rtc_get_seconds();
+    val = rtc_increment_bcd_digit_value(val, 0, 59);
+    rtc_set_seconds(val);
 }
 
 /**
  * @brief Increment seconds tens digit (0-5)
  */
 static void rtc_increment_seconds_tens(void) {
-    rtc_increment_bcd_digit(&rtc_regs->sec_ones, 1, 59);
+    uint8_t val = rtc_get_seconds();
+    val = rtc_increment_bcd_digit_value(val, 1, 59);
+    rtc_set_seconds(val);
 }
 
 /**
  * @brief Increment minutes ones digit (0-9)
  */
 static void rtc_increment_minutes_ones(void) {
-    rtc_increment_bcd_digit(&rtc_regs->min_ones, 0, 59);
+    uint8_t val = rtc_get_minutes();
+    val = rtc_increment_bcd_digit_value(val, 0, 59);
+    rtc_set_minutes(val);
 }
 
 /**
  * @brief Increment minutes tens digit (0-5)
  */
 static void rtc_increment_minutes_tens(void) {
-    rtc_increment_bcd_digit(&rtc_regs->min_ones, 1, 59);
+    uint8_t val = rtc_get_minutes();
+    val = rtc_increment_bcd_digit_value(val, 1, 59);
+    rtc_set_minutes(val);
 }
 
 /**
  * @brief Increment hours ones digit (0-9)
  */
 static void rtc_increment_hours_ones(void) {
-    rtc_increment_bcd_digit(&rtc_regs->hour_ones, 0, 23);
+    uint8_t val = rtc_get_hours();
+    val = rtc_increment_bcd_digit_value(val, 0, 23);
+    rtc_set_hours(val);
 }
 
 /**
  * @brief Increment hours tens digit (0-2)
  */
 static void rtc_increment_hours_tens(void) {
-    rtc_increment_bcd_digit(&rtc_regs->hour_ones, 1, 23);
+    uint8_t val = rtc_get_hours();
+    val = rtc_increment_bcd_digit_value(val, 1, 23);
+    rtc_set_hours(val);
 }
 
 /**
  * @brief Increment day ones digit (0-9)
  */
 static void rtc_increment_day_ones(void) {
-    rtc_increment_bcd_digit(&rtc_regs->day_ones, 0, 31);
+    uint8_t val = rtc_get_day();
+    val = rtc_increment_bcd_digit_value(val, 0, 31);
+    rtc_set_day(val);
 }
 
 /**
  * @brief Increment day tens digit (0-3)
  */
 static void rtc_increment_day_tens(void) {
-    rtc_increment_bcd_digit(&rtc_regs->day_ones, 1, 39);
+    uint8_t val = rtc_get_day();
+    val = rtc_increment_bcd_digit_value(val, 1, 39);
+    rtc_set_day(val);
 }
 
 /**
  * @brief Increment month ones digit (0-9)
  */
 static void rtc_increment_month_ones(void) {
-    rtc_increment_bcd_digit(&rtc_regs->month_ones, 0, 12);
+    uint8_t val = rtc_get_month();
+    val = rtc_increment_bcd_digit_value(val, 0, 12);
+    rtc_set_month(val);
 }
 
 /**
  * @brief Increment month tens digit (0-1)
  */
 static void rtc_increment_month_tens(void) {
-    rtc_increment_bcd_digit(&rtc_regs->month_ones, 1, 19);
+    uint8_t val = rtc_get_month();
+    val = rtc_increment_bcd_digit_value(val, 1, 19);
+    rtc_set_month(val);
 }
 
 /**
  * @brief Increment year ones digit (0-9)
  */
 static void rtc_increment_year_ones(void) {
-    rtc_increment_bcd_digit(&rtc_regs->year_ones, 0, 99);
+    uint8_t val = rtc_get_year();
+    val = rtc_increment_bcd_digit_value(val, 0, 99);
+    rtc_set_year(val);
 }
 
 /**
  * @brief Increment year tens digit (0-9)
  */
 static void rtc_increment_year_tens(void) {
-    rtc_increment_bcd_digit(&rtc_regs->year_ones, 1, 99);
+    uint8_t val = rtc_get_year();
+    val = rtc_increment_bcd_digit_value(val, 1, 99);
+    rtc_set_year(val);
 }
 
 /**
@@ -362,8 +656,7 @@ static void rtc_increment_year_tens(void) {
  * Sets 24-hour format and starts counting
  */
 static void rtc_init(void) {
-    volatile uint8_t *ctrl_f = (uint8_t *)RTC_CTRL_F_ADD;
-    *ctrl_f = RTC_CTRL_F_24H;  // 24-hour format, not stopped, not in test mode
+    rtc_write_ctrl_f(RTC_CTRL_F_24H);  // 24-hour format, not stopped, not in test mode
 }
 
 #endif
