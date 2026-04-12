@@ -104,6 +104,7 @@ bool blink_flag = false;
 bool date_edit_mode = false;
 bool time_edit_mode = false;
 int8_t selected_digit = -1;
+int8_t menu_item = 0;
 
 uint8_t sensor_ram[8];
 uint8_t sensor_row = 0;
@@ -754,29 +755,29 @@ void menu_all_lamps_on() {
 /**
  * @brief Handle normal mode menu selection
  */
-void handle_normal_mode(int8_t *menu_item, bool buttonl, bool buttons, bool buttonr, bool buttonret) {
-    write_serie(sensor_ram[*menu_item]);
-    write_both(0, *menu_item);
+void handle_normal_mode(int8_t menu_item, bool buttonl, bool buttons, bool buttonr, bool buttonret) {
+    write_serie(sensor_ram[menu_item]);
+    write_both(0, menu_item);
     write_both(1, 0xff);
     write_both(2, 0xff);
     write_both(3, 0xff);
     write_both(4, 0xff);
 
     if (buttonl) {
-        (*menu_item)--;
+        menu_item--;
         dumb_delay(200);
     } else if (buttonr) {
-        (*menu_item)++;
+        menu_item++;
         dumb_delay(200);
     }
 
     if (buttonret) {
-        *menu_item = 0;
+        menu_item = 0;
         dumb_delay(200);
     }
 
     if (buttons) {
-        switch (*menu_item) {
+        switch (menu_item) {
             //case 0: menu_reset(); break;
             case 1: menu_all_lamps_on(); break;
             case 2: menu_edit_date(); break;
@@ -790,8 +791,8 @@ void handle_normal_mode(int8_t *menu_item, bool buttonl, bool buttons, bool butt
     }
 
     // Wrap menu item
-    if (*menu_item < 0) *menu_item = 7;
-    if (*menu_item >= 8) *menu_item = 0;
+    if (menu_item < 0) menu_item = 7;
+    if (menu_item >= 8) menu_item = 0;
 }
 
 /**
@@ -802,8 +803,6 @@ void handle_normal_mode(int8_t *menu_item, bool buttonl, bool buttons, bool butt
  * and echoes back any serial input
  */
 int main(void) {
-    int8_t menu_item = 0;
-
     init_kdc();
     init_muart();
     init_ppi();
@@ -825,10 +824,10 @@ int main(void) {
     while (1) {
         read_sensor_matrix();
 
-        bool buttonl = check_button(RISK_LEFT) | check_button(RUNTER01);
-        bool buttons = check_button(STOP_MID) | check_button(GEWINN);
-        bool buttonr = check_button(RISK_RIGHT) | check_button(HOCH01);
-        bool buttonret = check_button(RETURN) | check_button(INIT);
+        bool buttonl = check_button(RISK_LEFT) || check_button(RUNTER01);
+        bool buttons = check_button(STOP_MID) || check_button(GEWINN);
+        bool buttonr = check_button(RISK_RIGHT) || check_button(HOCH01);
+        bool buttonret = check_button(RETURN) || check_button(INIT);
 
         /*
         if (check_button(HW_TEST)) {
@@ -847,7 +846,7 @@ int main(void) {
         } else if (time_edit_mode) {
             handle_time_edit_mode(buttonl, buttons, buttonr, buttonret);
         } else {
-            handle_normal_mode(&menu_item, buttonl, buttons, buttonr, buttonret);
+            handle_normal_mode(menu_item, buttonl, buttons, buttonr, buttonret);
         }
 
         // Echo serial input
