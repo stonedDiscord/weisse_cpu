@@ -755,7 +755,11 @@ void menu_all_lamps_on() {
 /**
  * @brief Handle normal mode menu selection
  */
-void handle_normal_mode(int8_t menu_item, bool buttonl, bool buttons, bool buttonr, bool buttonret) {
+void handle_normal_mode(bool buttonl, bool buttons, bool buttonr, bool buttonret) {
+    // Bounds check BEFORE any access
+    if (menu_item < 0) menu_item = 0;
+    if (menu_item >= 8) menu_item = 7;
+    
     write_serie(sensor_ram[menu_item]);
     write_both(0, menu_item);
     write_both(1, 0xff);
@@ -822,7 +826,16 @@ int main(void) {
 
     // Infinite loop to scan the keyboard
     while (1) {
+        // Disable interrupts during sensor matrix read to prevent race conditions
+        __asm
+            DI
+        __endasm;
+        
         read_sensor_matrix();
+        
+        __asm
+            EI
+        __endasm;
 
         bool buttonl = check_button(RISK_LEFT) || check_button(RUNTER01);
         bool buttons = check_button(STOP_MID) || check_button(GEWINN);
@@ -846,7 +859,7 @@ int main(void) {
         } else if (time_edit_mode) {
             handle_time_edit_mode(buttonl, buttons, buttonr, buttonret);
         } else {
-            handle_normal_mode(menu_item, buttonl, buttons, buttonr, buttonret);
+            handle_normal_mode(buttonl, buttons, buttonr, buttonret);
         }
 
         // Echo serial input
