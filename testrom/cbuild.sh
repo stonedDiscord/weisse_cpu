@@ -1,6 +1,8 @@
+rm *.zip
+rm *.ic*
+
 docker run  -v .:/src/ z88dk/z88dk sh ./build.sh -DBOARD4087
 
-rm testromc.zip
 7z a testromc.zip a.rom
 
 cp a.rom merkur_full_house_ic1.ice6
