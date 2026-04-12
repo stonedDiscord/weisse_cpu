@@ -34,7 +34,7 @@
 #pragma output REGISTER_SP = 0x9ff0
 #pragma output CRT_ORG_BSS = 0x9000
 #include "rtc62421.c"
-#else
+#else // BOARD4087
 #define I8279_IO    0x50
 #define I8256_IO    0x60
 #define RTC_ADD     0x9000
@@ -830,6 +830,7 @@ int main(void) {
         bool buttonr = check_button(RISK_RIGHT) | check_button(HOCH01);
         bool buttonret = check_button(RETURN) | check_button(INIT);
 
+        /*
         if (check_button(HW_TEST)) {
             menu_play_music();
         }
@@ -839,6 +840,7 @@ int main(void) {
         if (check_button(FOUL)) {
             menu_edit_time();
         }
+            */
 
         if (date_edit_mode) {
             handle_date_edit_mode(buttonl, buttons, buttonr, buttonret);
