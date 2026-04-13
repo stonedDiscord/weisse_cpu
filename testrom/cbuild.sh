@@ -6,7 +6,9 @@ docker run  -v .:/src/ z88dk/z88dk sh ./build.sh -DBOARD4087
 7z a testromc.zip a.rom
 
 cp a.rom merkur_full_house_ic1.ice6
+truncate -s 16K merkur_full_house_ic1.ice6
 cp a.rom merkur_full_house_ic2.icd6
+truncate -s 16K merkur_full_house_ic2.icd6
 rm fullhous.zip
 7z a fullhous.zip merkur_full_house_ic1.ice6 merkur_full_house_ic2.icd6
 
@@ -28,7 +30,9 @@ cp excellnt.zip /run/media/stoned/schrott/Roms/mame/roms/excellnt.zip
 
 docker run  -v .:/src/ z88dk/z88dk sh ./build.sh -DBOARD4109
 cp a.rom merkur_astro_pr1.ice6
+truncate -s 32K merkur_astro_pr1.ice6
 cp a.rom merkur_astro_pr2.icd6
+truncate -s 32K merkur_astro_pr2.icd6
 rm mastro.zip
 7z a mastro.zip merkur_astro_pr1.ice6 merkur_astro_pr2.icd6
 
