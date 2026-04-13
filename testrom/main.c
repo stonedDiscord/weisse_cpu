@@ -125,25 +125,21 @@ void enable_interrupts() {
 
 // timer2
 void _8085_int1() {
-    uint8_t out=0xaa;
-    enable_interrupts();
+    // unused
 }
 // timer3
 void _8085_int3() {
     timer3_flag = false;
-    enable_interrupts();
 }
 // tx int
 void _8085_int5() {
-    uint8_t out=0xaa;
-    enable_interrupts();
+    // unused
 }
 //timer5
 void _8085_int7() {
     blink_flag = !blink_flag;
-    refresh_display();
+    // Keep this minimal - only hardware register operations
     set_timer5(250);
-    enable_muart_interrupts(I8256_INT_L7);
 }
 
 /**
@@ -818,31 +814,22 @@ int main(void) {
 #endif
     rtc_init();  // Initialize RTC (24-hour format, start counting)
 
-    _8085_int7();
-    enable_interrupts();
+    _8085_int7();           // Initialize timer5 for blinking
+    enable_interrupts();     // Enable interrupts - but handlers are now minimal!
 
-    write_lamps(0, 0x16); // light up pressable buttons
-    write_lamps(3, 0xc0); // return
+    write_lamps(0, 0x16);   // light up pressable buttons
+    write_lamps(3, 0xc0);   // return
 
     // Infinite loop to scan the keyboard
     while (1) {
-        // Disable interrupts during sensor matrix read to prevent race conditions
-        __asm
-            DI
-        __endasm;
-        
+        // Read sensor matrix - no interrupt protection needed now since ISR is minimal
         read_sensor_matrix();
-        
-        __asm
-            EI
-        __endasm;
 
         bool buttonl = check_button(RISK_LEFT) || check_button(RUNTER01);
         bool buttons = check_button(STOP_MID) || check_button(GEWINN);
         bool buttonr = check_button(RISK_RIGHT) || check_button(HOCH01);
         bool buttonret = check_button(RETURN) || check_button(INIT);
 
-        /*
         if (check_button(HW_TEST)) {
             menu_play_music();
         }
@@ -852,8 +839,8 @@ int main(void) {
         if (check_button(FOUL)) {
             menu_edit_time();
         }
-            */
 
+        // Mode handling
         if (date_edit_mode) {
             handle_date_edit_mode(buttonl, buttons, buttonr, buttonret);
         } else if (time_edit_mode) {
@@ -862,10 +849,12 @@ int main(void) {
             handle_normal_mode(buttonl, buttons, buttonr, buttonret);
         }
 
-        // Echo serial input
         if (read_status() & I8256_STATUS_RBF) {
             uint8_t rcv = read_serial_char();
             print_serial_char(rcv);
         }
+
+        // Always refresh display every loop - blink_flag is used for effects
+        refresh_display();
     }
 }
