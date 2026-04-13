@@ -4,11 +4,6 @@
  *
  * This program interacts with a type of German slot machine in use from the late 1980s-early 1990s
  *
- * Hardware Configuration:
- * - 0x50-0x51: 8279 keyboard/display controller
- * - 0x60-0x6f: 8256 UART
- * - 0x70-0x73: 8255
- *
  * The program initializes the controller in 16-bit display mode with encoded
  * keyboard scanning, then continuously scans for keyboard input and updates
  * the displays accordingly.
@@ -413,7 +408,7 @@ void wait_tx_ready() {
  * @param txdata Data to transmit
  */
 void print_serial_char(uint8_t txdata) {
-    wait_tx_ready();
+    //wait_tx_ready();
     write_buffer(txdata);
 }
 
@@ -754,12 +749,11 @@ void handle_normal_mode(bool buttonl, bool buttons, bool buttonr, bool buttonret
     if (menu_item < 0) menu_item = 0;
     if (menu_item >= 8) menu_item = 7;
     
-    write_serie(sensor_ram[menu_item]);
     write_both(0, menu_item);
-    write_both(1, 0xff);
-    write_both(2, 0xff);
-    write_both(3, 0xff);
-    write_both(4, 0xff);
+    write_both(1, buttonl);
+    write_both(2, buttons);
+    write_both(3, buttonr);
+    write_both(4, buttonret);
 
     if (buttonl) {
         menu_item--;
@@ -812,6 +806,8 @@ int main(void) {
 #endif
     rtc_init();  // Initialize RTC (24-hour format, start counting)
 
+    print_string("Test ROM Initialized\n");
+
     _8085_int7();           // Initialize timer5 for blinking
     enable_interrupts();     // Enable interrupts - but handlers are now minimal!
 
@@ -823,10 +819,10 @@ int main(void) {
         // Read sensor matrix - no interrupt protection needed now since ISR is minimal
         read_sensor_matrix();
 
-        bool buttonl = check_button(RISK_LEFT) || check_button(RUNTER01);
-        bool buttons = check_button(STOP_MID) || check_button(GEWINN);
-        bool buttonr = check_button(RISK_RIGHT) || check_button(HOCH01);
-        bool buttonret = check_button(RETURN) || check_button(INIT);
+        bool buttonl = check_button(RUNTER01); // | check_button(RISK_LEFT);
+        bool buttons = check_button(GEWINN); // | check_button(STOP_MID);
+        bool buttonr = check_button(HOCH1); // | check_button(RISK_RIGHT);
+        bool buttonret = check_button(INIT); // | check_button(RETURN);
 
         if (check_button(HW_TEST)) {
             menu_play_music();
