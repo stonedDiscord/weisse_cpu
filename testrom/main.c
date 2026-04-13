@@ -149,7 +149,6 @@ void _8085_int7() {
  */
 void _8085_int65() {
     //read_sensor_matrix();
-    enable_interrupts();
 }
 
 void read_sensor_matrix() {
@@ -165,7 +164,6 @@ void read_sensor_matrix() {
  */
 void _8085_int75() {
     //refresh_display();
-    enable_interrupts();
 }
 
 /**
@@ -174,8 +172,7 @@ void _8085_int75() {
  * Currently a placeholder function.
  */
 void _8085_int55() {
-    uint8_t out=0xaa;
-    enable_interrupts();
+    // unused
 }
 
 /**
