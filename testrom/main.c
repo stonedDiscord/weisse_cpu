@@ -403,7 +403,7 @@ void dumb_delay(uint16_t ms) {
 
 void wait_tx_ready() {
     while ((read_status() & I8256_STATUS_TBE) == 0) {
-        delay(1);
+        dumb_delay(1);
     }
 }
 
@@ -436,7 +436,7 @@ void play_note(uint8_t note, uint8_t octave, uint8_t duration)
     l_notedata |= ((octave & 0x03) << 6);    
     set_sound(l_notedata);
     counter_out(COUNTERS_START_SOUND);
-    delay(1);
+    dumb_delay(1);
     counter_out(0);
 }
 
@@ -450,6 +450,7 @@ void play_track()
         write_both(2, track[i].duration);
         write_both(3, track[i].length);
         write_both(4, i);
+        refresh_display();
         // Print lyric to serial port
         if (track[i].lyric != 0)
         {
@@ -458,7 +459,7 @@ void play_track()
             print_string(" ");
         }
 
-        delay(track[i].length * 3);
+        dumb_delay(track[i].length * 3);
     }
 }
 
