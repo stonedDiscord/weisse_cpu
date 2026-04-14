@@ -15,6 +15,8 @@
 #include <stdint.h>
 #include <stddef.h>
 
+#define EMULATOR
+
 #if defined(BOARD4040)
 #define I8279_IO    0x80
 #define I8256_IO    0x90
@@ -819,10 +821,17 @@ int main(void) {
         // Read sensor matrix - no interrupt protection needed now since ISR is minimal
         read_sensor_matrix();
 
-        bool buttonl = check_button(RUNTER01); // | check_button(RISK_LEFT);
-        bool buttons = check_button(GEWINN); // | check_button(STOP_MID);
-        bool buttonr = check_button(HOCH1); // | check_button(RISK_RIGHT);
-        bool buttonret = check_button(INIT); // | check_button(RETURN);
+        #ifdef EMULATOR // current mame on master has the risk buttons reversed
+        bool buttonl = check_button(RUNTER01) | check_button(RISK_LEFT);
+        bool buttons = check_button(GEWINN) | check_button(STOP_MID);
+        bool buttonr = check_button(HOCH1) | check_button(RISK_RIGHT);
+        bool buttonret = check_button(INIT) | check_button(RETURN);
+        #else
+        bool buttonl = check_button(RUNTER01);
+        bool buttons = check_button(GEWINN);
+        bool buttonr = check_button(HOCH1);
+        bool buttonret = check_button(INIT);
+        #endif
 
         if (check_button(HW_TEST)) {
             menu_play_music();
