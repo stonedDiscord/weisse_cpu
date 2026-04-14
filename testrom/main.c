@@ -822,15 +822,15 @@ int main(void) {
         read_sensor_matrix();
 
         #ifdef EMULATOR // current mame on master has the risk buttons reversed
-        bool buttonl = check_button(RUNTER01) | check_button(RISK_LEFT);
-        bool buttons = check_button(GEWINN) | check_button(STOP_MID);
-        bool buttonr = check_button(HOCH1) | check_button(RISK_RIGHT);
-        bool buttonret = check_button(INIT) | check_button(RETURN);
-        #else
         bool buttonl = check_button(RUNTER01);
         bool buttons = check_button(GEWINN);
         bool buttonr = check_button(HOCH1);
         bool buttonret = check_button(INIT);
+        #else
+        bool buttonl = check_button(RUNTER01) | check_button(RISK_LEFT);
+        bool buttons = check_button(GEWINN) | check_button(STOP_MID);
+        bool buttonr = check_button(HOCH1) | check_button(RISK_RIGHT);
+        bool buttonret = check_button(INIT) | check_button(RETURN);
         #endif
 
         if (check_button(HW_TEST)) {
