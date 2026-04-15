@@ -15,7 +15,7 @@
 #include <stdint.h>
 #include <stddef.h>
 
-#define EMULATOR
+//#define EMULATOR
 
 #if defined(BOARD4040)
 #define I8279_IO    0x80
@@ -410,7 +410,7 @@ void wait_tx_ready() {
  * @param txdata Data to transmit
  */
 void print_serial_char(uint8_t txdata) {
-    //wait_tx_ready();
+    wait_tx_ready();
     write_buffer(txdata);
 }
 
