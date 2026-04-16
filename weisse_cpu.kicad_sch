@@ -76849,7 +76849,6 @@
 		(on_board yes)
 		(in_pos_files yes)
 		(dnp no)
-		(fields_autoplaced yes)
 		(uuid "16101267-a813-4aae-935d-64b03e100b77")
 		(property "Reference" "#PWR083"
 			(at 1137.92 67.31 0)
@@ -76863,7 +76862,7 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 1143 63.5 90)
+			(at 1137.92 67.31 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -77681,7 +77680,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:D")
+		(lib_id "Device:D_Zener")
 		(at 1057.91 59.69 180)
 		(unit 1)
 		(body_style 1)
@@ -77701,7 +77700,7 @@
 				)
 			)
 		)
-		(property "Value" "ITT ZY"
+		(property "Value" "ITT ZY ZPD5,6"
 			(at 1057.91 63.5 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -77733,7 +77732,7 @@
 				)
 			)
 		)
-		(property "Description" "Diode"
+		(property "Description" "Zener diode"
 			(at 1057.91 59.69 0)
 			(hide yes)
 			(show_name no)
@@ -88255,8 +88254,9 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:D")
-		(at 1151.89 218.44 270)
+		(lib_id "Device:D_Zener")
+		(at 1151.89 218.44 90)
+		(mirror x)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -88264,10 +88264,9 @@
 		(on_board yes)
 		(in_pos_files yes)
 		(dnp no)
-		(fields_autoplaced yes)
 		(uuid "3105cd82-b210-4633-af81-9fb1888d9184")
 		(property "Reference" "D63"
-			(at 1154.43 217.1699 90)
+			(at 1149.35 217.1699 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -88277,8 +88276,8 @@
 				(justify left)
 			)
 		)
-		(property "Value" "D"
-			(at 1154.43 219.7099 90)
+		(property "Value" "ZPD3"
+			(at 1149.35 219.7099 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -88310,7 +88309,7 @@
 				)
 			)
 		)
-		(property "Description" "Diode"
+		(property "Description" "Zener diode"
 			(at 1151.89 218.44 0)
 			(hide yes)
 			(show_name no)
@@ -108964,7 +108963,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:D")
+		(lib_id "Device:D_Zener")
 		(at 96.52 558.8 270)
 		(unit 1)
 		(body_style 1)
@@ -108986,7 +108985,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "D"
+		(property "Value" "ZPD3"
 			(at 99.06 560.0699 90)
 			(show_name no)
 			(do_not_autoplace no)
@@ -109019,7 +109018,7 @@
 				)
 			)
 		)
-		(property "Description" "Diode"
+		(property "Description" "Zener diode"
 			(at 96.52 558.8 0)
 			(hide yes)
 			(show_name no)
@@ -143460,7 +143459,7 @@
 				)
 			)
 		)
-		(property "Value" "ITT 4,7"
+		(property "Value" "ITT BZV 4,7"
 			(at 1145.54 46.99 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -151677,7 +151676,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:D")
+		(lib_id "Device:D_Zener")
 		(at 1096.01 29.21 0)
 		(mirror x)
 		(unit 1)
@@ -151690,7 +151689,7 @@
 		(fields_autoplaced yes)
 		(uuid "cd9e8571-8d5a-4d56-b406-4f84debbe71b")
 		(property "Reference" "DB1"
-			(at 1096.01 23.495 0)
+			(at 1096.01 22.86 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -151699,8 +151698,8 @@
 				)
 			)
 		)
-		(property "Value" "D"
-			(at 1096.01 26.035 0)
+		(property "Value" "ZPD3"
+			(at 1096.01 25.4 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -151731,7 +151730,7 @@
 				)
 			)
 		)
-		(property "Description" "Diode"
+		(property "Description" "Zener diode"
 			(at 1096.01 29.21 0)
 			(hide yes)
 			(show_name no)
@@ -160613,7 +160612,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "C"
+		(property "Value" "1uF"
 			(at 1165.86 219.7099 0)
 			(show_name no)
 			(do_not_autoplace no)
