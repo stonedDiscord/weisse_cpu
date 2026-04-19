@@ -24847,14 +24847,14 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "Memory_RAM:CXK5816PN"
+		(symbol "Memory_RAM:CY62256-70PC"
 			(exclude_from_sim no)
 			(in_bom yes)
 			(on_board yes)
 			(in_pos_files yes)
 			(duplicate_pin_numbers_are_jumpers no)
 			(property "Reference" "U"
-				(at -10.16 23.495 0)
+				(at -10.16 20.955 0)
 				(show_name no)
 				(do_not_autoplace no)
 				(effects
@@ -24864,8 +24864,8 @@
 					(justify left bottom)
 				)
 			)
-			(property "Value" "CXK5816PN"
-				(at 2.54 23.495 0)
+			(property "Value" "CY62256-70PC"
+				(at 2.54 20.955 0)
 				(show_name no)
 				(do_not_autoplace no)
 				(effects
@@ -24875,8 +24875,8 @@
 					(justify left bottom)
 				)
 			)
-			(property "Footprint" ""
-				(at 0 0 0)
+			(property "Footprint" "Package_DIP:DIP-28_W15.24mm"
+				(at 0 -2.54 0)
 				(show_name no)
 				(do_not_autoplace no)
 				(hide yes)
@@ -24886,8 +24886,8 @@
 					)
 				)
 			)
-			(property "Datasheet" "https://pdf1.alldatasheet.com/datasheet-pdf/view/154355/SONY/CXK5816PN.html"
-				(at 0 0 0)
+			(property "Datasheet" "https://ecee.colorado.edu/~mcclurel/Cypress_SRAM_CY62256.pdf"
+				(at 0 -2.54 0)
 				(show_name no)
 				(do_not_autoplace no)
 				(hide yes)
@@ -24897,7 +24897,7 @@
 					)
 				)
 			)
-			(property "Description" "128K x 8 High-Speed CMOS Static RAM, 55/70ns, DIP-32/SSOP-32"
+			(property "Description" "256K (32K x 8) Static RAM, 70ns, DIP-28"
 				(at 0 0 0)
 				(show_name no)
 				(do_not_autoplace no)
@@ -24919,7 +24919,7 @@
 					)
 				)
 			)
-			(property "ki_fp_filters" "DIP*W15.24mm* SSOP*11.305x20.495mm*P1.27mm*"
+			(property "ki_fp_filters" "DIP*W15.24mm*"
 				(at 0 0 0)
 				(show_name no)
 				(do_not_autoplace no)
@@ -24930,18 +24930,36 @@
 					)
 				)
 			)
-			(symbol "CXK5816PN_0_0"
-				(pin tri_state line
-					(at 12.7 3.81 180)
+			(symbol "CY62256-70PC_0_0"
+				(pin power_in line
+					(at 0 -22.86 90)
 					(length 2.54)
-					(name "I/O7"
+					(name "GND"
 						(effects
 							(font
 								(size 1.27 1.27)
 							)
 						)
 					)
-					(number "16"
+					(number "14"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin power_in line
+					(at 0 22.86 270)
+					(length 2.54)
+					(name "VCC"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "28"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -24950,10 +24968,10 @@
 					)
 				)
 			)
-			(symbol "CXK5816PN_0_1"
+			(symbol "CY62256-70PC_0_1"
 				(rectangle
-					(start -10.16 22.86)
-					(end 10.16 -10.16)
+					(start -10.16 20.32)
+					(end 10.16 -20.32)
 					(stroke
 						(width 0.254)
 						(type default)
@@ -24963,11 +24981,11 @@
 					)
 				)
 			)
-			(symbol "CXK5816PN_1_1"
+			(symbol "CY62256-70PC_1_1"
 				(pin input line
-					(at -12.7 1.27 0)
+					(at -12.7 -17.78 0)
 					(length 2.54)
-					(name "A7"
+					(name "A14"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -24983,9 +25001,9 @@
 					)
 				)
 				(pin input line
-					(at -12.7 3.81 0)
+					(at -12.7 -12.7 0)
 					(length 2.54)
-					(name "A6"
+					(name "A12"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -25001,9 +25019,9 @@
 					)
 				)
 				(pin input line
-					(at -12.7 6.35 0)
+					(at -12.7 0 0)
 					(length 2.54)
-					(name "A5"
+					(name "A7"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -25019,9 +25037,9 @@
 					)
 				)
 				(pin input line
-					(at -12.7 8.89 0)
+					(at -12.7 2.54 0)
 					(length 2.54)
-					(name "A4"
+					(name "A6"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -25037,9 +25055,9 @@
 					)
 				)
 				(pin input line
-					(at -12.7 11.43 0)
+					(at -12.7 5.08 0)
 					(length 2.54)
-					(name "A3"
+					(name "A5"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -25055,9 +25073,9 @@
 					)
 				)
 				(pin input line
-					(at -12.7 13.97 0)
+					(at -12.7 7.62 0)
 					(length 2.54)
-					(name "A2"
+					(name "A4"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -25073,9 +25091,9 @@
 					)
 				)
 				(pin input line
-					(at -12.7 16.51 0)
+					(at -12.7 10.16 0)
 					(length 2.54)
-					(name "A1"
+					(name "A3"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -25091,9 +25109,9 @@
 					)
 				)
 				(pin input line
-					(at -12.7 19.05 0)
+					(at -12.7 12.7 0)
 					(length 2.54)
-					(name "A0"
+					(name "A2"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -25108,10 +25126,10 @@
 						)
 					)
 				)
-				(pin tri_state line
-					(at 12.7 19.05 180)
+				(pin input line
+					(at -12.7 15.24 0)
 					(length 2.54)
-					(name "I/O1"
+					(name "A1"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -25126,10 +25144,10 @@
 						)
 					)
 				)
-				(pin tri_state line
-					(at 12.7 16.51 180)
+				(pin input line
+					(at -12.7 17.78 0)
 					(length 2.54)
-					(name "I/O2"
+					(name "A0"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -25145,9 +25163,9 @@
 					)
 				)
 				(pin tri_state line
-					(at 12.7 13.97 180)
+					(at 12.7 17.78 180)
 					(length 2.54)
-					(name "I/O3"
+					(name "Q0"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -25162,10 +25180,10 @@
 						)
 					)
 				)
-				(pin power_in line
-					(at 0 -12.7 90)
+				(pin tri_state line
+					(at 12.7 15.24 180)
 					(length 2.54)
-					(name "GND"
+					(name "Q1"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -25181,9 +25199,9 @@
 					)
 				)
 				(pin tri_state line
-					(at 12.7 11.43 180)
+					(at 12.7 12.7 180)
 					(length 2.54)
-					(name "I/O4"
+					(name "Q2"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -25199,27 +25217,9 @@
 					)
 				)
 				(pin tri_state line
-					(at 12.7 8.89 180)
+					(at 12.7 10.16 180)
 					(length 2.54)
-					(name "I/O5"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "14"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin tri_state line
-					(at 12.7 6.35 180)
-					(length 2.54)
-					(name "I/O6"
+					(name "Q3"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -25235,9 +25235,27 @@
 					)
 				)
 				(pin tri_state line
-					(at 12.7 1.27 180)
+					(at 12.7 7.62 180)
 					(length 2.54)
-					(name "I/O8"
+					(name "Q4"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "16"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin tri_state line
+					(at 12.7 5.08 180)
+					(length 2.54)
+					(name "Q5"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -25252,10 +25270,10 @@
 						)
 					)
 				)
-				(pin input line
-					(at 12.7 -2.54 180)
+				(pin tri_state line
+					(at 12.7 2.54 180)
 					(length 2.54)
-					(name "~{CE}"
+					(name "Q6"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -25270,10 +25288,10 @@
 						)
 					)
 				)
-				(pin input line
-					(at -12.7 -6.35 0)
+				(pin tri_state line
+					(at 12.7 0 180)
 					(length 2.54)
-					(name "A10"
+					(name "Q7"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -25288,10 +25306,10 @@
 						)
 					)
 				)
-				(pin output line
-					(at 12.7 -7.62 180)
+				(pin input line
+					(at 12.7 -5.08 180)
 					(length 2.54)
-					(name "~{OE}"
+					(name "~{CS}"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -25307,9 +25325,9 @@
 					)
 				)
 				(pin input line
-					(at 12.7 -5.08 180)
+					(at -12.7 -7.62 0)
 					(length 2.54)
-					(name "~{WE}"
+					(name "A10"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -25325,9 +25343,9 @@
 					)
 				)
 				(pin input line
-					(at -12.7 -3.81 0)
+					(at 12.7 -10.16 180)
 					(length 2.54)
-					(name "A9"
+					(name "~{OE}"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -25343,9 +25361,9 @@
 					)
 				)
 				(pin input line
-					(at -12.7 -1.27 0)
+					(at -12.7 -10.16 0)
 					(length 2.54)
-					(name "A8"
+					(name "A11"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -25360,10 +25378,10 @@
 						)
 					)
 				)
-				(pin power_in line
-					(at 0 25.4 270)
+				(pin input line
+					(at -12.7 -5.08 0)
 					(length 2.54)
-					(name "Vcc"
+					(name "A9"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -25371,6 +25389,60 @@
 						)
 					)
 					(number "24"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin input line
+					(at -12.7 -2.54 0)
+					(length 2.54)
+					(name "A8"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "25"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin input line
+					(at -12.7 -15.24 0)
+					(length 2.54)
+					(name "A13"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "26"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin input line
+					(at 12.7 -12.7 180)
+					(length 2.54)
+					(name "~{WE}"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "27"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -34380,6 +34452,10 @@
 		(uuid "1aa3be52-7112-4487-b329-a0797493b3b0")
 	)
 	(no_connect
+		(at 612.14 594.36)
+		(uuid "1b28d741-d803-4573-95bc-57fc48818418")
+	)
+	(no_connect
 		(at 772.16 297.18)
 		(uuid "1b62b69b-bd9f-4977-b5ae-ac3b4100e825")
 	)
@@ -42591,7 +42667,7 @@
 	)
 	(wire
 		(pts
-			(xy 637.54 582.93) (xy 646.43 582.93)
+			(xy 612.14 586.74) (xy 604.52 586.74)
 		)
 		(stroke
 			(width 0)
@@ -45963,7 +46039,7 @@
 	)
 	(global_label "RAMVCC"
 		(shape input)
-		(at 657.86 601.98 180)
+		(at 660.4 601.98 180)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -45973,7 +46049,7 @@
 		)
 		(uuid "1502598d-cfa9-4884-836a-80ea0b3bdd1d")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 647.4362 601.98 0)
+			(at 649.9762 601.98 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -47019,17 +47095,17 @@
 	)
 	(global_label "WriteRAM"
 		(shape input)
-		(at 650.24 577.85 0)
+		(at 600.71 581.66 180)
 		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
-			(justify left)
+			(justify right)
 		)
 		(uuid "212c7cc3-8105-4da3-80bf-e5453fefcb7f")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 661.6919 577.85 0)
+			(at 589.2581 581.66 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -47037,7 +47113,7 @@
 				(font
 					(size 1.27 1.27)
 				)
-				(justify left)
+				(justify right)
 			)
 		)
 	)
@@ -47654,6 +47730,30 @@
 		(uuid "27e0c9e0-bed4-4cca-84fa-a601866bfbe5")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
 			(at 1123.9282 255.27 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+	)
+	(global_label "RAMVCC"
+		(shape input)
+		(at 612.14 591.82 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "27f7c753-c8e7-4f2e-ae6f-0b59287686c7")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 601.7162 591.82 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -52635,7 +52735,7 @@
 	)
 	(global_label "RAMVCC"
 		(shape input)
-		(at 624.84 552.45 180)
+		(at 624.84 553.72 180)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -52645,7 +52745,7 @@
 		)
 		(uuid "646dcea2-782e-402b-b2b3-7674d09fcf78")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 614.4162 552.45 0)
+			(at 614.4162 553.72 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -55225,6 +55325,30 @@
 			)
 		)
 	)
+	(global_label "WriteRAM"
+		(shape input)
+		(at 637.54 589.28 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "7f1d3a05-fa61-414a-b371-4973827b976a")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 648.9919 589.28 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+	)
 	(global_label "MEM_RD"
 		(shape input)
 		(at 614.68 529.59 180)
@@ -56763,17 +56887,17 @@
 	)
 	(global_label "BUS_A11"
 		(shape input)
-		(at 650.24 588.01 0)
+		(at 600.71 591.82 180)
 		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
-			(justify left)
+			(justify right)
 		)
 		(uuid "8e66f42e-fdbc-4a0f-992a-99bb93acb7fb")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 661.5104 588.01 0)
+			(at 589.4396 591.82 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -56781,7 +56905,7 @@
 				(font
 					(size 1.27 1.27)
 				)
-				(justify left)
+				(justify right)
 			)
 		)
 	)
@@ -58923,7 +59047,7 @@
 	)
 	(global_label "RAM_CE"
 		(shape input)
-		(at 637.54 580.39 0)
+		(at 637.54 581.66 0)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -58933,7 +59057,7 @@
 		)
 		(uuid "a4aa1d52-cdf9-45d9-a949-30c92fdc0326")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 647.7218 580.39 0)
+			(at 647.7218 581.66 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -59998,6 +60122,30 @@
 					(size 1.27 1.27)
 				)
 				(justify left)
+			)
+		)
+	)
+	(global_label "BUS_A12"
+		(shape input)
+		(at 612.14 589.28 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "afce4fb3-3256-4990-ba19-6ce50889b3e9")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 600.8696 589.28 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
 			)
 		)
 	)
@@ -62883,7 +63031,7 @@
 	)
 	(global_label "MEM_RD"
 		(shape input)
-		(at 637.54 585.47 0)
+		(at 637.54 586.74 0)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -62893,7 +63041,7 @@
 		)
 		(uuid "d2d22e69-a4d5-4bb5-9cc7-9cd77758bc50")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 648.0846 585.47 0)
+			(at 648.0846 586.74 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -92994,7 +93142,7 @@
 	)
 	(symbol
 		(lib_id "Device:C")
-		(at 661.67 601.98 270)
+		(at 664.21 601.98 270)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -93005,7 +93153,7 @@
 		(fields_autoplaced yes)
 		(uuid "3d71337f-e9cf-4d40-985f-dcd627ae3e56")
 		(property "Reference" "C76"
-			(at 661.67 594.36 90)
+			(at 664.21 594.36 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -93015,7 +93163,7 @@
 			)
 		)
 		(property "Value" "C"
-			(at 661.67 596.9 90)
+			(at 664.21 596.9 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -93025,7 +93173,7 @@
 			)
 		)
 		(property "Footprint" "Capacitor_THT:C_Rect_L9.0mm_W2.5mm_P7.50mm_MKT"
-			(at 657.86 602.9452 0)
+			(at 660.4 602.9452 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -93036,7 +93184,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 661.67 601.98 0)
+			(at 664.21 601.98 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -93047,7 +93195,7 @@
 			)
 		)
 		(property "Description" "Unpolarized capacitor"
-			(at 661.67 601.98 0)
+			(at 664.21 601.98 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -93655,7 +93803,8 @@
 	)
 	(symbol
 		(lib_id "Jumper:Jumper_3_Bridged12")
-		(at 650.24 582.93 270)
+		(at 600.71 586.74 90)
+		(mirror x)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -93666,7 +93815,7 @@
 		(fields_autoplaced yes)
 		(uuid "3ee17986-99bd-4e26-a5a2-f617d8524024")
 		(property "Reference" "JP1"
-			(at 652.78 581.6599 90)
+			(at 598.17 585.4699 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -93677,7 +93826,7 @@
 			)
 		)
 		(property "Value" "RAM/ROM"
-			(at 652.78 584.1999 90)
+			(at 598.17 588.0099 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -93688,7 +93837,7 @@
 			)
 		)
 		(property "Footprint" "BigOnes:PinHeader_1x03_P2.54mm_Vertical"
-			(at 650.24 582.93 0)
+			(at 600.71 586.74 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -93699,7 +93848,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 650.24 582.93 0)
+			(at 600.71 586.74 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -93710,7 +93859,7 @@
 			)
 		)
 		(property "Description" "Jumper, 3-pole, pins 1+2 closed/bridged"
-			(at 638.81 582.93 0)
+			(at 612.14 586.74 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -110380,7 +110529,6 @@
 		(on_board yes)
 		(in_pos_files yes)
 		(dnp no)
-		(fields_autoplaced yes)
 		(uuid "6a74fa0d-a199-449b-aaa9-2d1d1677a9ed")
 		(property "Reference" "#PWR0234"
 			(at 292.1 382.27 0)
@@ -110394,7 +110542,7 @@
 			)
 		)
 		(property "Value" "+5V"
-			(at 294.64 377.1899 0)
+			(at 290.83 372.11 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -114192,7 +114340,7 @@
 	)
 	(symbol
 		(lib_id "power:GND")
-		(at 624.84 590.55 0)
+		(at 624.84 599.44 0)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -114203,7 +114351,7 @@
 		(fields_autoplaced yes)
 		(uuid "736bda3c-1636-4d17-b63d-948cd268b275")
 		(property "Reference" "#PWR019"
-			(at 624.84 596.9 0)
+			(at 624.84 605.79 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -114214,7 +114362,7 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 627.38 591.8199 0)
+			(at 627.38 600.7099 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -114225,7 +114373,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 624.84 590.55 0)
+			(at 624.84 599.44 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -114236,7 +114384,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 624.84 590.55 0)
+			(at 624.84 599.44 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -114247,7 +114395,7 @@
 			)
 		)
 		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
-			(at 624.84 590.55 0)
+			(at 624.84 599.44 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -154701,8 +154849,8 @@
 		)
 	)
 	(symbol
-		(lib_id "Memory_RAM:CXK5816PN")
-		(at 624.84 577.85 0)
+		(lib_id "Memory_RAM:CY62256-70PC")
+		(at 624.84 576.58 0)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -154713,7 +154861,7 @@
 		(fields_autoplaced yes)
 		(uuid "d69f3920-0307-459f-953b-baf7b760f95c")
 		(property "Reference" "ICC6"
-			(at 627.0341 549.91 0)
+			(at 626.9833 551.18 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -154724,7 +154872,7 @@
 			)
 		)
 		(property "Value" "CXK5816PN-12L"
-			(at 627.0341 552.45 0)
+			(at 626.9833 553.72 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -154734,8 +154882,8 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Package_DIP:DIP-24_W15.24mm"
-			(at 624.84 577.85 0)
+		(property "Footprint" "Package_DIP:DIP-28_W15.24mm"
+			(at 624.84 579.12 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -154745,8 +154893,8 @@
 				)
 			)
 		)
-		(property "Datasheet" "https://pdf1.alldatasheet.com/datasheet-pdf/view/154355/SONY/CXK5816PN.html"
-			(at 624.84 577.85 0)
+		(property "Datasheet" "https://ecee.colorado.edu/~mcclurel/Cypress_SRAM_CY62256.pdf"
+			(at 624.84 579.12 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -154756,8 +154904,8 @@
 				)
 			)
 		)
-		(property "Description" "128K x 8 High-Speed CMOS Static RAM, 55/70ns, DIP-32/SSOP-32"
-			(at 624.84 577.85 0)
+		(property "Description" "256K (32K x 8) Static RAM, 70ns, DIP-28"
+			(at 624.84 576.58 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -154838,6 +154986,18 @@
 		)
 		(pin "9"
 			(uuid "0180a5e3-c823-44e1-80c2-3df1f9765d50")
+		)
+		(pin "25"
+			(uuid "f342b56d-e702-475d-b5d3-9813cc50e2c2")
+		)
+		(pin "28"
+			(uuid "c9182435-9ea3-48ef-8a60-f51f2ce0566c")
+		)
+		(pin "26"
+			(uuid "63341482-2e07-4ff5-b0fd-9d19ea682bb9")
+		)
+		(pin "27"
+			(uuid "2ecfc458-3561-4ce1-94fd-a66c51ce3876")
 		)
 		(instances
 			(project "weisse_cpu"
@@ -159414,7 +159574,7 @@
 	)
 	(symbol
 		(lib_id "power:GND")
-		(at 665.48 601.98 90)
+		(at 668.02 601.98 90)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -159425,7 +159585,7 @@
 		(fields_autoplaced yes)
 		(uuid "ddff255b-a57a-4226-9f09-437c06bf25cc")
 		(property "Reference" "#PWR080"
-			(at 671.83 601.98 0)
+			(at 674.37 601.98 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -159436,7 +159596,7 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 669.29 601.9799 90)
+			(at 671.83 601.9799 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -159447,7 +159607,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 665.48 601.98 0)
+			(at 668.02 601.98 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -159458,7 +159618,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 665.48 601.98 0)
+			(at 668.02 601.98 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -159469,7 +159629,7 @@
 			)
 		)
 		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
-			(at 665.48 601.98 0)
+			(at 668.02 601.98 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
