@@ -33622,6 +33622,12 @@
 		(uuid "85b80349-fd98-4b46-a9bb-75b3f7c643fc")
 	)
 	(junction
+		(at 312.42 510.54)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "85fff353-991a-4312-9664-dfb6d1b35afd")
+	)
+	(junction
 		(at 847.09 41.91)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -33710,12 +33716,6 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "95836c9b-7d50-4c2c-b908-ea326ed28b38")
-	)
-	(junction
-		(at 312.42 510.54)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "97264d7f-7b37-4156-ba6f-bc960d3bf854")
 	)
 	(junction
 		(at 621.03 403.86)
@@ -70265,7 +70265,7 @@
 	)
 	(symbol
 		(lib_id "Device:C")
-		(at 223.52 242.57 270)
+		(at 223.52 242.57 90)
 		(mirror x)
 		(unit 1)
 		(body_style 1)
@@ -70296,8 +70296,8 @@
 				)
 			)
 		)
-		(property "Footprint" "Capacitor_THT:C_Rect_L7.0mm_W2.0mm_P5.00mm"
-			(at 219.71 241.6048 0)
+		(property "Footprint" "BigOnes:C_Rect_L7.0mm_Double2"
+			(at 227.33 243.5352 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -70627,7 +70627,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Capacitor_THT:C_Rect_L7.0mm_W2.5mm_P5.00mm"
+		(property "Footprint" "BigOnes:C_Rect_L7.0mm_Double2"
 			(at 601.0148 760.73 0)
 			(hide yes)
 			(show_name no)
@@ -95088,7 +95088,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Capacitor_THT:C_Rect_L7.0mm_W2.5mm_P5.00mm"
+		(property "Footprint" "BigOnes:C_Rect_L7.0mm_Double2"
 			(at 35.8648 648.97 0)
 			(hide yes)
 			(show_name no)
@@ -96978,7 +96978,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Capacitor_THT:C_Rect_L7.0mm_W2.0mm_P5.00mm"
+		(property "Footprint" "BigOnes:C_Rect_L7.0mm_Double2"
 			(at 242.57 508.3048 0)
 			(hide yes)
 			(show_name no)
@@ -97757,7 +97757,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Capacitor_THT:C_Rect_L7.0mm_W2.5mm_P5.00mm"
+		(property "Footprint" "BigOnes:C_Rect_L7.0mm_Double2"
 			(at 575.6148 760.73 0)
 			(hide yes)
 			(show_name no)
@@ -97839,7 +97839,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Capacitor_THT:C_Rect_L7.0mm_W2.5mm_P5.00mm"
+		(property "Footprint" "BigOnes:C_Rect_L7.0mm_Double2"
 			(at 591.5152 107.95 0)
 			(hide yes)
 			(show_name no)
@@ -100111,7 +100111,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Capacitor_THT:C_Rect_L7.0mm_W2.0mm_P5.00mm"
+		(property "Footprint" "BigOnes:C_Rect_L7.0mm_Double2"
 			(at 238.76 505.7648 0)
 			(hide yes)
 			(show_name no)
@@ -101844,7 +101844,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Capacitor_THT:C_Rect_L7.0mm_W2.5mm_P5.00mm"
+		(property "Footprint" "BigOnes:C_Rect_L7.0mm_Double2"
 			(at 589.5848 43.18 0)
 			(hide yes)
 			(show_name no)
@@ -106662,7 +106662,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "Capacitor_THT:C_Rect_L7.2mm_W2.5mm_P5.00mm_FKS2_FKP2_MKS2_MKP2"
+		(property "Footprint" "BigOnes:C_Rect_L7.0mm_Double2"
 			(at 73.3552 589.28 0)
 			(hide yes)
 			(show_name no)
@@ -109876,7 +109876,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Capacitor_THT:C_Rect_L7.0mm_W2.0mm_P5.00mm"
+		(property "Footprint" "BigOnes:C_Rect_L7.0mm_Double2"
 			(at 238.76 510.8448 0)
 			(hide yes)
 			(show_name no)
@@ -115823,7 +115823,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Capacitor_THT:C_Rect_L7.0mm_W2.5mm_P5.00mm"
+		(property "Footprint" "BigOnes:C_Rect_L7.0mm_Double2"
 			(at 73.3552 654.05 0)
 			(hide yes)
 			(show_name no)
@@ -122499,7 +122499,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Capacitor_THT:C_Rect_L7.0mm_W2.0mm_P5.00mm"
+		(property "Footprint" "BigOnes:C_Rect_L7.0mm_Double2"
 			(at 242.57 498.1448 0)
 			(hide yes)
 			(show_name no)
@@ -128332,7 +128332,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Capacitor_THT:C_Rect_L7.0mm_W2.0mm_P5.00mm"
+		(property "Footprint" "BigOnes:C_Rect_L7.0mm_Double2"
 			(at 242.57 513.3848 0)
 			(hide yes)
 			(show_name no)
@@ -142103,7 +142103,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Capacitor_THT:C_Rect_L7.0mm_W2.0mm_P5.00mm"
+		(property "Footprint" "BigOnes:C_Rect_L7.0mm_Double2"
 			(at 242.57 503.2248 0)
 			(hide yes)
 			(show_name no)
@@ -158445,7 +158445,7 @@
 	)
 	(symbol
 		(lib_id "Device:C")
-		(at 312.42 514.35 180)
+		(at 312.42 514.35 0)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -158463,7 +158463,7 @@
 				(font
 					(size 1.27 1.27)
 				)
-				(justify right)
+				(justify left)
 			)
 		)
 		(property "Value" "100pF"
@@ -158474,11 +158474,11 @@
 				(font
 					(size 1.27 1.27)
 				)
-				(justify right)
+				(justify left)
 			)
 		)
-		(property "Footprint" "Capacitor_THT:C_Rect_L7.0mm_W2.0mm_P5.00mm"
-			(at 311.4548 510.54 0)
+		(property "Footprint" "BigOnes:C_Rect_L7.0mm_Double2"
+			(at 313.3852 518.16 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -160046,7 +160046,7 @@
 	(symbol
 		(lib_id "Device:C")
 		(at 590.55 74.93 0)
-		(mirror x)
+		(mirror y)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -160056,7 +160056,7 @@
 		(dnp no)
 		(uuid "dfe99436-9a64-4095-b981-5214c5e9c46b")
 		(property "Reference" "C120"
-			(at 591.185 77.47 0)
+			(at 589.915 72.39 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -160067,7 +160067,7 @@
 			)
 		)
 		(property "Value" "C"
-			(at 591.185 72.39 0)
+			(at 589.915 77.47 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -160077,8 +160077,8 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Capacitor_THT:C_Rect_L7.0mm_W2.5mm_P5.00mm"
-			(at 591.5152 71.12 0)
+		(property "Footprint" "BigOnes:C_Rect_L7.0mm_Double2"
+			(at 589.5848 78.74 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -160979,7 +160979,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Capacitor_THT:C_Rect_L7.0mm_W2.0mm_P5.00mm"
+		(property "Footprint" "BigOnes:C_Rect_L7.0mm_Double2"
 			(at 238.76 515.9248 0)
 			(hide yes)
 			(show_name no)
@@ -163468,7 +163468,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Capacitor_THT:C_Rect_L7.0mm_W2.5mm_P5.00mm"
+		(property "Footprint" "BigOnes:C_Rect_L7.0mm_Double2"
 			(at 676.91 159.0548 0)
 			(hide yes)
 			(show_name no)
@@ -164190,7 +164190,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Capacitor_THT:C_Rect_L7.0mm_W2.5mm_P5.00mm"
+		(property "Footprint" "BigOnes:C_Rect_L7.0mm_Double2"
 			(at 588.3148 760.73 0)
 			(hide yes)
 			(show_name no)
@@ -166183,7 +166183,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "Capacitor_THT:C_Rect_L7.0mm_W2.5mm_P5.00mm"
+		(property "Footprint" "Capacitor_THT:C_Rect_L7.2mm_W2.5mm_P5.00mm_FKS2_FKP2_MKS2_MKP2"
 			(at 86.6648 440.69 0)
 			(hide yes)
 			(show_name no)
@@ -167369,7 +167369,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Capacitor_THT:C_Rect_L7.0mm_W2.0mm_P5.00mm"
+		(property "Footprint" "BigOnes:C_Rect_L7.0mm_Double2"
 			(at 238.76 500.6848 0)
 			(hide yes)
 			(show_name no)
