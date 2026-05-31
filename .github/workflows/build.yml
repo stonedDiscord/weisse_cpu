@@ -2,9 +2,10 @@ name: Build
 
 on:
   push:
-    paths: ['testrom/*.c']
+    paths: ['testrom/*']
   pull_request:
-    paths: ['testrom/*.c']
+    paths: ['testrom/*']
+  workflow_dispatch: 
 
 jobs:
   build:
@@ -37,3 +38,9 @@ jobs:
       with:
         name: testroms
         path: testrom/*.rom
+
+    - name: Update release
+      uses: softprops/action-gh-release@v3
+      with:
+        tag_name: release
+        files: testrom/*.rom
