@@ -1,0 +1,38 @@
+{
+    "$schema": "https://images.onerom.org/configs/schema.json",
+    "version": 1,
+    "name": "Weisse CPU",
+    "description": "A ROM config that covers all 3 types of CPU boards",
+    "rom_sets": [
+        {
+            "type": "single",
+            "roms": [
+                {
+                    "description": "4087",
+                    "file": "https://github.com/stonedDiscord/weisse_cpu/releases/download/release/a4087.rom",
+                    "type": "27128"
+                }
+            ]
+        },
+        {
+            "type": "single",
+            "roms": [
+                {
+                    "description": "4109",
+                    "file": "https://github.com/stonedDiscord/weisse_cpu/releases/download/release/a4109.rom",
+                    "type": "27C512"
+                }
+            ]
+        },
+        {
+            "type": "single",
+            "roms": [
+                {
+                    "description": "4040",
+                    "file": "https://github.com/stonedDiscord/weisse_cpu/releases/download/release/a4040.rom",
+                    "type": "2732"
+                }
+            ]
+        }
+    ]
+}

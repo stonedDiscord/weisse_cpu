@@ -25,12 +25,14 @@ jobs:
       run: |
         ./build.sh -DBOARD4087
         mv a.rom a4087.rom
+        truncate -s 16K a4087.rom
 
     - name: Build for 4109
       working-directory: testrom
       run: |
         ./build.sh -DBOARD4109
         mv a.rom a4109.rom
+        truncate -s 32K a4109.rom
 
     - name: Upload ROM artifact
       uses: actions/upload-artifact@v6

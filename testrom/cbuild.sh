@@ -37,3 +37,7 @@ rm mastro.zip
 7z a mastro.zip merkur_astro_pr1.ice6 merkur_astro_pr2.icd6
 
 cp mastro.zip /run/media/stoned/schrott/Roms/mame/roms/mastro.zip
+
+docker run  -v .:/src/ z88dk/z88dk sh ./build.sh -DBOARD4087
+cp a.rom disc2000.27128.ice6
+truncate -s 16K disc2000.27128.ice6
