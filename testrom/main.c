@@ -170,6 +170,7 @@ void _8085_int75() {
  */
 void _8085_int55() {
     // unused
+    enable_interrupts();
 }
 
 /**

@@ -1,4 +1,4 @@
-rm *.rom
+rm a.rom
 rm *.bin
 
 zcc +z80 -clib=8085 -crt0=crt0.asm main.c -create-app $@
