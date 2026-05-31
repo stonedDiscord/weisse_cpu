@@ -20,7 +20,7 @@
                 {
                     "description": "4109",
                     "file": "https://github.com/stonedDiscord/weisse_cpu/releases/download/release/a4109.rom",
-                    "type": "27C512"
+                    "type": "27256"
                 }
             ]
         },
@@ -30,7 +30,8 @@
                 {
                     "description": "4040",
                     "file": "https://github.com/stonedDiscord/weisse_cpu/releases/download/release/a4040.rom",
-                    "type": "2732"
+                    "type": "2732",
+                    "size_handling": "truncate"
                 }
             ]
         }
