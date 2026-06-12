@@ -89,6 +89,7 @@ void print_string(const char* str);
 void play_note(uint8_t note, uint8_t octave, uint8_t duration);
 void play_track();
 bool check_button(uint8_t button);
+bool check_button_edge(uint8_t button);
 void display_rtc_date();
 void display_rtc_time();
 
@@ -109,7 +110,14 @@ uint8_t sensor_ram[8];        // raw current sample
 uint8_t sensor_prev[8];       // previous raw sample (for debounce)
 uint8_t sensor_debounced[8];  // confirmed stable state
 uint8_t sensor_baseline[8];   // boot "rest" state - presses are deviations from this
+uint8_t pressed_prev[8];      // pressed state from previous scan (for edge detection)
+uint8_t button_edge[8];       // bits that went pressed since last scan (rising edge)
 uint8_t sensor_row = 0;
+
+// Software blink: toggle blink_flag every BLINK_PERIOD main-loop iterations.
+// Tune to taste - higher = slower blink. (Timer 5 ISR blink is not enabled.)
+#define BLINK_PERIOD 25
+uint16_t blink_counter = 0;
 
 uint8_t money_display[8];
 uint8_t service_display[8];
@@ -181,6 +189,8 @@ void calibrate_buttons() {
         sensor_baseline[row]  = sensor_ram[row];
         sensor_debounced[row] = sensor_ram[row];
         sensor_prev[row]      = sensor_ram[row];
+        pressed_prev[row]     = 0;   // nothing pressed relative to baseline yet
+        button_edge[row]      = 0;
     }
 }
 
@@ -198,6 +208,11 @@ void scan_buttons() {
         sensor_debounced[row] = (sensor_debounced[row] & ~stable)
                               | (sensor_ram[row]       &  stable);
         sensor_prev[row] = sensor_ram[row];
+
+        // rising-edge: bits pressed now (vs baseline) that were not pressed last scan
+        uint8_t pressed = sensor_debounced[row] ^ sensor_baseline[row];
+        button_edge[row] = pressed & ~pressed_prev[row];
+        pressed_prev[row] = pressed;
     }
 }
 
@@ -557,6 +572,22 @@ bool check_button(uint8_t button) {
     return ((sensor_debounced[row] ^ sensor_baseline[row]) & mask) != 0;
 }
 
+/**
+ * @brief Check whether a button was just pressed (rising edge)
+ *
+ * Returns true for one scan only, on the transition from released to pressed.
+ * Use this for menu navigation so a single physical press = a single step.
+ *
+ * @param button Button identifier (row, column, and inversion flag)
+ * @return bool true on the scan where the button became pressed
+ */
+bool check_button_edge(uint8_t button) {
+    uint8_t row = (button >> 4) & 0x07;
+    uint8_t mask = 1 << (button & 0x0F);
+
+    return (button_edge[row] & mask) != 0;
+}
+
 void display_rtc_date()
 {
     uint8_t day = rtc_get_day();
@@ -866,25 +897,26 @@ int main(void) {
         // Sample + debounce buttons - no interrupt protection needed since ISR is minimal
         scan_buttons();
 
+        // Edge-triggered: one step per physical press (fixes navigation double-stepping)
         #ifdef EMULATOR // current mame on master has the risk buttons reversed
-        bool buttonl = check_button(RUNTER01);
-        bool buttons = check_button(GEWINN);
-        bool buttonr = check_button(HOCH1);
-        bool buttonret = check_button(INIT);
+        bool buttonl = check_button_edge(RUNTER01);
+        bool buttons = check_button_edge(GEWINN);
+        bool buttonr = check_button_edge(HOCH1);
+        bool buttonret = check_button_edge(INIT);
         #else
-        bool buttonl = check_button(RUNTER01) | check_button(RISK_LEFT);
-        bool buttons = check_button(GEWINN) | check_button(STOP_MID);
-        bool buttonr = check_button(HOCH1) | check_button(RISK_RIGHT);
-        bool buttonret = check_button(INIT) | check_button(RETURN);
+        bool buttonl = check_button_edge(RUNTER01) | check_button_edge(RISK_LEFT);
+        bool buttons = check_button_edge(GEWINN) | check_button_edge(STOP_MID);
+        bool buttonr = check_button_edge(HOCH1) | check_button_edge(RISK_RIGHT);
+        bool buttonret = check_button_edge(INIT) | check_button_edge(RETURN);
         #endif
 
-        if (check_button(HW_TEST)) {
+        if (check_button_edge(HW_TEST)) {
             menu_play_music();
         }
-        if (check_button(DAUERLAUF)) {
+        if (check_button_edge(DAUERLAUF)) {
             menu_edit_date();
         }
-        if (check_button(FOUL)) {
+        if (check_button_edge(FOUL)) {
             menu_edit_time();
         }
 
@@ -900,6 +932,12 @@ int main(void) {
         if (read_status() & I8256_STATUS_RBF) {
             uint8_t rcv = read_serial_char();
             print_serial_char(rcv);
+        }
+
+        // Software blink: timer5 ISR is not enabled, so drive blink_flag here
+        if (++blink_counter >= BLINK_PERIOD) {
+            blink_counter = 0;
+            blink_flag = !blink_flag;
         }
 
         // Always refresh display every loop - blink_flag is used for effects
