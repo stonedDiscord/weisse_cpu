@@ -64,6 +64,8 @@ void _8085_int5();
 void _8085_int7();
 void _8085_int65();
 void read_sensor_matrix();
+void calibrate_buttons();
+void scan_buttons();
 void _8085_int75();
 void _8085_int55();
 void counter_out(uint8_t data);
@@ -103,7 +105,10 @@ bool time_edit_mode = false;
 int8_t selected_digit = -1;
 int8_t menu_item = 0;
 
-uint8_t sensor_ram[8];
+uint8_t sensor_ram[8];        // raw current sample
+uint8_t sensor_prev[8];       // previous raw sample (for debounce)
+uint8_t sensor_debounced[8];  // confirmed stable state
+uint8_t sensor_baseline[8];   // boot "rest" state - presses are deviations from this
 uint8_t sensor_row = 0;
 
 uint8_t money_display[8];
@@ -151,6 +156,48 @@ void _8085_int65() {
 void read_sensor_matrix() {
     for (uint8_t row = 0; row < 8; row++) {
         sensor_ram[row] = read_sram(row);
+    }
+}
+
+/**
+ * @brief Sample the button matrix at boot and remember the rest state
+ *
+ * Reads the sensor matrix twice and stores the result as the baseline.
+ * At runtime a button counts as pressed when its debounced state differs
+ * from this baseline, so the wiring polarity (active-high vs active-low)
+ * is detected automatically per machine/emulator layout.
+ *
+ * @note A button physically held during boot becomes its own baseline and
+ *       reads as released until it is released and pressed again.
+ */
+void calibrate_buttons() {
+    read_sensor_matrix();
+    for (uint8_t row = 0; row < 8; row++) {
+        sensor_prev[row] = sensor_ram[row];
+    }
+    dumb_delay(50);
+    read_sensor_matrix();
+    for (uint8_t row = 0; row < 8; row++) {
+        sensor_baseline[row]  = sensor_ram[row];
+        sensor_debounced[row] = sensor_ram[row];
+        sensor_prev[row]      = sensor_ram[row];
+    }
+}
+
+/**
+ * @brief Sample the button matrix with software debouncing
+ *
+ * Only bits that read the same as the previous scan are committed to the
+ * debounced state, so a button must be stable for two consecutive scans
+ * before its change is registered.
+ */
+void scan_buttons() {
+    read_sensor_matrix();
+    for (uint8_t row = 0; row < 8; row++) {
+        uint8_t stable = ~(sensor_ram[row] ^ sensor_prev[row]); // bits unchanged this scan
+        sensor_debounced[row] = (sensor_debounced[row] & ~stable)
+                              | (sensor_ram[row]       &  stable);
+        sensor_prev[row] = sensor_ram[row];
     }
 }
 
@@ -503,16 +550,11 @@ void play_track()
  */
 bool check_button(uint8_t button) {
     uint8_t row = (button >> 4) & 0x07;
-    uint8_t col = button & 0x0F;
-    uint8_t inverted = (button >> 7) & 0x01;
-    
-    bool button_state = (sensor_ram[row] >> col) & 0x01;
-    
-    if (inverted) {
-        return !button_state;
-    } else {
-        return button_state;
-    }
+    uint8_t mask = 1 << (button & 0x0F);
+
+    // Pressed = debounced state deviates from the boot baseline.
+    // Polarity is handled by calibration, so the inverted bit is ignored.
+    return ((sensor_debounced[row] ^ sensor_baseline[row]) & mask) != 0;
 }
 
 void display_rtc_date()
@@ -811,6 +853,8 @@ int main(void) {
 
     print_string("Test ROM Initialized\n");
 
+    calibrate_buttons();    // Sample button rest state for auto polarity detection
+
     _8085_int7();           // Initialize timer5 for blinking
     enable_interrupts();     // Enable interrupts - but handlers are now minimal!
 
@@ -819,8 +863,8 @@ int main(void) {
 
     // Infinite loop to scan the keyboard
     while (1) {
-        // Read sensor matrix - no interrupt protection needed now since ISR is minimal
-        read_sensor_matrix();
+        // Sample + debounce buttons - no interrupt protection needed since ISR is minimal
+        scan_buttons();
 
         #ifdef EMULATOR // current mame on master has the risk buttons reversed
         bool buttonl = check_button(RUNTER01);
