@@ -1,6 +1,6 @@
 #include "music.h"
 
-struct noteData track[] = {
+const struct noteData track[] = {
     { .note = NOTE_A, .octave = A7, .duration = DURATION_QUARTER, .length = 100, .lyric = "SA" },
     { .note = NOTE_A, .octave = A7, .duration = DURATION_QUARTER, .length = 100, .lyric = "KU" },
     { .note = NOTE_B, .octave = A7, .duration = DURATION_HALF,    .length = 200, .lyric = "RA " },
