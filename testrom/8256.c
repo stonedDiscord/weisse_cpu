@@ -33,6 +33,7 @@
 
 // Function prototypes
 void set_timer3(uint8_t data);
+uint8_t read_timer3();
 void set_timer5(uint8_t data);
 uint8_t read_port1();
 uint8_t read_port2();
@@ -119,6 +120,22 @@ void set_timer3(uint8_t data) {
     __asm
         OUT I8256_TIMER3
     __endasm;
+}
+
+/**
+ * @brief Read the current count of Timer 3
+ *
+ * @return uint8_t Current timer value (counts down)
+ */
+uint8_t read_timer3() {
+    uint8_t out=0xaa;
+    __asm
+        POP HL
+        IN I8256_TIMER3
+        MOV L,A
+        PUSH HL
+    __endasm;
+    return out;
 }
 
 /**

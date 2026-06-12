@@ -86,6 +86,8 @@ void wait_tx_ready();
 void print_serial_char(uint8_t txdata);
 uint8_t read_serial_char();
 void print_string(const char* str);
+void print_hex8(uint8_t v);
+void menu_8256_test();
 void play_note(uint8_t note, uint8_t octave, uint8_t duration);
 void play_track();
 bool check_button(uint8_t button);
@@ -488,6 +490,17 @@ void print_string(const char* str) {
     }
 }
 
+/**
+ * @brief Print a byte as two hex digits over the serial port
+ *
+ * @param v Byte to print
+ */
+void print_hex8(uint8_t v) {
+    const char hex[] = "0123456789ABCDEF";
+    print_serial_char(hex[(v >> 4) & 0x0F]);
+    print_serial_char(hex[v & 0x0F]);
+}
+
 void play_note(uint8_t note, uint8_t octave, uint8_t duration)
 {
     uint8_t l_notedata = 0;
@@ -818,12 +831,97 @@ void menu_all_lamps_on() {
 }
 
 /**
+ * @brief Menu option: 8256 MUART timer self-test
+ *
+ * Exercises Timer 3 of the 8256 in three ways and reports over the serial
+ * port (and on the 7-segment display):
+ *   1. Read-back: the timer must be readable and counting down.
+ *   2. Frequency: counts per RTC second, expected ~0x400 (1.024 kHz mode).
+ *   3. Interrupt: the Level 3 timer interrupt must fire (bounded by the RTC
+ *      so this can never hang, unlike a bare wait_timer3).
+ *
+ * The display shows "8256" then the measured counts/second as 4 hex digits.
+ */
+void menu_8256_test() {
+    // Label "8256" on the displays
+    write_both(7, 8); write_both(6, 2); write_both(5, 5); write_both(4, 6);
+    write_both(3, 0); write_both(2, 0); write_both(1, 0); write_both(0, 0);
+    refresh_display();
+
+    print_string("\n8256 timer test\n");
+
+    // --- Test 1: timer is readable and counting down ---
+    set_timer3(0xFF);
+    uint8_t t0 = read_timer3();
+    dumb_delay(30);
+    uint8_t t1 = read_timer3();
+    dumb_delay(30);
+    uint8_t t2 = read_timer3();
+    bool count_ok = ((uint8_t)(t0 - t1) != 0) && ((uint8_t)(t1 - t2) != 0);
+
+    print_string("readback ");
+    print_hex8(t0); print_serial_char(' ');
+    print_hex8(t1); print_serial_char(' ');
+    print_hex8(t2);
+    print_string(count_ok ? "  countdown OK\n" : "  countdown FAIL\n");
+
+    // --- Test 2: frequency vs RTC (counts per 1 second) ---
+    uint8_t s = rtc_get_seconds();
+    while (rtc_get_seconds() == s) { }   // sync to a second edge
+    s = rtc_get_seconds();
+
+    set_timer3(0xFF);
+    uint8_t last = read_timer3();
+    uint16_t counts = 0;
+    while (rtc_get_seconds() == s) {
+        uint8_t now = read_timer3();
+        counts += (uint8_t)(last - now);     // 8-bit modular: handles wrap
+        if (now < 0x10) {                    // keep it running (one-shot or auto-reload)
+            set_timer3(0xFF);
+            now = 0xFF;
+        }
+        last = now;
+    }
+    bool freq_ok = (counts > 0x320) && (counts < 0x500);  // ~0x400 +/- margin
+
+    print_string("freq ~");
+    print_hex8(counts >> 8); print_hex8(counts & 0xFF);
+    print_string(" counts/s (expect ~0400) ");
+    print_string(freq_ok ? "OK\n" : "FAIL\n");
+
+    // Show the measured count on the displays as 4 hex digits
+    write_both(3, (counts >> 12) & 0x0F);
+    write_both(2, (counts >>  8) & 0x0F);
+    write_both(1, (counts >>  4) & 0x0F);
+    write_both(0,  counts        & 0x0F);
+    refresh_display();
+
+    // --- Test 3: timer interrupt fires (bounded by RTC, cannot hang) ---
+    timer3_flag = true;
+    set_timer3(200);
+    enable_muart_interrupts(I8256_INT_L3);
+    uint8_t prev = rtc_get_seconds();
+    uint8_t ticks = 0;
+    bool int_ok = false;
+    while (ticks < 2) {                      // give it up to ~2 RTC seconds
+        if (!timer3_flag) { int_ok = true; break; }
+        uint8_t cur = rtc_get_seconds();
+        if (cur != prev) { prev = cur; ticks++; }
+    }
+    print_string(int_ok ? "interrupt OK\n" : "interrupt FAIL\n");
+
+    print_string((count_ok && freq_ok && int_ok) ? "8256 PASS\n" : "8256 FAIL\n");
+
+    dumb_delay(3000);   // hold the result on the display before returning to the menu
+}
+
+/**
  * @brief Handle normal mode menu selection
  */
 void handle_normal_mode(bool buttonl, bool buttons, bool buttonr, bool buttonret) {
     // Bounds check BEFORE any access
     if (menu_item < 0) menu_item = 0;
-    if (menu_item >= 8) menu_item = 7;
+    if (menu_item >= 9) menu_item = 8;
     
     write_both(0, menu_item);
     write_both(1, buttonl);
@@ -854,13 +952,14 @@ void handle_normal_mode(bool buttonl, bool buttons, bool buttonr, bool buttonret
             case 5: menu_clear_lamps(); break;
             case 6: menu_lamp_test(); break;
             case 7: menu_all_lamps_on(); break;
+            case 8: menu_8256_test(); break;
         }
         dumb_delay(200);
     }
 
     // Wrap menu item
-    if (menu_item < 0) menu_item = 7;
-    if (menu_item >= 8) menu_item = 0;
+    if (menu_item < 0) menu_item = 8;
+    if (menu_item >= 9) menu_item = 0;
 }
 
 /**
