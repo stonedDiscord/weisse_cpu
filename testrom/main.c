@@ -96,8 +96,8 @@ volatile struct rtc_state_t *rtc;
 #define COUNTERS    0x71
 #define SOUND       0x72
 
-bool timer3_flag = false;
-bool blink_flag = false;
+volatile bool timer3_flag = false;
+volatile bool blink_flag = false;
 bool date_edit_mode = false;
 bool time_edit_mode = false;
 int8_t selected_digit = -1;
@@ -366,11 +366,11 @@ void init_ppi() {
  *       This function assumes a 1kHz timer for millisecond delays.
  */
 void delay(uint16_t ms) {
-    uint8_t full_chunks = ms / 255;
+    uint16_t full_chunks = ms / 255;
     uint8_t remainder = ms % 255;
-    
+
     // Wait for full 255ms chunks
-    for (uint8_t i = 0; i < full_chunks; i++) {
+    for (uint16_t i = 0; i < full_chunks; i++) {
         wait_timer3(255);
     }
     
