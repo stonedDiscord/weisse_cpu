@@ -43,6 +43,25 @@
 #include "8279.c"
 #include "8256.c"
 
+// RAM bounds for the RAM size self-test.
+//   RAM_BASE      - first RAM address (matches CRT_ORG_BSS)
+//   RAM_SCAN_MAX  - one past the last address to probe (kept below any MMIO)
+//   RAM_STACK_TOP - top of the stack (matches REGISTER_SP); probes near here
+//                   are skipped so the test never clobbers its own stack frame
+#if defined(BOARD4040)
+#define RAM_BASE      0x5000
+#define RAM_SCAN_MAX  0x6000   // RTC is mapped at 0x6000
+#define RAM_STACK_TOP 0x53fc
+#elif defined(BOARD4109)
+#define RAM_BASE      0x9000
+#define RAM_SCAN_MAX  0xA000
+#define RAM_STACK_TOP 0x9ff0
+#else // BOARD4087
+#define RAM_BASE      0xc000
+#define RAM_SCAN_MAX  0x10000
+#define RAM_STACK_TOP 0xc7f0
+#endif
+
 enum COUNTER_VALS {
     COUNTERS_START_SOUND = 0x01,
     COUNTERS_GONG        = 0x02,
@@ -89,6 +108,9 @@ uint8_t read_serial_char();
 void print_string(const char* str);
 void print_hex8(uint8_t v);
 void menu_8256_test();
+void menu_8279_test();
+void menu_ram_test();
+void menu_rtc_test();
 void play_note(uint8_t note, uint8_t octave, uint8_t duration);
 void play_track();
 bool check_button(uint8_t button);
@@ -988,12 +1010,166 @@ void menu_8256_test() {
 }
 
 /**
+ * @brief Menu option: 8279 display-RAM self-test
+ *
+ * Saves the 16 bytes of display RAM, then writes several patterns (including
+ * an address-unique pattern that catches stuck address lines) and reads them
+ * back, plus an auto-increment burst. The original contents are restored and
+ * the result is reported over serial and on the display. Cancelable with the
+ * return button.
+ */
+void menu_8279_test() {
+    print_string("\n8279 display RAM test\n");
+
+    // Preserve the current display RAM so the test is non-destructive
+    uint8_t saved[16];
+    for (uint8_t a = 0; a < 16; a++) saved[a] = read_dram(a);
+
+    bool ok = true;
+    static const uint8_t patterns[4] = { 0x00, 0xFF, 0xAA, 0x55 };
+    for (uint8_t p = 0; p < 4; p++) {
+        // XOR with the address gives every cell a distinct value
+        for (uint8_t a = 0; a < 16; a++) write_dram(a, patterns[p] ^ a);
+        for (uint8_t a = 0; a < 16; a++) {
+            uint8_t expect = patterns[p] ^ a;
+            uint8_t rd = read_dram(a);
+            if (rd != expect) {
+                ok = false;
+                print_string("addr "); print_hex8(a);
+                print_string(" wrote "); print_hex8(expect);
+                print_string(" read "); print_hex8(rd);
+                print_serial_char('\n');
+            }
+        }
+        if (test_cancelled()) {
+            for (uint8_t a = 0; a < 16; a++) write_dram(a, saved[a]);
+            refresh_display();
+            print_string("cancelled\n");
+            return;
+        }
+    }
+
+    // Auto-increment write: one command, 16 sequential data writes
+    kdc_cmd_out(I8279_WRITE_DISPLAY_RAM | I8279_RW_AUTO_INCREMENT | 0);
+    for (uint8_t a = 0; a < 16; a++) kdc_data_out(0xF0 | a);
+    for (uint8_t a = 0; a < 16; a++) {
+        if (read_dram(a) != (uint8_t)(0xF0 | a)) ok = false;
+    }
+
+    // Restore the display
+    for (uint8_t a = 0; a < 16; a++) write_dram(a, saved[a]);
+    refresh_display();
+
+    print_string(ok ? "8279 PASS\n" : "8279 FAIL\n");
+    for (uint16_t i = 0; i < 2000 && !test_cancelled(); i++) dumb_delay(1);
+}
+
+/**
+ * @brief Menu option: RAM size / end detection
+ *
+ * Probes upward from RAM_BASE in 256-byte steps. Each probe is non-destructive
+ * (save, write 0xA5, read back, restore) and guarded by DI so an interrupt
+ * cannot run while a byte is borrowed. A marker at RAM_BASE detects address
+ * aliasing (mirrored RAM): if writing a high address changes the marker, the
+ * real RAM has wrapped and we stop. Probes inside the live stack window are
+ * skipped (assumed present) so the scan never corrupts its own frame.
+ *
+ * The detected top address and size are shown over serial and the size in KB
+ * is shown on the display. Cancelable with the return button.
+ */
+void menu_ram_test() {
+    print_string("\nRAM size test\n");
+
+    volatile uint8_t* base = (volatile uint8_t*)RAM_BASE;
+
+    disable_interrupts();
+    uint8_t base_save = base[0];
+    base[0] = 0x5A;                 // aliasing marker
+    enable_interrupts();
+
+    uint16_t top = RAM_BASE;        // highest address verified present
+    for (uint32_t a = RAM_BASE + 0x100; a < (uint32_t)RAM_SCAN_MAX; a += 0x100) {
+        uint16_t addr = (uint16_t)a;
+
+        // Skip the live stack window so we never overwrite our own frame
+        if (addr >= (uint16_t)(RAM_STACK_TOP - 0x100) && addr <= RAM_STACK_TOP) {
+            top = addr;
+            continue;
+        }
+
+        volatile uint8_t* p = (volatile uint8_t*)addr;
+        disable_interrupts();
+        uint8_t save = *p;
+        *p = 0xA5;
+        uint8_t rd = *p;
+        bool alias = (base[0] != 0x5A);   // did this write disturb the marker?
+        *p = save;
+        enable_interrupts();
+
+        if (rd != 0xA5 || alias) break;   // not RAM, or mirror of low RAM
+        top = addr;
+
+        if (test_cancelled()) { print_string("cancelled\n"); break; }
+    }
+
+    disable_interrupts();
+    base[0] = base_save;
+    enable_interrupts();
+
+    uint16_t size = (top - RAM_BASE) + 0x100;   // rounded to the probe step
+    uint8_t kb = (uint8_t)(size >> 10);
+
+    print_string("base "); print_hex8(RAM_BASE >> 8); print_hex8(RAM_BASE & 0xFF);
+    print_string(" top "); print_hex8(top >> 8); print_hex8(top & 0xFF);
+    print_string(" size "); print_hex8(size >> 8); print_hex8(size & 0xFF);
+    print_string(" ("); print_hex8(kb); print_string(" KB)\n");
+
+    // Show the size in KB on the display (low two hex digits)
+    write_both(7, 0x4); write_both(6, 0xa);   // crude "rA" label
+    write_both(1, (kb >> 4) & 0x0F);
+    write_both(0, kb & 0x0F);
+    refresh_display();
+    for (uint16_t i = 0; i < 2000 && !test_cancelled(); i++) dumb_delay(1);
+}
+
+/**
+ * @brief Menu option: RTC seconds-advance self-test
+ *
+ * Confirms the real-time clock is actually running by waiting for the seconds
+ * register to change, bounded by a generous timeout so a dead clock reports
+ * FAIL instead of hanging. The 8256 timer tests rely on the RTC advancing, so
+ * this isolates "is the RTC alive" from "is the timer alive". Cancelable.
+ */
+void menu_rtc_test() {
+    print_string("\nRTC seconds-advance test\n");
+
+    uint8_t s0 = rtc_get_seconds();
+    bool ok = false;
+    for (uint16_t i = 0; i < 1000; i++) {        // ~several seconds worst case
+        if (rtc_get_seconds() != s0) { ok = true; break; }
+        if (test_cancelled()) { print_string("cancelled\n"); return; }
+        dumb_delay(30);
+    }
+    uint8_t s1 = rtc_get_seconds();
+
+    print_string("seconds "); print_hex8(s0);
+    print_string(" -> "); print_hex8(s1);
+    print_serial_char('\n');
+    print_string(ok ? "RTC PASS\n" : "RTC FAIL\n");
+
+    write_both(1, (s1 >> 4) & 0x0F);
+    write_both(0, s1 & 0x0F);
+    refresh_display();
+    for (uint16_t i = 0; i < 2000 && !test_cancelled(); i++) dumb_delay(1);
+}
+
+/**
  * @brief Handle normal mode menu selection
  */
 void handle_normal_mode(bool buttonl, bool buttons, bool buttonr, bool buttonret) {
     // Bounds check BEFORE any access
     if (menu_item < 0) menu_item = 0;
-    if (menu_item >= 9) menu_item = 8;
+    if (menu_item >= 12) menu_item = 11;
     
     write_both(0, menu_item);
     write_both(1, buttonl);
@@ -1025,13 +1201,16 @@ void handle_normal_mode(bool buttonl, bool buttons, bool buttonr, bool buttonret
             case 6: menu_lamp_test(); break;
             case 7: menu_all_lamps_on(); break;
             case 8: menu_8256_test(); break;
+            case 9: menu_8279_test(); break;
+            case 10: menu_ram_test(); break;
+            case 11: menu_rtc_test(); break;
         }
         dumb_delay(200);
     }
 
     // Wrap menu item
-    if (menu_item < 0) menu_item = 8;
-    if (menu_item >= 9) menu_item = 0;
+    if (menu_item < 0) menu_item = 11;
+    if (menu_item >= 12) menu_item = 0;
 }
 
 /**

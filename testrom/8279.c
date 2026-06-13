@@ -25,6 +25,7 @@ uint8_t kdc_cmd_in();
 uint8_t kdc_data_in();
 void set_kdc_clock(uint8_t divider);
 uint8_t read_dram(uint8_t addr);
+void write_dram(uint8_t addr, uint8_t data);
 uint8_t read_sram(uint8_t addr);
 
 #define I8279_MODE_SET 0x00
@@ -168,6 +169,17 @@ void set_kdc_clock(uint8_t divider) {
 uint8_t read_dram(uint8_t addr) {
     kdc_cmd_out(I8279_READ_DISPLAY_RAM | (addr & 0x0F));
     return kdc_data_in();
+}
+
+/**
+ * @brief Write data to the 8279's display RAM
+ *
+ * @param addr Address in display RAM (0-15)
+ * @param data Data to write
+ */
+void write_dram(uint8_t addr, uint8_t data) {
+    kdc_cmd_out(I8279_WRITE_DISPLAY_RAM | (addr & 0x0F));
+    kdc_data_out(data);
 }
 
 /**
