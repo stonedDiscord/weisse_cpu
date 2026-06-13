@@ -873,17 +873,33 @@ void menu_8256_test() {
     write_both(3, 0); write_both(2, 0); write_both(1, 0); write_both(0, 0);
     refresh_display();
 
-    // Dump the current state of the 8256's parallel I/O to the lamps:
-    // Port 1 on lamp line 0, Port 2 on lamp line 1.
+    print_string("\n8256 timer test\n");
+
+    // --- Parallel I/O test (before the timer tests) ---
+    // Drive both ports fully as outputs and zero them, then flip both ports
+    // to inputs and read them back. The read-back state is shown on the lamps
+    // (Port 1 on lamp line 0, Port 2 on lamp line 1) and logged over serial.
+    set_port1_control(0x00);                 // Port 1: all pins outputs
+    set_muart_mode(I8256_MODE_PORT2C_OO);    // Port 2: both nibbles outputs
+    set_port1(0x00);                         // zero the outputs
+    set_port2(0x00);
+
+    set_port1_control(0xFF);                 // Port 1: all pins inputs
+    set_muart_mode(I8256_MODE_PORT2C_II);    // Port 2: both nibbles inputs
     uint8_t p1 = read_port1();
     uint8_t p2 = read_port2();
     write_lamps(0, p1);
     write_lamps(1, p2);
 
-    print_string("\n8256 timer test\n");
-    print_string("port1 "); print_hex8(p1);
+    print_string("parallel in: port1 "); print_hex8(p1);
     print_string(" port2 "); print_hex8(p2);
     print_serial_char('\n');
+
+    // Restore the normal MUART port configuration for the rest of the ROM
+    set_muart_mode(I8256_MODE_PORT2C_OO);
+    set_port1_control(0x70);
+    set_port2(0xFF);
+    set_port1(0x30);
 
     // --- Test 1: timer is readable and counting down ---
     set_timer3(0xFF);

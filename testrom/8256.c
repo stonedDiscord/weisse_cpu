@@ -37,6 +37,10 @@ uint8_t read_timer3();
 void set_timer5(uint8_t data);
 uint8_t read_port1();
 uint8_t read_port2();
+void set_port1(uint8_t data);
+void set_port2(uint8_t data);
+void set_port1_control(uint8_t data);
+void set_muart_mode(uint8_t data);
 void enable_muart_interrupts(uint8_t data);
 void arm_muart_interrupts(uint8_t data);
 uint8_t read_status();
@@ -180,6 +184,50 @@ uint8_t read_port2() {
         PUSH HL
     __endasm;
     return out;
+}
+
+/**
+ * @brief Write data to the 8256 MUART's Port 1
+ * @param data Value to drive on Port 1 (pins configured as outputs)
+ */
+void set_port1(uint8_t data) {
+    uint8_t test = data;
+    __asm
+        OUT I8256_PORT1
+    __endasm;
+}
+
+/**
+ * @brief Write data to the 8256 MUART's Port 2
+ * @param data Value to drive on Port 2 (pins configured as outputs)
+ */
+void set_port2(uint8_t data) {
+    uint8_t test = data;
+    __asm
+        OUT I8256_PORT2
+    __endasm;
+}
+
+/**
+ * @brief Set the Port 1 direction control register
+ * @param data Per-pin direction mask (1 = input, 0 = output)
+ */
+void set_port1_control(uint8_t data) {
+    uint8_t test = data;
+    __asm
+        OUT I8256_PORT1C
+    __endasm;
+}
+
+/**
+ * @brief Write the MODE register (Port 2 direction + counter/timer config)
+ * @param data Mode byte (see I8256_MODE_* defines)
+ */
+void set_muart_mode(uint8_t data) {
+    uint8_t test = data;
+    __asm
+        OUT I8256_MODE
+    __endasm;
 }
 
 /**
