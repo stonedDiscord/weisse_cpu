@@ -58,6 +58,7 @@ enum COUNTER_VALS {
 
 // Function prototypes
 void enable_interrupts();
+void disable_interrupts();
 void _8085_int1();
 void _8085_int3();
 void _8085_int5();
@@ -92,6 +93,7 @@ void play_note(uint8_t note, uint8_t octave, uint8_t duration);
 void play_track();
 bool check_button(uint8_t button);
 bool check_button_edge(uint8_t button);
+bool test_cancelled();
 void display_rtc_date();
 void display_rtc_time();
 
@@ -132,6 +134,15 @@ uint8_t service_display[8];
 void enable_interrupts() {
     __asm
         EI
+    __endasm;
+}
+
+/**
+ * @brief Disable Interrupts (8085 interrupt delivery off)
+ */
+void disable_interrupts() {
+    __asm
+        DI
     __endasm;
 }
 
@@ -601,6 +612,20 @@ bool check_button_edge(uint8_t button) {
     return (button_edge[row] & mask) != 0;
 }
 
+/**
+ * @brief Poll the return button so long-running tests can be cancelled
+ *
+ * Rescans the button matrix and reports a fresh press of the return / INIT
+ * button. Call this inside any blocking loop in a self-test so the user can
+ * always bail out instead of having to power-cycle.
+ *
+ * @return bool true if the user just pressed return
+ */
+bool test_cancelled() {
+    scan_buttons();
+    return check_button_edge(INIT) || check_button_edge(RETURN);
+}
+
 void display_rtc_date()
 {
     uint8_t day = rtc_get_day();
@@ -848,7 +873,17 @@ void menu_8256_test() {
     write_both(3, 0); write_both(2, 0); write_both(1, 0); write_both(0, 0);
     refresh_display();
 
+    // Dump the current state of the 8256's parallel I/O to the lamps:
+    // Port 1 on lamp line 0, Port 2 on lamp line 1.
+    uint8_t p1 = read_port1();
+    uint8_t p2 = read_port2();
+    write_lamps(0, p1);
+    write_lamps(1, p2);
+
     print_string("\n8256 timer test\n");
+    print_string("port1 "); print_hex8(p1);
+    print_string(" port2 "); print_hex8(p2);
+    print_serial_char('\n');
 
     // --- Test 1: timer is readable and counting down ---
     set_timer3(0xFF);
@@ -867,7 +902,9 @@ void menu_8256_test() {
 
     // --- Test 2: frequency vs RTC (counts per 1 second) ---
     uint8_t s = rtc_get_seconds();
-    while (rtc_get_seconds() == s) { }   // sync to a second edge
+    while (rtc_get_seconds() == s) {      // sync to a second edge
+        if (test_cancelled()) { print_string("cancelled\n"); return; }
+    }
     s = rtc_get_seconds();
 
     set_timer3(0xFF);
@@ -881,6 +918,7 @@ void menu_8256_test() {
             now = 0xFF;
         }
         last = now;
+        if (test_cancelled()) { print_string("cancelled\n"); return; }
     }
     bool freq_ok = (counts > 0x320) && (counts < 0x500);  // ~0x400 +/- margin
 
@@ -896,23 +934,41 @@ void menu_8256_test() {
     write_both(0,  counts        & 0x0F);
     refresh_display();
 
-    // --- Test 3: timer interrupt fires (bounded by RTC, cannot hang) ---
-    timer3_flag = true;
-    set_timer3(200);
-    enable_muart_interrupts(I8256_INT_L3);
+    // --- Test 3: timer raises its interrupt request (polled, cannot hang) ---
+    // We deliberately do NOT enable 8085 interrupt delivery here. Enabling the
+    // timer-3 interrupt and relying on the ISR (as wait_timer3 does) can storm
+    // the CPU if the MUART's interrupt request is never acknowledged, which
+    // starves the main loop and hangs the whole ROM regardless of any RTC
+    // bound. Instead we arm L3 in the MUART mask only (no EI) and poll the
+    // status INT bit, so a broken interrupt path reports FAIL instead of
+    // hanging.
+    disable_interrupts();                    // no 8085 vectoring while we poll
+    arm_muart_interrupts(I8256_INT_L3);      // enable L3 in MUART mask, no EI
+    set_timer3(200);                         // ~200 ms at 1.024 kHz
     uint8_t prev = rtc_get_seconds();
     uint8_t ticks = 0;
     bool int_ok = false;
     while (ticks < 2) {                      // give it up to ~2 RTC seconds
-        if (!timer3_flag) { int_ok = true; break; }
+        if (read_status() & I8256_STATUS_INT) { int_ok = true; break; }
+        if (test_cancelled()) {
+            arm_muart_interrupts(0x00);      // clean up before bailing out
+            enable_interrupts();
+            print_string("cancelled\n");
+            return;
+        }
         uint8_t cur = rtc_get_seconds();
         if (cur != prev) { prev = cur; ticks++; }
     }
+    arm_muart_interrupts(0x00);              // mask all MUART ints (clears pending delivery)
+    enable_interrupts();                     // restore 8085 delivery for the other ISRs
     print_string(int_ok ? "interrupt OK\n" : "interrupt FAIL\n");
 
     print_string((count_ok && freq_ok && int_ok) ? "8256 PASS\n" : "8256 FAIL\n");
 
-    dumb_delay(3000);   // hold the result on the display before returning to the menu
+    // Hold the result on the display, but let return cut it short
+    for (uint16_t i = 0; i < 3000 && !test_cancelled(); i++) {
+        dumb_delay(1);
+    }
 }
 
 /**

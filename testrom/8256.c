@@ -38,6 +38,7 @@ void set_timer5(uint8_t data);
 uint8_t read_port1();
 uint8_t read_port2();
 void enable_muart_interrupts(uint8_t data);
+void arm_muart_interrupts(uint8_t data);
 uint8_t read_status();
 void write_buffer(uint8_t txdata);
 uint8_t read_buffer();
@@ -191,6 +192,22 @@ void enable_muart_interrupts(uint8_t data) {
     __asm
         OUT I8256_INTEN
         EI
+    __endasm;
+}
+
+/**
+ * @brief Set the MUART interrupt-enable mask WITHOUT enabling 8085 delivery
+ *
+ * Same as enable_muart_interrupts() but omits the EI, so the chip will latch
+ * its interrupt request (visible in the status INT bit) without the CPU ever
+ * vectoring to an ISR. Use this to poll for a timer interrupt safely.
+ *
+ * @param data Interrupt enable mask
+ */
+void arm_muart_interrupts(uint8_t data) {
+    uint8_t test = data;
+    __asm
+        OUT I8256_INTEN
     __endasm;
 }
 
