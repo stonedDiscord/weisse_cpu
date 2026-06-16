@@ -111,6 +111,7 @@ void menu_8256_test();
 void menu_8279_test();
 void menu_ram_test();
 void menu_rtc_test();
+void menu_disc_readout();
 void play_note(uint8_t note, uint8_t octave, uint8_t duration);
 void play_track();
 bool check_button(uint8_t button);
@@ -1164,12 +1165,83 @@ void menu_rtc_test() {
 }
 
 /**
+ * @brief Menu option: read out the reel coded-disc optic pattern
+ *
+ * The disc machines use coded optical discs on each reel: the firmware drives a
+ * 2-phase stepper on 8256 Port 2 (two coil bits per wheel) and reads a light
+ * barrier back on Port 1 (one bit per wheel, active high). The varying slot
+ * widths around each disc encode the symbol positions - which is exactly the
+ * data MAME is missing to emulate the discs.
+ *
+ * This walks each of the 3 wheels one motor step at a time through several
+ * revolutions, sampling its light barrier after the rotor settles, and prints
+ * the optic state per step over the serial port ('#' = light/slot, '.' = dark),
+ * 48 steps per line (one revolution as the firmware counts them). Capture the
+ * serial log from a working machine to recover the disc map.
+ *
+ * Wiring (wheel w = 0..2): coils on P2 bits (2w, 2w+1), optic on P1 bit w.
+ * Port 1 bits 0-3 are already inputs (PORT1C = 0x70 set in init_muart) and the
+ * coil drive uses the firmware's 2-bit gray sequence 0,1,3,2.
+ *
+ * @note Stepping is a constant ~10 ms/step (within the firmware's dwell range,
+ *       so the motor follows reliably). Cancelable with the return/INIT button.
+ */
+void menu_disc_readout() {
+    static const uint8_t gray[4] = { 0, 1, 3, 2 };
+    const uint16_t STEPS = 240;   // ~5 revolutions at 48 steps/rev
+
+    print_string("\nDISC optic readout  (# = light, . = dark, 48/line)\n");
+
+    // Label "dISC" on the displays
+    write_both(7, 0xd); write_both(6, 1); write_both(5, 5); write_both(4, 0xc);
+    write_both(3, 0); write_both(2, 0); write_both(1, 0); write_both(0, 0);
+    refresh_display();
+
+    for (uint8_t w = 0; w < 3; w++) {
+        uint8_t shift = (uint8_t)(w * 2);
+        uint8_t optic_mask = (uint8_t)(1 << w);
+
+        print_string("\nWHEEL ");
+        print_serial_char((char)('1' + w));
+        print_string(" (P2 ");
+        print_serial_char((char)('0' + shift));
+        print_serial_char('/');
+        print_serial_char((char)('0' + shift + 1));
+        print_string(", optic P1.");
+        print_serial_char((char)('0' + w));
+        print_string(")\n");
+
+        write_both(0, (uint8_t)(w + 1));   // show current wheel on display
+        refresh_display();
+
+        for (uint16_t step = 0; step < STEPS; step++) {
+            set_port2((uint8_t)(gray[step & 3] << shift));   // drive only this wheel
+            delay(10);                                       // let the rotor step + settle
+            uint8_t optic = (read_port1() & optic_mask) ? 1 : 0;
+            print_serial_char(optic ? '#' : '.');
+            if ((step % 48) == 47)
+                print_serial_char('\n');
+            if (test_cancelled()) {
+                set_port2(0xff);
+                print_string("\ncancelled\n");
+                return;
+            }
+        }
+        set_port2(0xff);             // idle the coils between wheels
+        print_serial_char('\n');
+    }
+
+    print_string("\nDISC readout done\n");
+    for (uint16_t i = 0; i < 2000 && !test_cancelled(); i++) dumb_delay(1);
+}
+
+/**
  * @brief Handle normal mode menu selection
  */
 void handle_normal_mode(bool buttonl, bool buttons, bool buttonr, bool buttonret) {
     // Bounds check BEFORE any access
     if (menu_item < 0) menu_item = 0;
-    if (menu_item >= 12) menu_item = 11;
+    if (menu_item >= 13) menu_item = 12;
     
     write_both(0, menu_item);
     write_both(1, buttonl);
@@ -1204,13 +1276,14 @@ void handle_normal_mode(bool buttonl, bool buttons, bool buttonr, bool buttonret
             case 9: menu_8279_test(); break;
             case 10: menu_ram_test(); break;
             case 11: menu_rtc_test(); break;
+            case 12: menu_disc_readout(); break;
         }
         dumb_delay(200);
     }
 
     // Wrap menu item
-    if (menu_item < 0) menu_item = 11;
-    if (menu_item >= 12) menu_item = 0;
+    if (menu_item < 0) menu_item = 12;
+    if (menu_item >= 13) menu_item = 0;
 }
 
 /**
