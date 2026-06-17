@@ -112,6 +112,7 @@ void menu_8279_test();
 void menu_ram_test();
 void menu_rtc_test();
 void menu_disc_readout();
+void menu_coin_capture();
 void play_note(uint8_t note, uint8_t octave, uint8_t duration);
 void play_track();
 bool check_button(uint8_t button);
@@ -1236,12 +1237,64 @@ void menu_disc_readout() {
 }
 
 /**
+ * @brief Menu option: coin-acceptor sensor capture (for the MAME driver RE)
+ *
+ * Two parts, printed over serial:
+ *  1) REST state of all 8 sensor rows (TZ0..TZ7) exactly as the firmware reads
+ *     them via IN 0x50 - this nails the idle polarity of every coin light
+ *     barrier (LIM/LIG on TZ1, RUEM/LUE/ZEM/LIA on TZ2, etc).
+ *  2) A fast burst capture of the two coin rows (TZ1, TZ2) into RAM while you
+ *     drop a single coin through the validator, then a dump of every change
+ *     (index:TZ1,TZ2). That shows the order/timing of the LIM denomination,
+ *     RUEM, LIG and ZEM/Fadenfoul pulses so the emulated coin sequence can be
+ *     made faithful.
+ *
+ * Capture window is COIN_NSAMP * ~3ms; drop the coin right after the prompt.
+ * Return/INIT exits the trailing hold.
+ */
+#define COIN_NSAMP 400
+void menu_coin_capture() {
+    static uint8_t b1[COIN_NSAMP];
+    static uint8_t b2[COIN_NSAMP];
+
+    print_string("\n=== COIN CAPTURE ===\n");
+
+    // 1) idle rest state of every row, labelled
+    read_sensor_matrix();
+    print_string("REST TZ0..TZ7: ");
+    for (uint8_t r = 0; r < 8; r++) { print_hex8(sensor_ram[r]); print_serial_char(' '); }
+    print_serial_char('\n');
+
+    // 2) burst capture of the coin rows (TZ1 + TZ2) while a coin drops
+    print_string("drop ONE coin now...\n");
+    for (uint16_t i = 0; i < COIN_NSAMP; i++) {
+        b1[i] = read_sram(1);
+        b2[i] = read_sram(2);
+        dumb_delay(3);
+    }
+
+    print_string("idx:TZ1,TZ2 (changes only)\n");
+    uint8_t l1 = 0xee, l2 = 0xee;   // impossible seed so the first sample always prints
+    for (uint16_t i = 0; i < COIN_NSAMP; i++) {
+        if (b1[i] != l1 || b2[i] != l2) {
+            print_hex8((uint8_t)(i >> 8)); print_hex8((uint8_t)(i & 0xff));
+            print_serial_char(':');
+            print_hex8(b1[i]); print_serial_char(',');
+            print_hex8(b2[i]); print_serial_char('\n');
+            l1 = b1[i]; l2 = b2[i];
+        }
+    }
+    print_string("=== done ===\n");
+    for (uint16_t i = 0; i < 2000 && !test_cancelled(); i++) dumb_delay(1);
+}
+
+/**
  * @brief Handle normal mode menu selection
  */
 void handle_normal_mode(bool buttonl, bool buttons, bool buttonr, bool buttonret) {
     // Bounds check BEFORE any access
     if (menu_item < 0) menu_item = 0;
-    if (menu_item >= 13) menu_item = 12;
+    if (menu_item >= 14) menu_item = 13;
     
     write_both(0, menu_item);
     write_both(1, buttonl);
@@ -1277,13 +1330,14 @@ void handle_normal_mode(bool buttonl, bool buttons, bool buttonr, bool buttonret
             case 10: menu_ram_test(); break;
             case 11: menu_rtc_test(); break;
             case 12: menu_disc_readout(); break;
+            case 13: menu_coin_capture(); break;
         }
         dumb_delay(200);
     }
 
     // Wrap menu item
-    if (menu_item < 0) menu_item = 12;
-    if (menu_item >= 13) menu_item = 0;
+    if (menu_item < 0) menu_item = 13;
+    if (menu_item >= 14) menu_item = 0;
 }
 
 /**
