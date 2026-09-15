@@ -24,6 +24,7 @@
 #pragma output REGISTER_SP = 0x53fc
 #pragma output CRT_ORG_BSS = 0x5000
 #include "hd146818.c"
+
 #elif defined(BOARD4109)
 #define I8279_IO    0x50
 #define I8256_IO    0x60
@@ -31,7 +32,8 @@
 #pragma output REGISTER_SP = 0x9ff0
 #pragma output CRT_ORG_BSS = 0x9000
 #include "rtc62421.c"
-#else // BOARD4087
+
+#else // BOARD4087 default
 #define I8279_IO    0x50
 #define I8256_IO    0x60
 #define RTC_ADD     0x9000
@@ -52,11 +54,13 @@
 #define RAM_BASE      0x5000
 #define RAM_SCAN_MAX  0x6000   // RTC is mapped at 0x6000
 #define RAM_STACK_TOP 0x53fc
+
 #elif defined(BOARD4109)
 #define RAM_BASE      0x9000
 #define RAM_SCAN_MAX  0xA000
 #define RAM_STACK_TOP 0x9ff0
-#else // BOARD4087
+
+#else // BOARD4087 default
 #define RAM_BASE      0xc000
 #define RAM_SCAN_MAX  0x10000
 #define RAM_STACK_TOP 0xc7f0
@@ -74,52 +78,6 @@ enum COUNTER_VALS {
 };
 
 #include "track.c"
-
-// Function prototypes
-void enable_interrupts();
-void disable_interrupts();
-void _8085_int1();
-void _8085_int3();
-void _8085_int5();
-void _8085_int7();
-void _8085_int65();
-void read_sensor_matrix();
-void calibrate_buttons();
-void scan_buttons();
-void _8085_int75();
-void _8085_int55();
-void counter_out(uint8_t data);
-void set_sound(uint8_t note);
-void wait_timer3(uint8_t data);
-void write_lamps(uint8_t line, uint8_t data);
-void write_money(uint8_t digit, uint8_t value);
-void write_service(uint8_t digit, uint8_t value);
-void write_both(uint8_t digit, uint8_t value);
-void refresh_display();
-void write_serie(uint8_t number);
-void init_kdc();
-void init_muart();
-void init_ppi();
-void delay(uint16_t ms);
-void dumb_delay(uint16_t ms);
-void wait_tx_ready();
-void print_serial_char(uint8_t txdata);
-uint8_t read_serial_char();
-void print_string(const char* str);
-void print_hex8(uint8_t v);
-void menu_8256_test();
-void menu_8279_test();
-void menu_ram_test();
-void menu_rtc_test();
-void menu_disc_readout();
-void menu_coin_capture();
-void play_note(uint8_t note, uint8_t octave, uint8_t duration);
-void play_track();
-bool check_button(uint8_t button);
-bool check_button_edge(uint8_t button);
-bool test_cancelled();
-void display_rtc_date();
-void display_rtc_time();
 
 volatile struct rtc_state_t *rtc;
 
