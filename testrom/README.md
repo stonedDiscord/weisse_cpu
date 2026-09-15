@@ -7,17 +7,17 @@ Beim Hochfahren startet es einen kurzen Selbsttest der über die serielle Schnit
 Danach können über die Fronttasten des Automaten folgende Funktionen gestartet werden:
 
 | Nr | Funktion |
-| ---- | ----------------|
-| 0 | Reset |
-| 1 | Alle Lampen ein |
-| 2 | Datum setzen |
-| 3 | Musik spielen |
-| 4 | Zeit setzen |
-| 5 | Alle Lampen aus |
-| 6 | Lampentest |
-| 7 | Alle Lampen ein |
-| 8 | 8256 Test |
-| 9 | 8279 Test |
+| -- | -------- |
+| 0  | Reset |
+| 1  | Alle Lampen ein |
+| 2  | Datum setzen |
+| 3  | Musik spielen |
+| 4  | Zeit setzen |
+| 5  | Alle Lampen aus |
+| 6  | Lampentest |
+| 7  | Alle Lampen ein |
+| 8  | 8256 Test |
+| 9  | 8279 Test |
 | 10 | RAM Test |
 | 11 | RTC Test |
 | 12 | Scheiben auslesen |
